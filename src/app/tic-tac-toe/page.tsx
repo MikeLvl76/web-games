@@ -1,5 +1,7 @@
 "use client";
 
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { memo, useCallback, useState } from "react";
 
 type Tile = {
@@ -12,6 +14,7 @@ export default function TicTacToePage() {
   );
   const [player, setPlayer] = useState<Tile["symbol"]>("o");
   const [winner, setWinner] = useState<Tile["symbol"] | undefined>();
+  const router = useRouter();
 
   const handleClick = useCallback(
     (idx: number) => {
@@ -93,6 +96,12 @@ export default function TicTacToePage() {
 
   return (
     <div className="flex flex-col items-center gap-4 p-2">
+      <ArrowLeft
+        size={32}
+        color="black"
+        className="self-start hover:cursor-pointer shadow-xl/50 rounded-full p-2 w-fit h-fit"
+        onClick={() => router.push("/")}
+      />
       {winner ? (
         <div className="flex flex-col items-center gap-2">
           <h1 className="font-bold text-2xl">
