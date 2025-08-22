@@ -11,10 +11,19 @@ export default function SudokuPage() {
     Array.from({ length: 81 }, () => ({}))
   );
 
+  const [isWin, setIsWin] = useState(false);
+
   useEffect(() => {
     generate(60);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    setIsWin(
+      cells.every((cell, i) => cell.digit && isSafe(cells, i, cell.digit))
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cells]);
 
   const isSafe = useCallback(
     (current: Cell[], index: number, digit: number): boolean => {
@@ -93,39 +102,48 @@ export default function SudokuPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleLeftClick = useCallback((event: MouseEvent, idx: number) => {
-    if (event.button === 0) {
-      return setCells((prev) =>
-        prev.map((cell, i) => {
-          if (i === idx) {
-            return {
-              ...cell,
-              digit: cell.digit && cell.digit === 9 ? 1 : (cell.digit ?? 0) + 1,
-            };
-          }
-          return cell;
-        })
-      );
-    }
-  }, []);
+  const handleLeftClick = useCallback(
+    (event: MouseEvent, idx: number) => {
+      if (isWin) return;
+      if (event.button === 0) {
+        return setCells((prev) =>
+          prev.map((cell, i) => {
+            if (i === idx) {
+              return {
+                ...cell,
+                digit:
+                  cell.digit && cell.digit === 9 ? 1 : (cell.digit ?? 0) + 1,
+              };
+            }
+            return cell;
+          })
+        );
+      }
+    },
+    [isWin]
+  );
 
-  const handleRightClick = useCallback((event: MouseEvent, idx: number) => {
-    event.preventDefault();
-    if (event.button === 2) {
-      return setCells((prev) =>
-        prev.map((cell, i) => {
-          if (i === idx) {
-            return {
-              ...cell,
-              digit:
-                cell.digit && cell.digit === 1 ? 9 : (cell.digit ?? 10) - 1,
-            };
-          }
-          return cell;
-        })
-      );
-    }
-  }, []);
+  const handleRightClick = useCallback(
+    (event: MouseEvent, idx: number) => {
+      event.preventDefault();
+      if (isWin) return;
+      if (event.button === 2) {
+        return setCells((prev) =>
+          prev.map((cell, i) => {
+            if (i === idx) {
+              return {
+                ...cell,
+                digit:
+                  cell.digit && cell.digit === 1 ? 9 : (cell.digit ?? 10) - 1,
+              };
+            }
+            return cell;
+          })
+        );
+      }
+    },
+    [isWin]
+  );
 
   const Grid = memo(({ cells }: { cells: Cell[] }) => (
     <div className="grid grid-cols-9">
@@ -147,10 +165,22 @@ export default function SudokuPage() {
 
   return (
     <div className="flex flex-col items-center gap-4 p-2">
-      <h1 className="text-center font-bold text-xl">
-        Click in a cell to increase/decrease digit. Use mouse left button to
-        increase and mouse right button to decrease.
-      </h1>
+      {isWin ? (
+        <div className="flex flex-col gap-2 items-center">
+          <h2 className="font-bold text-x1 text-center">You win!</h2>
+          <button
+            onClick={() => generate(60)}
+            className="bg-blue-500 text-center text-white w-fit h-fit p-2 rounded-sm hover:cursor-pointer"
+          >
+            Restart
+          </button>
+        </div>
+      ) : (
+        <h1 className="text-center font-bold text-xl">
+          Click in a cell to increase/decrease digit. Use mouse left button to
+          increase and mouse right button to decrease.
+        </h1>
+      )}
       <Grid cells={cells} />
     </div>
   );
