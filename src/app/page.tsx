@@ -3,7 +3,8 @@ import Link from "next/link";
 export default function Home() {
   const URLs = [
     { name: "Tic Tac Toe", url: "/tic-tac-toe" },
-    ...Array.from({ length: 19 }, (_, k) => ({
+    { name: "Sudoku", url: "/sudoku" },
+    ...Array.from({ length: 18 }, (_, k) => ({
       name: `Item ${k + 1}`,
       url: "#",
     })),
