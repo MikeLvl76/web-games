@@ -83,14 +83,28 @@ export default function TicTacToePage() {
       ))}
     </div>
   ));
-  Board.displayName = "Board;";
+  Board.displayName = "Board";
+
+  const reset = () => {
+    setTiles(Array.from({ length: 9 }, () => ({})));
+    setWinner(undefined);
+    setPlayer("o");
+  };
 
   return (
     <div className="flex flex-col items-center gap-4 p-2">
       {winner ? (
-        <h1 className="font-bold text-2xl">
-          {winner === "o" ? "Player 1" : "Player 2"} wins!
-        </h1>
+        <div className="flex flex-col items-center gap-2">
+          <h1 className="font-bold text-2xl">
+            {winner === "o" ? "Player 1" : "Player 2"} wins!
+          </h1>
+          <button
+            onClick={reset}
+            className="bg-blue-500 text-center text-white w-fit h-fit p-2 rounded-sm hover:cursor-pointer"
+          >
+            Restart
+          </button>
+        </div>
       ) : (
         <h1 className="font-bold text-2xl">
           {player === "o" ? "Player 1" : "Player 2"} turn
