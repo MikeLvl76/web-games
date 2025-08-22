@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState } from "react";
+import { memo, useState, MouseEvent, useCallback } from "react";
 
 type Cell = {
   digit?: number;
@@ -11,12 +11,47 @@ export default function SudokuPage() {
     Array.from({ length: 81 }, () => ({}))
   );
 
+  const handleLeftClick = useCallback((event: MouseEvent, idx: number) => {
+    if (event.button === 0) {
+      return setCells((prev) =>
+        prev.map((cell, i) => {
+          if (i === idx) {
+            return {
+              ...cell,
+              digit: cell.digit && cell.digit === 9 ? 1 : (cell.digit ?? 0) + 1,
+            };
+          }
+          return cell;
+        })
+      );
+    }
+  }, []);
+
+  const handleRightClick = useCallback((event: MouseEvent, idx: number) => {
+    event.preventDefault();
+    if (event.button === 2) {
+      return setCells((prev) =>
+        prev.map((cell, i) => {
+          if (i === idx) {
+            return {
+              ...cell,
+              digit:
+                cell.digit && cell.digit === 1 ? 9 : (cell.digit ?? 10) - 1,
+            };
+          }
+          return cell;
+        })
+      );
+    }
+  }, []);
+
   const Grid = memo(({ cells }: { cells: Cell[] }) => (
     <div className="grid grid-cols-9">
       {cells.map(({ digit }, idx) => (
         <span
-          className="flex w-16 h-16 border-1 border-black hover:cursor-pointer text-sm text-center justify-center items-center"
-          //onClick={() => handleClick(idx)}
+          className="flex w-16 h-16 border-1 border-black hover:cursor-pointer text-2xl text-center justify-center items-center select-none"
+          onClick={(e) => handleLeftClick(e, idx)}
+          onContextMenu={(e) => handleRightClick(e, idx)}
           key={idx}
         >
           {digit ?? ""}
