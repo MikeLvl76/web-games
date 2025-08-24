@@ -4,7 +4,8 @@ export default function Home() {
   const URLs = [
     { name: "Tic Tac Toe", url: "/tic-tac-toe" },
     { name: "Sudoku", url: "/sudoku" },
-    ...Array.from({ length: 18 }, (_, k) => ({
+    { name: "Checkers", url: "/checkers" },
+    ...Array.from({ length: 17 }, (_, k) => ({
       name: `Item ${k + 1}`,
       url: "#",
     })),
