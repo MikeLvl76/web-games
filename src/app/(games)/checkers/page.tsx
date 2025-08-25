@@ -8,65 +8,126 @@ type Tile = {
 };
 
 export default function CheckersPage() {
-  const [tiles, setTiles] = useState<Tile[]>(Array(64).fill({}));
+  const [tiles, setTiles] = useState<Tile[]>([]);
   const [pieces, setPieces] = useState<Tile[]>(
     Array(12).fill({ piece: "pawn", pieceColor: "black" })
   );
   const [oppPieces, setOppPieces] = useState<Tile[]>(
     Array(12).fill({ piece: "pawn", pieceColor: "white" })
   );
+  const [nextMoves, setNextMoves] = useState<number[]>([]);
+  const [selectedIdx, setSelectedIdx] = useState(-1);
 
   const generate = useCallback(() => {
-    const current = [...tiles];
+    const _tiles = Array(64).fill({});
     let index = 0,
       oppIndex = 0;
 
-    for (let i = 0; i < current.length; i++) {
+    for (let i = 0; i < _tiles.length; i++) {
       const row = Math.floor(i / 8);
       const col = i % 8;
 
       if ((row + col) % 2 === 0 && oppIndex < oppPieces.length) {
-        current[i] = oppPieces[oppIndex];
+        _tiles[i] = oppPieces[oppIndex];
         oppIndex++;
       }
 
       if (i >= 40) {
         if ((row + col) % 2 === 0 && index < pieces.length) {
-          current[i] = pieces[index];
+          _tiles[i] = pieces[index];
           index++;
         }
       }
     }
 
-    return current;
-  }, [oppPieces, pieces, tiles]);
+    return _tiles;
+  }, [oppPieces, pieces]);
 
   useEffect(() => {
     setTiles(generate());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    console.log(nextMoves);
+  }, [nextMoves]);
+
+  const handleClick = useCallback(
+    (idx: number, tile: Tile) => {
+      const rowSize = 8;
+      setSelectedIdx(idx);
+      setNextMoves([]);
+
+      if (tile.piece === "pawn") {
+        const dirs =
+          tile.pieceColor === "black"
+            ? [
+                [-1, -1], // top left diag
+                [-1, 1], // top right diag
+              ]
+            : [
+                [1, -1], // bottom left diag
+                [1, 1], // bottom right diag
+              ];
+
+        for (const [dr, dc] of dirs) {
+          const row = Math.floor(idx / rowSize) + dr;
+          const col = (idx % rowSize) + dc;
+
+          if (row >= 0 && row < rowSize && col >= 0 && col < rowSize) {
+            const tile = tiles[row * rowSize + col];
+            if (tile && !tile.piece) {
+              setNextMoves((prev) => [...prev, row * rowSize + col]);
+            } else {
+              // TODO: handle capture
+            }
+          }
+        }
+      }
+    },
+    [tiles]
+  );
+
+  const Tile = memo(({ tile, idx }: { tile: Tile; idx: number }) => {
+    const alternatingBg =
+      (Math.floor(idx / 8) + (idx % 8)) % 2 === 0
+        ? "bg-amber-200"
+        : "bg-amber-900";
+
+    const alternatingPieceBg = `hover:border-amber-400 hover:border-4 ${
+      tile.pieceColor === "black"
+        ? "bg-black"
+        : "bg-white border-1 border-black"
+    } ${selectedIdx === idx && "border-4 border-green-400"}`;
+
+    return (
+      <span
+        className={`flex w-20 h-20 border-1 border-black font-bold text-2xl text-center justify-center items-center select-none ${alternatingBg}`}
+        key={idx}
+      >
+        {nextMoves.includes(idx) ? (
+          <div
+            onClick={() => handleClick(idx, tile)}
+            className={`w-4 h-4 rounded-full hover:cursor-pointer bg-green-500`}
+          />
+        ) : (
+          tile.piece &&
+          tile.pieceColor && (
+            <div
+              onClick={() => handleClick(idx, tile)}
+              className={`w-12 h-12 rounded-full hover:cursor-pointer ${alternatingPieceBg}`}
+            />
+          )
+        )}
+      </span>
+    );
+  });
+  Tile.displayName = "Tile";
+
   const Board = memo(({ tiles }: { tiles: Tile[] }) => (
     <div className="grid grid-cols-8">
       {tiles.map((tile, idx) => (
-        <span
-          className={`flex w-20 h-20 border-1 border-black hover:border-amber-400 hover:border-4 hover:cursor-pointer font-bold text-2xl text-center justify-center items-center select-none ${
-            (Math.floor(idx / 8) + (idx % 8)) % 2 === 0
-              ? "bg-amber-200"
-              : "bg-amber-900"
-          }`}
-          key={idx}
-        >
-          {tile.piece && tile.pieceColor && (
-            <div
-              className={`w-12 h-12 rounded-full ${
-                tile.pieceColor === "black"
-                  ? "bg-black border-1 border-white"
-                  : "bg-white border-1 border-black"
-              }`}
-            />
-          )}
-        </span>
+        <Tile tile={tile} idx={idx} key={idx} />
       ))}
     </div>
   ));
