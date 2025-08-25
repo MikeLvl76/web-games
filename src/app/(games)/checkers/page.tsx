@@ -48,11 +48,10 @@ export default function CheckersPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleClick = useCallback(
+  const computeMoves = useCallback(
     (idx: number, tile: Tile) => {
       const rowSize = 8;
-      setSelectedIdx(idx);
-      const moves = [];
+      const moves: number[] = [];
 
       if (tile.piece === "pawn") {
         const dirs =
@@ -142,9 +141,41 @@ export default function CheckersPage() {
           }
         }
       }
-      setNextMoves(moves);
+
+      return moves;
     },
     [tiles]
+  );
+
+  const movePiece = (fromIdx: number, toIdx: number) => {
+    setTiles((prevTiles) => {
+      const _tiles = [...prevTiles];
+      const origin = _tiles[fromIdx];
+      _tiles[fromIdx] = { ..._tiles[toIdx] };
+      _tiles[toIdx] = origin;
+      return _tiles;
+    });
+  };
+
+  const handleClick = useCallback(
+    (idx: number, tile: Tile) => {
+      if (selectedIdx === -1 && tile.piece) {
+        setSelectedIdx(idx);
+        setNextMoves(computeMoves(idx, tile));
+        return;
+      }
+
+      if (selectedIdx !== -1 && !tile.piece && nextMoves.includes(idx)) {
+        movePiece(selectedIdx, idx);
+        setSelectedIdx(-1);
+        setNextMoves([]);
+        return;
+      }
+
+      setSelectedIdx(-1);
+      setNextMoves([]);
+    },
+    [computeMoves, nextMoves, selectedIdx]
   );
 
   const Tile = memo(({ tile, idx }: { tile: Tile; idx: number }) => {
