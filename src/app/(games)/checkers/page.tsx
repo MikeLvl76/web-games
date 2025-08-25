@@ -48,15 +48,11 @@ export default function CheckersPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    console.log(nextMoves);
-  }, [nextMoves]);
-
   const handleClick = useCallback(
     (idx: number, tile: Tile) => {
       const rowSize = 8;
       setSelectedIdx(idx);
-      setNextMoves([]);
+      const moves = [];
 
       if (tile.piece === "pawn") {
         const dirs =
@@ -76,14 +72,77 @@ export default function CheckersPage() {
 
           if (row >= 0 && row < rowSize && col >= 0 && col < rowSize) {
             const tile = tiles[row * rowSize + col];
-            if (tile && !tile.piece) {
-              setNextMoves((prev) => [...prev, row * rowSize + col]);
+            if (!tile.piece) {
+              moves.push(row * rowSize + col);
             } else {
-              // TODO: handle capture
+              const nextRow = row + dr;
+              const nextCol = col + dc;
+
+              if (
+                nextRow >= 0 &&
+                nextRow < rowSize &&
+                nextCol >= 0 &&
+                nextCol < rowSize
+              ) {
+                const jumpTile = tiles[nextRow * rowSize + nextCol];
+                if (
+                  tile.pieceColor !== tiles[idx].pieceColor &&
+                  !jumpTile.piece
+                ) {
+                  moves.push(nextRow * rowSize + nextCol);
+                }
+              }
+            }
+          }
+        }
+      } else if (tile.piece === "dame") {
+        const dirs = [
+          [-1, -1], // top-left
+          [-1, 1], // top-right
+          [1, -1], // bottom-left
+          [1, 1], // bottom-right
+        ];
+
+        for (const [dr, dc] of dirs) {
+          let row = Math.floor(idx / rowSize);
+          let col = idx % rowSize;
+
+          while (true) {
+            row += dr;
+            col += dc;
+
+            if (row < 0 || row >= rowSize || col < 0 || col >= rowSize) break;
+
+            const index = row * rowSize + col;
+            const tile = tiles[index];
+
+            if (!tile.piece) {
+              moves.push(index);
+              continue;
+            } else {
+              const nextRow = row + dr;
+              const nextCol = col + dc;
+
+              if (
+                nextRow >= 0 &&
+                nextRow < rowSize &&
+                nextCol >= 0 &&
+                nextCol < rowSize
+              ) {
+                const jumpTile = tiles[nextRow * rowSize + nextCol];
+                if (
+                  tile.pieceColor !== tiles[idx].pieceColor &&
+                  !jumpTile.piece
+                ) {
+                  moves.push(nextRow * rowSize + nextCol);
+                }
+              }
+              break;
             }
           }
         }
       }
+      setNextMoves(moves);
     },
     [tiles]
   );
