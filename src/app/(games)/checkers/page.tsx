@@ -5,21 +5,35 @@ import { memo, useCallback, useEffect, useState } from "react";
 type Tile = {
   piece?: "pawn" | "dame";
   pieceColor?: "black" | "white";
+  boardIndex?: number;
+};
+
+type NextMove = {
+  indices: number[];
+  captures: { targetIdx: number; jumpIdx: number }[];
 };
 
 export default function CheckersPage() {
   const [tiles, setTiles] = useState<Tile[]>([]);
-  const [pieces, setPieces] = useState<Tile[]>(
-    Array(12).fill({ piece: "pawn", pieceColor: "black" })
-  );
-  const [oppPieces, setOppPieces] = useState<Tile[]>(
-    Array(12).fill({ piece: "pawn", pieceColor: "white" })
-  );
-  const [nextMoves, setNextMoves] = useState<number[]>([]);
+  const [pieces, setPieces] = useState<Tile[]>([]);
+  const [oppPieces, setOppPieces] = useState<Tile[]>([]);
+  const [nextMove, setNextMove] = useState<NextMove>({
+    indices: [],
+    captures: [],
+  });
   const [selectedIdx, setSelectedIdx] = useState(-1);
 
   const generate = useCallback(() => {
-    const _tiles = Array(64).fill({});
+    const _tiles: Tile[] = Array(64).fill({});
+    const _pieces: Tile[] = Array(12).fill({
+      piece: "pawn",
+      pieceColor: "black",
+    });
+    const _oppPieces: Tile[] = Array(12).fill({
+      piece: "pawn",
+      pieceColor: "white",
+    });
+
     let index = 0,
       oppIndex = 0;
 
@@ -27,31 +41,38 @@ export default function CheckersPage() {
       const row = Math.floor(i / 8);
       const col = i % 8;
 
-      if ((row + col) % 2 === 0 && oppIndex < oppPieces.length) {
-        _tiles[i] = oppPieces[oppIndex];
+      if ((row + col) % 2 === 0 && oppIndex < _oppPieces.length) {
+        _oppPieces[oppIndex].boardIndex = i;
+        _tiles[i] = _oppPieces[oppIndex];
+
         oppIndex++;
       }
 
       if (i >= 40) {
-        if ((row + col) % 2 === 0 && index < pieces.length) {
-          _tiles[i] = pieces[index];
+        if ((row + col) % 2 === 0 && index < _pieces.length) {
+          _pieces[index].boardIndex = i;
+          _tiles[i] = _pieces[index];
+
           index++;
         }
       }
     }
 
-    return _tiles;
-  }, [oppPieces, pieces]);
+    return [_tiles, _pieces, _oppPieces];
+  }, []);
 
   useEffect(() => {
-    setTiles(generate());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const [_tiles, _pieces, _oppPieces] = generate();
+    setTiles(_tiles);
+    setPieces(_pieces);
+    setOppPieces(_oppPieces);
+  }, [generate]);
 
   const computeMoves = useCallback(
     (idx: number, tile: Tile) => {
       const rowSize = 8;
-      const moves: number[] = [];
+      const indices: number[] = [];
+      const captures: NextMove["captures"] = [];
 
       if (tile.piece === "pawn") {
         const dirs =
@@ -70,9 +91,11 @@ export default function CheckersPage() {
           const col = (idx % rowSize) + dc;
 
           if (row >= 0 && row < rowSize && col >= 0 && col < rowSize) {
-            const tile = tiles[row * rowSize + col];
-            if (!tile.piece) {
-              moves.push(row * rowSize + col);
+            const neighborIdx = row * rowSize + col;
+            const neighbor = tiles[neighborIdx];
+
+            if (!neighbor.piece) {
+              indices.push(neighborIdx);
             } else {
               const nextRow = row + dr;
               const nextCol = col + dc;
@@ -83,12 +106,15 @@ export default function CheckersPage() {
                 nextCol >= 0 &&
                 nextCol < rowSize
               ) {
-                const jumpTile = tiles[nextRow * rowSize + nextCol];
+                const jumpIdx = nextRow * rowSize + nextCol;
+                const jumpTile = tiles[jumpIdx];
+
                 if (
-                  tile.pieceColor !== tiles[idx].pieceColor &&
+                  neighbor.pieceColor !== tile.pieceColor &&
                   !jumpTile.piece
                 ) {
-                  moves.push(nextRow * rowSize + nextCol);
+                  indices.push(jumpIdx);
+                  captures.push({ targetIdx: neighborIdx, jumpIdx });
                 }
               }
             }
@@ -112,11 +138,11 @@ export default function CheckersPage() {
 
             if (row < 0 || row >= rowSize || col < 0 || col >= rowSize) break;
 
-            const index = row * rowSize + col;
-            const tile = tiles[index];
+            const neighborIdx = row * rowSize + col;
+            const neighbor = tiles[neighborIdx];
 
-            if (!tile.piece) {
-              moves.push(index);
+            if (!neighbor.piece) {
+              indices.push(neighborIdx);
               continue;
             } else {
               const nextRow = row + dr;
@@ -128,12 +154,15 @@ export default function CheckersPage() {
                 nextCol >= 0 &&
                 nextCol < rowSize
               ) {
-                const jumpTile = tiles[nextRow * rowSize + nextCol];
+                const jumpIdx = nextRow * rowSize + nextCol;
+                const jumpTile = tiles[jumpIdx];
+
                 if (
-                  tile.pieceColor !== tiles[idx].pieceColor &&
+                  neighbor.pieceColor !== tile.pieceColor &&
                   !jumpTile.piece
                 ) {
-                  moves.push(nextRow * rowSize + nextCol);
+                  indices.push(jumpIdx);
+                  captures.push({ targetIdx: neighborIdx, jumpIdx });
                 }
               }
               break;
@@ -142,17 +171,43 @@ export default function CheckersPage() {
         }
       }
 
-      return moves;
+      return { indices, captures } satisfies NextMove;
     },
     [tiles]
   );
 
-  const movePiece = (fromIdx: number, toIdx: number) => {
+  const movePiece = (
+    fromIdx: number,
+    toIdx: number,
+    captures: NextMove["captures"]
+  ) => {
     setTiles((prevTiles) => {
       const _tiles = [...prevTiles];
       const origin = _tiles[fromIdx];
-      _tiles[fromIdx] = { ..._tiles[toIdx] };
-      _tiles[toIdx] = origin;
+
+      const capture = captures.find((c) => c.jumpIdx === toIdx);
+
+      if (capture) {
+        const target = _tiles[capture.targetIdx];
+
+        _tiles[capture.targetIdx] = {};
+        _tiles[fromIdx] = {};
+        _tiles[toIdx] = origin;
+
+        if (target.pieceColor === "black") {
+          setPieces((prev) =>
+            prev.filter((p) => p.boardIndex !== capture.targetIdx)
+          );
+        } else if (target.pieceColor === "white") {
+          setOppPieces((prev) =>
+            prev.filter((p) => p.boardIndex !== capture.targetIdx)
+          );
+        }
+      } else {
+        _tiles[fromIdx] = {};
+        _tiles[toIdx] = origin;
+      }
+
       return _tiles;
     });
   };
@@ -161,21 +216,21 @@ export default function CheckersPage() {
     (idx: number, tile: Tile) => {
       if (selectedIdx === -1 && tile.piece) {
         setSelectedIdx(idx);
-        setNextMoves(computeMoves(idx, tile));
+        setNextMove(computeMoves(idx, tile));
         return;
       }
 
-      if (selectedIdx !== -1 && !tile.piece && nextMoves.includes(idx)) {
-        movePiece(selectedIdx, idx);
+      if (selectedIdx !== -1 && !tile.piece && nextMove.indices.includes(idx)) {
+        movePiece(selectedIdx, idx, nextMove.captures);
         setSelectedIdx(-1);
-        setNextMoves([]);
+        setNextMove({ indices: [], captures: [] });
         return;
       }
 
       setSelectedIdx(-1);
-      setNextMoves([]);
+      setNextMove({ indices: [], captures: [] });
     },
-    [computeMoves, nextMoves, selectedIdx]
+    [computeMoves, nextMove, selectedIdx]
   );
 
   const Tile = memo(({ tile, idx }: { tile: Tile; idx: number }) => {
@@ -195,7 +250,7 @@ export default function CheckersPage() {
         className={`flex w-20 h-20 border-1 border-black font-bold text-2xl text-center justify-center items-center select-none ${alternatingBg}`}
         key={idx}
       >
-        {nextMoves.includes(idx) ? (
+        {nextMove.indices.includes(idx) ? (
           <div
             onClick={() => handleClick(idx, tile)}
             className={`w-4 h-4 rounded-full hover:cursor-pointer bg-green-500`}
