@@ -26,6 +26,7 @@ export default function CheckersPage() {
   const [playerTurnColor, setPlayerTurnColor] =
     useState<Tile["pieceColor"]>("black");
   const [canContinue, setCanContinue] = useState(false);
+  const [winner, setWinner] = useState<Tile["pieceColor"]>();
 
   const generate = useCallback(() => {
     const _tiles: Tile[] = Array(64).fill({});
@@ -65,12 +66,21 @@ export default function CheckersPage() {
     return [_tiles, _pieces, _oppPieces];
   }, []);
 
-  useEffect(() => {
+  const init = useCallback(() => {
     const [_tiles, _pieces, _oppPieces] = generate();
     setTiles(_tiles);
     setPieces(_pieces);
     setOppPieces(_oppPieces);
   }, [generate]);
+
+  useEffect(() => {
+    init();
+  }, [generate, init]);
+
+  const checkWinner = useCallback(() => {
+    if (pieces.length === 0) setWinner("white");
+    if (oppPieces.length === 0) setWinner("black");
+  }, [oppPieces.length, pieces.length]);
 
   const computeMoves = useCallback(
     (idx: number, tile: Tile) => {
@@ -312,6 +322,8 @@ export default function CheckersPage() {
 
   const handleClick = useCallback(
     (idx: number, tile: Tile) => {
+      if (winner) return;
+
       if (selectedIdx === -1 && tile.piece) {
         setSelectedIdx(idx);
         setNextMove(computeMoves(idx, tile));
@@ -325,10 +337,19 @@ export default function CheckersPage() {
         return;
       }
 
+      checkWinner();
       setSelectedIdx(-1);
       setNextMove({ indices: [], captures: [] });
     },
-    [computeMoves, movePiece, nextMove.captures, nextMove.indices, selectedIdx]
+    [
+      checkWinner,
+      computeMoves,
+      movePiece,
+      nextMove.captures,
+      nextMove.indices,
+      selectedIdx,
+      winner,
+    ]
   );
 
   const Tile = memo(({ tile, idx }: { tile: Tile; idx: number }) => {
@@ -361,7 +382,7 @@ export default function CheckersPage() {
 
     return (
       <span
-        className={`flex w-20 h-20 border-1 border-black font-bold text-2xl text-center justify-center items-center select-none ${tileBg}`}
+        className={`flex w-18 h-18 border-1 border-black font-bold text-2xl text-center justify-center items-center select-none ${tileBg}`}
         key={idx}
         onClick={() =>
           canMoveHere || tile.piece ? handleClick(idx, tile) : undefined
@@ -387,28 +408,52 @@ export default function CheckersPage() {
   Board.displayName = "Board";
 
   return (
-    <div className="flex flex-col items-center gap-4 p-2">
+    <div className="flex flex-col items-center gap-2 p-2">
       <div className="flex flex-row items-center justify-between p-2 w-full">
-        <h1 className="text-2xl font-bold text-center">
-          {playerTurnColor === "black"
-            ? "Turn of Player 1"
-            : "Turn of Player 2"}
-        </h1>
-        {canContinue && (
-          <button
-            onClick={() => {
-              setCanContinue(false);
-              setPlayerTurnColor((prev) =>
-                prev === "black" ? "white" : "black"
-              );
-            }}
-            className="w-fit h-fit p-2 rounded-sm bg-blue-500 text-white"
-          >
-            End turn
-          </button>
+        {winner ? (
+          <>
+            <h1 className="text-2xl font-bold text-center">
+              {winner === "black" ? "Black" : "White"} wins!
+            </h1>
+            <button
+              onClick={() => {
+                init();
+                setCanContinue(false);
+                setPlayerTurnColor(() =>
+                  winner === "black" ? "white" : "black"
+                );
+                setWinner(undefined);
+                setSelectedIdx(-1);
+                setNextMove({ indices: [], captures: [] });
+              }}
+              className="w-fit h-fit p-2 rounded-sm bg-blue-500 text-white"
+            >
+              Restart
+            </button>
+          </>
+        ) : (
+          <>
+            <h1 className="text-2xl font-bold text-center">
+              {playerTurnColor === "black"
+                ? "Turn of Player 1"
+                : "Turn of Player 2"}
+            </h1>
+            {canContinue && (
+              <button
+                onClick={() => {
+                  setCanContinue(false);
+                  setPlayerTurnColor((prev) =>
+                    prev === "black" ? "white" : "black"
+                  );
+                }}
+                className="w-fit h-fit p-2 rounded-sm bg-blue-500 text-white"
+              >
+                End turn
+              </button>
+            )}
+          </>
         )}
       </div>
-
       <Board tiles={tiles} />
     </div>
   );
