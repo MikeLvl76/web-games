@@ -10,7 +10,7 @@ type Tile = {
 
 type NextMove = {
   indices: number[];
-  captures: { targetIdx: number; jumpIdx: number }[];
+  captures: { fromIdx: number; targetIdx: number; jumpIdx: number }[];
 };
 
 export default function CheckersPage() {
@@ -22,6 +22,9 @@ export default function CheckersPage() {
     captures: [],
   });
   const [selectedIdx, setSelectedIdx] = useState(-1);
+  const [playerTurnColor, setPlayerTurnColor] =
+    useState<Tile["pieceColor"]>("black");
+  const [canContinue, setCanContinue] = useState(false);
 
   const generate = useCallback(() => {
     const _tiles: Tile[] = Array(64).fill({});
@@ -114,7 +117,11 @@ export default function CheckersPage() {
                   !jumpTile.piece
                 ) {
                   indices.push(jumpIdx);
-                  captures.push({ targetIdx: neighborIdx, jumpIdx });
+                  captures.push({
+                    fromIdx: idx,
+                    targetIdx: neighborIdx,
+                    jumpIdx,
+                  });
                 }
               }
             }
@@ -162,7 +169,11 @@ export default function CheckersPage() {
                   !jumpTile.piece
                 ) {
                   indices.push(jumpIdx);
-                  captures.push({ targetIdx: neighborIdx, jumpIdx });
+                  captures.push({
+                    fromIdx: idx,
+                    targetIdx: neighborIdx,
+                    jumpIdx,
+                  });
                 }
               }
               break;
@@ -176,14 +187,63 @@ export default function CheckersPage() {
     [tiles]
   );
 
-  const movePiece = (
-    fromIdx: number,
-    toIdx: number,
-    captures: NextMove["captures"]
-  ) => {
-    setTiles((prevTiles) => {
-      const _tiles = [...prevTiles];
+  function getFollowUpJumps(
+    idx: number,
+    tiles: Tile[],
+    color: Tile["pieceColor"]
+  ) {
+    const rowSize = 8;
+    const directions =
+      color === "black"
+        ? [
+            [-1, -1],
+            [-1, 1],
+          ]
+        : [
+            [1, -1],
+            [1, 1],
+          ];
+    const jumps: NextMove["captures"] = [];
+
+    for (const [dr, dc] of directions) {
+      const row = Math.floor(idx / rowSize);
+      const col = idx % rowSize;
+      const nRow = row + dr;
+      const nCol = col + dc;
+
+      if (nRow < 0 || nRow >= rowSize || nCol < 0 || nCol >= rowSize) continue;
+
+      const neighborIdx = nRow * rowSize + nCol;
+      const neighbor = tiles[neighborIdx];
+
+      if (neighbor.pieceColor && neighbor.pieceColor !== color) {
+        const jumpRow = nRow + dr;
+        const jumpCol = nCol + dc;
+        if (
+          jumpRow >= 0 &&
+          jumpRow < rowSize &&
+          jumpCol >= 0 &&
+          jumpCol < rowSize
+        ) {
+          const jumpIdx = jumpRow * rowSize + jumpCol;
+          if (!tiles[jumpIdx].piece) {
+            jumps.push({ fromIdx: idx, targetIdx: neighborIdx, jumpIdx });
+          }
+        }
+      }
+    }
+
+    return jumps;
+  }
+
+  const movePiece = useCallback(
+    (fromIdx: number, toIdx: number, captures: NextMove["captures"]) => {
+      const _tiles = [...tiles];
       const origin = _tiles[fromIdx];
+
+      if (origin.pieceColor !== playerTurnColor && selectedIdx !== -1) {
+        return;
+      }
 
       const capture = captures.find((c) => c.jumpIdx === toIdx);
 
@@ -203,14 +263,25 @@ export default function CheckersPage() {
             prev.filter((p) => p.boardIndex !== capture.targetIdx)
           );
         }
-      } else {
+
+        const followUps = getFollowUpJumps(toIdx, _tiles, playerTurnColor);
+        setCanContinue(followUps.length > 0);
+
+        if (followUps.length === 0) {
+          setPlayerTurnColor((prev) => (prev === "black" ? "white" : "black"));
+        }
+      } else if (fromIdx !== toIdx) {
         _tiles[fromIdx] = {};
         _tiles[toIdx] = origin;
+
+        setCanContinue(false);
+        setPlayerTurnColor((prev) => (prev === "black" ? "white" : "black"));
       }
 
-      return _tiles;
-    });
-  };
+      setTiles(_tiles);
+    },
+    [playerTurnColor, selectedIdx, tiles]
+  );
 
   const handleClick = useCallback(
     (idx: number, tile: Tile) => {
@@ -230,40 +301,43 @@ export default function CheckersPage() {
       setSelectedIdx(-1);
       setNextMove({ indices: [], captures: [] });
     },
-    [computeMoves, nextMove, selectedIdx]
+    [computeMoves, movePiece, nextMove.captures, nextMove.indices, selectedIdx]
   );
 
   const Tile = memo(({ tile, idx }: { tile: Tile; idx: number }) => {
-    const alternatingBg =
+    const isSelected = selectedIdx === idx;
+    const canMoveHere =
+      nextMove.indices.includes(idx) &&
+      selectedIdx !== -1 &&
+      tiles[selectedIdx].pieceColor === playerTurnColor;
+
+    const tileBg =
       (Math.floor(idx / 8) + (idx % 8)) % 2 === 0
         ? "bg-amber-200"
         : "bg-amber-900";
 
-    const alternatingPieceBg = `hover:border-amber-400 hover:border-4 ${
-      tile.pieceColor === "black"
-        ? "bg-black"
-        : "bg-white border-1 border-black"
-    } ${selectedIdx === idx && "border-4 border-green-400"}`;
+    const tileContentClasses = [
+      "rounded-full",
+      "hover:cursor-pointer",
+      canMoveHere
+        ? "bg-green-500 w-4 h-4"
+        : tile.pieceColor === "black"
+        ? "bg-black w-12 h-12"
+        : "bg-white w-12 h-12 border-1 border-black",
+      isSelected && !canMoveHere ? "border-4 border-green-400" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
 
     return (
       <span
-        className={`flex w-20 h-20 border-1 border-black font-bold text-2xl text-center justify-center items-center select-none ${alternatingBg}`}
+        className={`flex w-20 h-20 border-1 border-black font-bold text-2xl text-center justify-center items-center select-none ${tileBg}`}
         key={idx}
+        onClick={() =>
+          canMoveHere || tile.piece ? handleClick(idx, tile) : undefined
+        }
       >
-        {nextMove.indices.includes(idx) ? (
-          <div
-            onClick={() => handleClick(idx, tile)}
-            className={`w-4 h-4 rounded-full hover:cursor-pointer bg-green-500`}
-          />
-        ) : (
-          tile.piece &&
-          tile.pieceColor && (
-            <div
-              onClick={() => handleClick(idx, tile)}
-              className={`w-12 h-12 rounded-full hover:cursor-pointer ${alternatingPieceBg}`}
-            />
-          )
-        )}
+        {(canMoveHere || tile.piece) && <div className={tileContentClasses} />}
       </span>
     );
   });
@@ -280,6 +354,27 @@ export default function CheckersPage() {
 
   return (
     <div className="flex flex-col items-center gap-4 p-2">
+      <div className="flex flex-row items-center justify-between p-2 w-full">
+        <h1 className="text-2xl font-bold text-center">
+          {playerTurnColor === "black"
+            ? "Turn of Player 1"
+            : "Turn of Player 2"}
+        </h1>
+        {canContinue && (
+          <button
+            onClick={() => {
+              setCanContinue(false);
+              setPlayerTurnColor((prev) =>
+                prev === "black" ? "white" : "black"
+              );
+            }}
+            className="w-fit h-fit p-2 rounded-sm bg-blue-500 text-white"
+          >
+            End turn
+          </button>
+        )}
+      </div>
+
       <Board tiles={tiles} />
     </div>
   );
