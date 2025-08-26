@@ -1,5 +1,6 @@
 "use client";
 
+import { Crown } from "lucide-react";
 import { memo, useCallback, useEffect, useState } from "react";
 
 type Tile = {
@@ -236,6 +237,25 @@ export default function CheckersPage() {
     return jumps;
   }
 
+  const getPromotedPiece = useCallback(
+    (piece: Tile["piece"], idx: number) => {
+      if (piece === "dame") return piece;
+
+      const rowSize = 8;
+      const lastRowStart = tiles.length - rowSize;
+
+      const isBlackPromotion =
+        playerTurnColor === "black" && idx >= 0 && idx < rowSize;
+      const isWhitePromotion =
+        playerTurnColor === "white" &&
+        idx >= lastRowStart &&
+        idx < tiles.length;
+
+      return isBlackPromotion || isWhitePromotion ? "dame" : piece;
+    },
+    [playerTurnColor, tiles.length]
+  );
+
   const movePiece = useCallback(
     (fromIdx: number, toIdx: number, captures: NextMove["captures"]) => {
       const _tiles = [...tiles];
@@ -252,7 +272,11 @@ export default function CheckersPage() {
 
         _tiles[capture.targetIdx] = {};
         _tiles[fromIdx] = {};
-        _tiles[toIdx] = origin;
+
+        _tiles[toIdx] = {
+          ...origin,
+          piece: getPromotedPiece(origin.piece, toIdx),
+        };
 
         if (target.pieceColor === "black") {
           setPieces((prev) =>
@@ -272,7 +296,10 @@ export default function CheckersPage() {
         }
       } else if (fromIdx !== toIdx) {
         _tiles[fromIdx] = {};
-        _tiles[toIdx] = origin;
+        _tiles[toIdx] = {
+          ...origin,
+          piece: getPromotedPiece(origin.piece, toIdx),
+        };
 
         setCanContinue(false);
         setPlayerTurnColor((prev) => (prev === "black" ? "white" : "black"));
@@ -280,7 +307,7 @@ export default function CheckersPage() {
 
       setTiles(_tiles);
     },
-    [playerTurnColor, selectedIdx, tiles]
+    [getPromotedPiece, playerTurnColor, selectedIdx, tiles]
   );
 
   const handleClick = useCallback(
@@ -317,6 +344,9 @@ export default function CheckersPage() {
         : "bg-amber-900";
 
     const tileContentClasses = [
+      "flex",
+      "justify-center",
+      "items-center",
       "rounded-full",
       "hover:cursor-pointer",
       canMoveHere
@@ -337,7 +367,11 @@ export default function CheckersPage() {
           canMoveHere || tile.piece ? handleClick(idx, tile) : undefined
         }
       >
-        {(canMoveHere || tile.piece) && <div className={tileContentClasses} />}
+        {(canMoveHere || tile.piece) && (
+          <div className={tileContentClasses}>
+            {tile.piece === "dame" && <Crown size="20" color="yellow" />}
+          </div>
+        )}
       </span>
     );
   });
