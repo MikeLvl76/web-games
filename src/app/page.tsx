@@ -1,28 +1,28 @@
-import { getUrls } from "@/utils/urls";
-import Image from "next/image";
-import Link from "next/link";
+"use client";
+
+import ImageResource from "@/components/generic/image-resource";
+import { getUrls, Resource } from "@/utils/resource";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  const urls = getUrls();
+  const [images, setImages] = useState<Resource[]>([]);
+
+  useEffect(() => {
+    getUrls()
+      .then((response) => setImages(response))
+      .catch((err) => console.error(err));
+  }, []);
 
   return (
     <div className="flex flex-col items-center gap-4 p-2">
       <h1 className="font-bold text-2xl text-center">All your games here!</h1>
-      <ul className="grid grid-cols-6 gap-4">
-        {urls.map(({ name, imageUrl, url }, i) => (
+      <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {images.map((resource, i) => (
           <li
             key={i}
             className="flex items-center justify-center rounded-sm w-60 h-60 gap-1 hover:cursor-pointer"
           >
-            <Link href={url}>
-              <Image
-                alt={name}
-                src={imageUrl}
-                width={600}
-                height={600}
-                priority
-              />
-            </Link>
+            <ImageResource resource={resource} />
           </li>
         ))}
       </ul>
