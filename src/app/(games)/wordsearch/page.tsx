@@ -21,10 +21,16 @@ export default function WordSearch() {
 
       for (let i = 0; i < limit; i++) {
         const randomIdx = Math.floor(Math.random() * _words.length);
-        const word = _words[randomIdx];
+        const word =
+          Math.random() < 0.4
+            ? _words[randomIdx]
+            : [..._words[randomIdx]].reverse().join("");
+
         _words.splice(randomIdx, 1);
 
-        const wordStartIdx = i * rowSize;
+        // Place randomly in row
+        const wordStartIdx =
+          i * rowSize + Math.floor(Math.random() * (rowSize - word.length + 1));
 
         _content.splice(wordStartIdx, word.length, ...word);
       }
@@ -59,7 +65,7 @@ export default function WordSearch() {
         {content.map((char, i) => (
           <li
             key={i}
-            className="justify-self-center w-fit h-fit rounded-full hover:cursor-pointer hover:border-1 hover:border-black select-none"
+            className="justify-self-center w-fit h-fit rounded-full hover:cursor-pointer hover:text-amber-400 select-none"
           >
             <p className="text-3xl font-bold">{char}</p>
           </li>
