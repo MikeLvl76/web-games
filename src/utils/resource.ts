@@ -9,7 +9,7 @@ export type Resource = {
   filepath: string;
 };
 
-export const getUrls = async () => {
+export const getResources = async () => {
   const imagesDir = "images";
   const dir = path.resolve("public", imagesDir);
   const filenames = fs.readdirSync(dir, { withFileTypes: true });

@@ -1,14 +1,14 @@
 "use client";
 
 import ImageResource from "@/components/generic/image-resource";
-import { getUrls, Resource } from "@/utils/resource";
+import { getResources, Resource } from "@/utils/resource";
 import { useEffect, useState } from "react";
 
 export default function Home() {
   const [images, setImages] = useState<Resource[]>([]);
 
   useEffect(() => {
-    getUrls()
+    getResources()
       .then((response) => setImages(response))
       .catch((err) => console.error(err));
   }, []);
