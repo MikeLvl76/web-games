@@ -48,10 +48,27 @@ export default function WordSearch() {
         });
       };
 
+      const rowIncludesWord = (index: number) => {
+        const row = Math.floor(index / rowSize);
+
+        const rowChars: string[] = [];
+        for (let i = 0; i < rowSize; i++) {
+          rowChars.push(_content[row * rowSize + i]);
+        }
+
+        return words.some((w) => {
+          return (
+            rowChars.join("").includes(w) ||
+            rowChars.reverse().join("").includes(w)
+          );
+        });
+      };
+
       for (let i = 0; i < limit; i++) {
         const word = pickRandomly();
 
         // Place randomly in col
+        /*
         let wordStartColIdx =
           Math.floor(Math.random() * rowSize) +
           rowSize * Math.floor(Math.random() * word.length);
@@ -66,14 +83,20 @@ export default function WordSearch() {
           const replaceIndex = wordStartColIdx + rowSize * c;
           _content.splice(replaceIndex, 1, word[c]);
         }
+        */
 
         // Place randomly in row
-        /*
-        const wordStartRowIdx =
-          i * rowSize + Math.floor(Math.random() * (rowSize - word.length + 1));
+        let wordStartRowIdx =
+          rowSize * Math.floor(Math.random() * rowSize + 2) +
+          Math.floor(Math.random() * (rowSize - word.length + 1));
+
+        while (rowIncludesWord(wordStartRowIdx)) {
+          wordStartRowIdx =
+            rowSize * Math.floor(Math.random() * rowSize + 2) +
+            Math.floor(Math.random() * (rowSize - word.length + 1));
+        }
 
         _content.splice(wordStartRowIdx, word.length, ...word);
-        */
       }
 
       return _content;
