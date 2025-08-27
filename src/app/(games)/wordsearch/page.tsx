@@ -16,10 +16,11 @@ export default function WordSearch() {
       );
 
       const _words = [...words];
-      const rowSize = size / 10;
+      const rowCount = 10;
+      const rowSize = size / rowCount;
       const limit = _words.length;
 
-      for (let i = 0; i < limit; i++) {
+      const pickRandomly = () => {
         const randomIdx = Math.floor(Math.random() * _words.length);
         const word =
           Math.random() < 0.4
@@ -28,11 +29,51 @@ export default function WordSearch() {
 
         _words.splice(randomIdx, 1);
 
+        return word;
+      };
+
+      const colIncludesWord = (index: number) => {
+        const col = index % rowSize;
+
+        const colChars: string[] = [];
+        for (let i = 0; i < rowCount; i++) {
+          colChars.push(_content[col + rowSize * i]);
+        }
+
+        return words.some((w) => {
+          return (
+            colChars.join("").includes(w) ||
+            colChars.reverse().join("").includes(w)
+          );
+        });
+      };
+
+      for (let i = 0; i < limit; i++) {
+        const word = pickRandomly();
+
+        // Place randomly in col
+        let wordStartColIdx =
+          Math.floor(Math.random() * rowSize) +
+          rowSize * Math.floor(Math.random() * word.length);
+
+        while (colIncludesWord(wordStartColIdx)) {
+          wordStartColIdx =
+            Math.floor(Math.random() * rowSize) +
+            rowSize * Math.floor(Math.random() * word.length + 1);
+        }
+
+        for (let c = 0; c < word.length; c++) {
+          const replaceIndex = wordStartColIdx + rowSize * c;
+          _content.splice(replaceIndex, 1, word[c]);
+        }
+
         // Place randomly in row
-        const wordStartIdx =
+        /*
+        const wordStartRowIdx =
           i * rowSize + Math.floor(Math.random() * (rowSize - word.length + 1));
 
-        _content.splice(wordStartIdx, word.length, ...word);
+        _content.splice(wordStartRowIdx, word.length, ...word);
+        */
       }
 
       return _content;
