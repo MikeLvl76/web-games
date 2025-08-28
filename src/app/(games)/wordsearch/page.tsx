@@ -8,16 +8,14 @@ export default function WordSearch() {
   const [content, setContent] = useState<string[]>([]);
 
   const generateGridContent = useCallback(
-    (words: string[], size: number = 80) => {
+    (words: string[], size: number = 100) => {
       setWords(words);
 
-      const _content: string[] = Array.from({ length: size }, () =>
-        String.fromCharCode(Math.floor(Math.random() * 26) + 97)
-      );
+      const _content: string[] = Array.from({ length: size }, () => "");
 
       const _words = [...words];
-      const rowCount = 10;
-      const rowSize = size / rowCount;
+      const rowSize = size / 10;
+      const rowCount = Math.ceil(size / rowSize);
       const limit = _words.length;
 
       const pickRandomly = () => {
@@ -32,74 +30,81 @@ export default function WordSearch() {
         return word;
       };
 
-      const colIncludesWord = (index: number) => {
+      const canPlaceWord = (
+        index: number,
+        word: string,
+        isHorizontal: boolean
+      ) => {
+        const row = Math.floor(index / rowSize);
         const col = index % rowSize;
 
-        const colChars: string[] = [];
-        for (let i = 0; i < rowCount; i++) {
-          colChars.push(_content[col + rowSize * i]);
+        if (isHorizontal) {
+          if (col + word.length > rowSize) return false;
+          for (let i = 0; i < word.length; i++) {
+            const charIndex = row * rowSize + (col + i);
+            if (_content[charIndex] !== "" && _content[charIndex] !== word[i]) {
+              return false;
+            }
+          }
+        } else {
+          if (row + word.length > rowCount) return false;
+          for (let i = 0; i < word.length; i++) {
+            const charIndex = (row + i) * rowSize + col;
+            if (_content[charIndex] !== "" && _content[charIndex] !== word[i]) {
+              return false;
+            }
+          }
         }
 
-        return words.some((w) => {
-          return (
-            colChars.join("").includes(w) ||
-            colChars.reverse().join("").includes(w)
-          );
-        });
-      };
-
-      const rowIncludesWord = (index: number) => {
-        const row = Math.floor(index / rowSize);
-
-        const rowChars: string[] = [];
-        for (let i = 0; i < rowSize; i++) {
-          rowChars.push(_content[row * rowSize + i]);
-        }
-
-        return words.some((w) => {
-          return (
-            rowChars.join("").includes(w) ||
-            rowChars.reverse().join("").includes(w)
-          );
-        });
+        return true;
       };
 
       for (let i = 0; i < limit; i++) {
         const word = pickRandomly();
 
-        // Place randomly in col
-        /*
-        let wordStartColIdx =
-          Math.floor(Math.random() * rowSize) +
-          rowSize * Math.floor(Math.random() * word.length);
+        const position: "row" | "col" = Math.random() < 0.5 ? "row" : "col";
 
-        while (colIncludesWord(wordStartColIdx)) {
-          wordStartColIdx =
-            Math.floor(Math.random() * rowSize) +
-            rowSize * Math.floor(Math.random() * word.length + 1);
-        }
-
-        for (let c = 0; c < word.length; c++) {
-          const replaceIndex = wordStartColIdx + rowSize * c;
-          _content.splice(replaceIndex, 1, word[c]);
-        }
-        */
-
-        // Place randomly in row
-        let wordStartRowIdx =
-          rowSize * Math.floor(Math.random() * rowSize + 2) +
-          Math.floor(Math.random() * (rowSize - word.length + 1));
-
-        while (rowIncludesWord(wordStartRowIdx)) {
-          wordStartRowIdx =
-            rowSize * Math.floor(Math.random() * rowSize + 2) +
+        if (position === "row") {
+          // Place randomly in row
+          let startIndex =
+            Math.floor(Math.random() * rowCount) * rowSize +
             Math.floor(Math.random() * (rowSize - word.length + 1));
+
+          while (!canPlaceWord(startIndex, word, true)) {
+            startIndex =
+              Math.floor(Math.random() * rowCount) * rowSize +
+              Math.floor(Math.random() * (rowSize - word.length + 1));
+          }
+
+          _content.splice(startIndex, word.length, ...word);
+          continue;
         }
 
-        _content.splice(wordStartRowIdx, word.length, ...word);
+        if (position === "col") {
+          // Place randomly in col
+          let startIndex =
+            Math.floor(Math.random() * rowSize) +
+            Math.floor(Math.random() * (rowCount - word.length + 1));
+
+          while (!canPlaceWord(startIndex, word, false)) {
+            startIndex =
+              Math.floor(Math.random() * rowSize) +
+              Math.floor(Math.random() * (rowCount - word.length + 1));
+          }
+
+          for (let c = 0; c < word.length; c++) {
+            const replaceIndex = startIndex + rowSize * c;
+            _content.splice(replaceIndex, 1, word[c]);
+          }
+          continue;
+        }
       }
 
-      return _content;
+      return _content.map((char) =>
+        char === ""
+          ? String.fromCharCode(Math.floor(Math.random() * 26) + 97)
+          : char
+      );
     },
     []
   );
@@ -111,7 +116,7 @@ export default function WordSearch() {
   }, [generateGridContent]);
 
   const WordList = memo(({ words }: { words: string[] }) => (
-    <div className="flex w-[40vw] h-[20vh]">
+    <div className="flex w-[20vw] h-[20vh]">
       <ul className="grid grid-cols-4 w-full h-full p-2 items-center">
         {words.map((word, i) => (
           <li key={i} className="justify-self-center">
@@ -124,8 +129,10 @@ export default function WordSearch() {
   WordList.displayName = "WordList";
 
   const Grid = memo(({ content }: { content: string[] }) => (
-    <div className="flex w-[30vw] h-[50vh] border-1 border-black rounded-sm p-2">
-      <ul className="grid grid-flow-row grid-cols-8 w-full h-full items-center">
+    <div className="flex w-[25vw] h-[60vh] border-1 border-black rounded-sm p-2">
+      <ul
+        className={`grid grid-flow-row grid-cols-10 w-full h-full items-center`}
+      >
         {content.map((char, i) => (
           <li
             key={i}
