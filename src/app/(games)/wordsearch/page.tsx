@@ -6,6 +6,8 @@ import { memo, useCallback, useEffect, useState } from "react";
 export default function WordSearch() {
   const [words, setWords] = useState<string[]>([]);
   const [content, setContent] = useState<string[]>([]);
+  const [isHolding, setIsHolding] = useState(false);
+  const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
 
   const generateGridContent = useCallback(
     (words: string[], size: number = 100) => {
@@ -115,6 +117,37 @@ export default function WordSearch() {
       .catch((err) => console.error(err));
   }, [generateGridContent]);
 
+  useEffect(() => {
+    const string = selectedIndices.map((idx) => content[idx]).join("");
+
+    const word = words.find((w) => string.includes(w));
+
+    if (word) {
+      setWords((prev) => prev.filter((w) => w !== word));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedIndices, words]);
+
+  useEffect(() => {
+    const handleMouseUp = () => {
+      setIsHolding(false);
+      setSelectedIndices([]);
+    };
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => window.removeEventListener("mouseup", handleMouseUp);
+  }, []);
+
+  const handleMouseDown = (index: number) => {
+    setIsHolding(true);
+    setSelectedIndices([index]);
+  };
+
+  const handleMouseEnter = (index: number) => {
+    if (isHolding) {
+      setSelectedIndices((prev) => [...prev, index]);
+    }
+  };
+
   const WordList = memo(({ words }: { words: string[] }) => (
     <div className="flex w-[20vw] h-[20vh]">
       <ul className="grid grid-cols-4 w-full h-full p-2 items-center">
@@ -136,9 +169,13 @@ export default function WordSearch() {
         {content.map((char, i) => (
           <li
             key={i}
-            className="justify-self-center w-fit h-fit rounded-full hover:cursor-pointer hover:text-amber-400 select-none"
+            className={`flex items-center justify-center justify-self-center w-3/4 h-3/4 rounded-full p-2 ${
+              selectedIndices.includes(i) ? "bg-green-300" : "bg-white"
+            } hover:cursor-pointer select-none`}
+            onMouseDown={() => handleMouseDown(i)}
+            onMouseEnter={() => handleMouseEnter(i)}
           >
-            <p className="text-3xl font-bold">{char}</p>
+            <p className="text-xl font-bold">{char}</p>
           </li>
         ))}
       </ul>
