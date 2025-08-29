@@ -1,6 +1,6 @@
 "use client";
 
-import { Resource } from "@/utils/resource";
+import { Resource } from "@/server-actions/resource";
 import { FileWarning } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

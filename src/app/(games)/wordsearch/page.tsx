@@ -1,6 +1,6 @@
 "use client";
 
-import generateList from "@/utils/word-generator";
+import generateList from "@/server-actions/word-generator";
 import { memo, useCallback, useEffect, useState } from "react";
 
 export default function WordSearch() {

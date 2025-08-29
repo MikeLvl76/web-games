@@ -1,7 +1,7 @@
 "use client";
 
 import ImageResource from "@/components/generic/image-resource";
-import { getResources, Resource } from "@/utils/resource";
+import { getResources, Resource } from "@/server-actions/resource";
 import { useEffect, useState } from "react";
 
 export default function Home() {
