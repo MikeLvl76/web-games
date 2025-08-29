@@ -225,23 +225,24 @@ const words = [
   "zone",
 ];
 
-const generateList = async (size: number, wordLength?: number) => {
+type GenerationParams = {
+  maxSize: number;
+  wordLength?: number;
+};
+
+const generateList = async ({ maxSize, wordLength }: GenerationParams) => {
+  const pool = wordLength
+    ? words.filter((w) => w.length === wordLength)
+    : words;
+
   const list: string[] = [];
 
-  for (let i = 0; i < size; i++) {
-    let randomIdx = Math.floor(Math.random() * size);
+  while (list.length < maxSize) {
+    const randomIdx = Math.floor(Math.random() * pool.length);
+    const word = pool[randomIdx];
 
-    while (true) {
-      const word = wordLength
-        ? words.filter((w) => w.length === wordLength)[randomIdx]
-        : words[randomIdx];
-
-      if (list.includes(word)) {
-        randomIdx = Math.floor(Math.random() * size);
-        continue;
-      }
+    if (!list.includes(word)) {
       list.push(word);
-      break;
     }
   }
 
