@@ -1,17 +1,20 @@
 "use client";
 
 import P5Sketch from "@/components/ui/p5-sketch";
+import { Food } from "@/utils/p5/snake/food";
 import { Snake } from "@/utils/p5/snake/snake";
 import p5 from "p5";
 
 export default function SnakePage() {
   const sketch = (p: p5) => {
     let snake: Snake;
+    let food: Food;
 
     p.setup = () => {
       p.createCanvas(p.windowWidth * 0.5, p.windowHeight * 0.8);
       p.background(0);
       snake = new Snake(p);
+      food = new Food(p, 15);
     };
 
     p.draw = () => {
@@ -19,11 +22,12 @@ export default function SnakePage() {
 
       if (!snake) return;
 
+      food.draw();
       snake.move();
       snake.draw();
 
       if (snake.isCrossing()) {
-        p.noLoop();
+        //p.noLoop();
       }
     };
 
