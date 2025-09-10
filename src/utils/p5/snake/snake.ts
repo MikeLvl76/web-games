@@ -1,0 +1,88 @@
+import p5 from "p5";
+
+type KeyDirection = "up" | "down" | "left" | "right";
+const directions = ["up", "down", "left", "right"] as const;
+
+type SnakePart = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  px: number;
+  py: number;
+};
+
+export class Snake {
+  direction: KeyDirection;
+  speed: number;
+  body: SnakePart[];
+  p: p5;
+
+  constructor(_p: p5) {
+    this.p = _p;
+    this.direction = directions[Math.floor(Math.random() * directions.length)];
+    this.speed = 2 + Math.floor(Math.random() * 3);
+    this.body = Array.from({ length: 3 }, (_, i) => ({
+      x: this.p.width * 0.5,
+      y: this.p.height * 0.5 + 20 * i,
+      w: 20,
+      h: 20,
+      px: this.p.width * 0.5,
+      py: this.p.height * 0.5 + 20 * i,
+    }));
+  }
+
+  setDirection(direction: KeyDirection) {
+    if (
+      (direction === "left" && this.direction !== "right") ||
+      (direction === "right" && this.direction !== "left") ||
+      (direction === "up" && this.direction !== "down") ||
+      (direction === "down" && this.direction !== "up")
+    ) {
+      this.direction = direction;
+    }
+  }
+
+  move() {
+    this.body.forEach((part) => {
+      part.px = part.x;
+      part.py = part.y;
+    });
+
+    const head = this.body[0];
+    if (this.direction === "left") {
+      head.x -= this.speed;
+    } else if (this.direction === "right") {
+      head.x += this.speed;
+    } else if (this.direction === "up") {
+      head.y -= this.speed;
+    } else if (this.direction === "down") {
+      head.y += this.speed;
+    }
+
+    for (let i = 1; i < this.body.length; i++) {
+      this.body[i].x = this.body[i - 1].px;
+      this.body[i].y = this.body[i - 1].py;
+    }
+  }
+
+  eat() {}
+
+  isCrossing() {
+    const { x, y } = this.body[0];
+    return x > this.p.width || x < 0 || y > this.p.height || y < 0;
+  }
+
+  draw() {
+    this.p.noStroke();
+
+    this.p.fill(0, 127, 0);
+    const head = this.body[0];
+    this.p.ellipse(head.x, head.y, head.w * 1.1, head.h * 1.2);
+
+    this.p.fill(0, 255, 0);
+    this.body.slice(1, this.body.length).forEach(({ x, y, w, h }) => {
+      this.p.ellipse(x, y, w, h);
+    });
+  }
+}
