@@ -19,7 +19,7 @@ export class Food {
 
   randomizeLocation() {
     this.x = this.p.random(this.r, this.p.width - this.r);
-    this.y = this.p.random(this.r, this.p.width - this.r);
+    this.y = this.p.random(this.r, this.p.height - this.r);
   }
 
   randomizeColor() {

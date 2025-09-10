@@ -25,6 +25,7 @@ export default function SnakePage() {
       food.draw();
       snake.move();
       snake.draw();
+      snake.eat(food);
 
       if (snake.isCrossing()) {
         //p.noLoop();

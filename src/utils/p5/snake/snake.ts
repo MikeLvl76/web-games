@@ -1,4 +1,5 @@
 import p5 from "p5";
+import { Food } from "./food";
 
 type KeyDirection = "up" | "down" | "left" | "right";
 const directions = ["up", "down", "left", "right"] as const;
@@ -66,7 +67,21 @@ export class Snake {
     }
   }
 
-  eat() {}
+  eat(food: Food) {
+    const head = this.body[0];
+    if (this.p.dist(head.x, head.y, food.x, food.y) < food.r) {
+      const tail = this.body[this.body.length - 1];
+      this.body.push({
+        ...tail,
+        x: food.x,
+        y: food.y,
+        px: tail.x,
+        py: tail.y,
+      });
+      this.speed += 0.3;
+      food.randomizeLocation();
+    }
+  }
 
   isCrossing() {
     const { x, y } = this.body[0];
