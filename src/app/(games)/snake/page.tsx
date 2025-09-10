@@ -28,7 +28,13 @@ export default function SnakePage() {
       snake.eat(food);
 
       if (snake.isCrossing()) {
-        //p.noLoop();
+        p.background(0);
+        p.fill(127, 0, 0);
+        p.textSize(48);
+        p.textAlign(p.CENTER);
+        p.text("You lose", p.width * 0.5, p.height * 0.5);
+
+        p.noLoop();
       }
     };
 

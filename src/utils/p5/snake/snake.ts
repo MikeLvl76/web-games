@@ -7,8 +7,7 @@ const directions = ["up", "down", "left", "right"] as const;
 type SnakePart = {
   x: number;
   y: number;
-  w: number;
-  h: number;
+  r: number;
   px: number;
   py: number;
 };
@@ -26,8 +25,7 @@ export class Snake {
     this.body = Array.from({ length: 3 }, (_, i) => ({
       x: this.p.width * 0.5,
       y: this.p.height * 0.5 + 20 * i,
-      w: 20,
-      h: 20,
+      r: 20,
       px: this.p.width * 0.5,
       py: this.p.height * 0.5 + 20 * i,
     }));
@@ -78,8 +76,9 @@ export class Snake {
         px: tail.x,
         py: tail.y,
       });
-      this.speed += 0.3;
+      this.speed += 0.2;
       food.randomizeLocation();
+      food.randomizeColor();
     }
   }
 
@@ -90,14 +89,13 @@ export class Snake {
 
   draw() {
     this.p.noStroke();
+    this.p.fill(0, 255, 0);
+    this.body.slice(1, this.body.length).forEach(({ x, y, r }) => {
+      this.p.ellipse(x, y, r, r);
+    });
 
     this.p.fill(0, 127, 0);
     const head = this.body[0];
-    this.p.ellipse(head.x, head.y, head.w * 1.1, head.h * 1.2);
-
-    this.p.fill(0, 255, 0);
-    this.body.slice(1, this.body.length).forEach(({ x, y, w, h }) => {
-      this.p.ellipse(x, y, w, h);
-    });
+    this.p.ellipse(head.x, head.y, head.r * 1.1, head.r * 1.2);
   }
 }
