@@ -13,6 +13,7 @@ export default function SnakePage() {
   const sketch = (p: p5) => {
     let snake: Snake;
     let food: Food;
+    let score: number;
 
     p.setup = () => {
       const div = document.getElementById("p5-container");
@@ -23,6 +24,7 @@ export default function SnakePage() {
       p.background(0);
       snake = new Snake(p);
       food = new Food(p, 15);
+      score = 0;
     };
 
     p.draw = () => {
@@ -33,7 +35,9 @@ export default function SnakePage() {
       food.draw();
       snake.move();
       snake.draw();
-      snake.eat(food);
+      snake.eat(food, (s, f) => {
+        score += Math.floor(f.r / 3) + Math.floor(s.body.length / 2);
+      });
 
       if (snake.isCrossing()) {
         p.background(0);
@@ -41,6 +45,10 @@ export default function SnakePage() {
         p.textSize(48);
         p.textAlign(p.CENTER);
         p.text("You lose", p.width * 0.5, p.height * 0.5);
+
+        p.fill(127);
+        p.textSize(32);
+        p.text(`Your score: ${score}`, p.width * 0.5, p.height * 0.6);
 
         p.noLoop();
       }

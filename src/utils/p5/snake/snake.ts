@@ -65,7 +65,7 @@ export class Snake {
     }
   }
 
-  eat(food: Food) {
+  eat(food: Food, onsuccess?: (snake: Snake, food: Food) => void) {
     const head = this.body[0];
     if (this.p.dist(head.x, head.y, food.x, food.y) < food.r) {
       const tail = this.body[this.body.length - 1];
@@ -79,6 +79,9 @@ export class Snake {
       this.speed += 0.2;
       food.randomizeLocation();
       food.randomizeColor();
+      if (onsuccess) {
+        onsuccess(this, food);
+      }
     }
   }
 
