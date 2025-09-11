@@ -3,15 +3,23 @@
 import P5Sketch from "@/components/ui/p5-sketch";
 import { Food } from "@/utils/p5/snake/food";
 import { Snake } from "@/utils/p5/snake/snake";
+import { RotateCcw } from "lucide-react";
 import p5 from "p5";
+import { useState } from "react";
 
 export default function SnakePage() {
+  const [refresh, setRefresh] = useState(0);
+
   const sketch = (p: p5) => {
     let snake: Snake;
     let food: Food;
 
     p.setup = () => {
-      p.createCanvas(p.windowWidth * 0.5, p.windowHeight * 0.8);
+      const div = document.getElementById("p5-container");
+      p.createCanvas(
+        div?.offsetWidth ?? p.windowWidth * 0.5,
+        div?.offsetHeight ?? p.windowHeight * 0.8
+      );
       p.background(0);
       snake = new Snake(p);
       food = new Food(p, 15);
@@ -49,8 +57,16 @@ export default function SnakePage() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4 p-2 w-full">
-      <P5Sketch sketch={sketch} />
+    <div className="flex flex-row justify-center items-center gap-2 p-2 w-full">
+      <P5Sketch sketch={sketch} refresh={refresh} />
+      <RotateCcw
+        color="white"
+        size={32}
+        onClick={() => {
+          setRefresh((prev) => prev + 1);
+        }}
+        className="self-start w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+      />
     </div>
   );
 }

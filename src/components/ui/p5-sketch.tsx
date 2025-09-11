@@ -5,9 +5,10 @@ import type p5 from "p5";
 
 type P5SketchProps = {
   sketch: (p: p5) => void;
+  refresh?: number;
 };
 
-export default function P5Sketch({ sketch }: P5SketchProps) {
+export default function P5Sketch({ sketch, refresh }: P5SketchProps) {
   const p5ContainerRef = useRef<HTMLDivElement>(null);
   const p5Instance = useRef<p5 | null>(null);
 
@@ -41,12 +42,13 @@ export default function P5Sketch({ sketch }: P5SketchProps) {
       p5Instance.current?.remove();
       p5Instance.current = null;
     };
-  }, [sketch]);
+  }, [sketch, refresh]);
 
   return (
     <div
+      id="p5-container"
       ref={p5ContainerRef}
-      className="flex items-center justify-center w-[70vw] h-[70vh]"
+      className="flex items-center justify-center w-[60vw] h-[80vh]"
     />
   );
 }
