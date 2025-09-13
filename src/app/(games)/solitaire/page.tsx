@@ -17,7 +17,7 @@ export default function SolitairePage() {
     heart: [],
     diamond: [],
   });
-  const [draw, setDraw] = useState<Card>();
+  const [drawnCards, setDrawnCards] = useState<Card[]>([]);
   const [piles, setPiles] = useState<Card[][]>([[], [], [], [], [], [], []]);
 
   const init = useCallback(async () => {
@@ -39,13 +39,32 @@ export default function SolitairePage() {
         return pile;
       });
 
-      console.log(_piles);
+      _pack.sort(() => Math.random() - 0.5);
+
       setPiles(_piles);
       setPack(_pack);
     } catch (err) {
       console.error(err);
     }
   }, []);
+
+  const draw = useCallback(() => {
+    const _pack = [...pack];
+
+    if (_pack.length === 0) {
+      if (drawnCards.length === 0) {
+        return;
+      }
+      setPack(drawnCards);
+      setDrawnCards([]);
+      return;
+    }
+
+    const card = _pack.pop();
+
+    setPack(_pack);
+    setDrawnCards((prev) => (card ? [...prev, card] : prev));
+  }, [drawnCards, pack]);
 
   useEffect(() => {
     init();
@@ -56,11 +75,11 @@ export default function SolitairePage() {
     ({
       pack,
       sequences,
-      draw,
+      drawnCards,
     }: {
       pack: Card[];
       sequences: Record<CardSymbol, Card[]>;
-      draw?: Card;
+      drawnCards: Card[];
     }) => {
       const sqsDiv = (
         <div className="flex flex-row w-[50%] justify-evenly items-center gap-6 p-2">
@@ -114,25 +133,40 @@ export default function SolitairePage() {
         </div>
       );
 
-      const drawDiv = (
-        <div className="flex justify-center items-center w-24 h-32 rounded-md bg-slate-400/70">
-          {draw?.value}
+      const lastCard = drawnCards[drawnCards.length - 1];
+      const lastCardDrawnDiv = (
+        <div
+          className={`flex flex-col justify-center items-center w-24 h-32 ${
+            lastCard ? "bg-slate-200" : "bg-slate-400/70"
+          }  hover:cursor-pointer rounded-md gap-2`}
+        >
+          {lastCard && (
+            <>
+              <CardSymbolIcon symbol={lastCard.symbol} color={lastCard.color} />
+              <p className="text-lg font-bold">{lastCard.value}</p>
+            </>
+          )}
         </div>
       );
-      const packDiv =
-        pack.length > 0 ? (
-          <div className="flex justify-center items-center w-24 h-32 rounded-md bg-red-700/60">
+
+      const packDiv = (
+        <div
+          onClick={draw}
+          className={`flex justify-center items-center w-24 h-32 rounded-md hover:cursor-pointer ${
+            pack.length > 0 ? "bg-red-700/60" : "bg-slate-400/70"
+          } `}
+        >
+          {pack.length > 0 && (
             <p className="text-xl text-white">{pack.length}</p>
-          </div>
-        ) : (
-          <div className="flex justify-center items-center w-24 h-32 rounded-md bg-slate-400/70" />
-        );
+          )}
+        </div>
+      );
 
       return (
-        <div className="flex flex-row justify-between items-center h-52 p-2">
+        <div className="flex flex-row justify-between items-center h-52 p-2 select-none">
           {sqsDiv}
           <div className="flex flex-row w-[30%] justify-evenly items-center gap-6">
-            {drawDiv}
+            {lastCardDrawnDiv}
             {packDiv}
           </div>
         </div>
@@ -176,7 +210,7 @@ export default function SolitairePage() {
 
   return (
     <div className="flex flex-col gap-2 w-[70vw] h-[80vh] bg-green-800 rounded-md">
-      <Header pack={pack} sequences={sequences} draw={draw} />
+      <Header pack={pack} sequences={sequences} drawnCards={drawnCards} />
       <Piles piles={piles} />
     </div>
   );
