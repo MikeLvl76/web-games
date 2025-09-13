@@ -5,6 +5,7 @@ type Card = {
   value: string;
   symbol: CardSymbol;
   color: CardColor;
+  isHidden: boolean;
 };
 
 export const generatePack = async () => {
@@ -29,6 +30,7 @@ export const generatePack = async () => {
           value,
           symbol,
           color,
+          isHidden: true,
         } satisfies Card;
 
         pack.push(card);
