@@ -1,16 +1,14 @@
 "use client";
 
-import CardSymbolIcon from "@/components/generic/card-symbol-icon";
-import Draggable from "@/components/generic/draggable";
-import Droppable from "@/components/generic/droppable";
 import {
   Card,
   CardSymbol,
   generatePack,
 } from "@/server-actions/pack-generator";
-import { DndContext, DragEndEvent } from "@dnd-kit/core";
-import { Club, Diamond, Heart, Spade } from "lucide-react";
-import { memo, useCallback, useEffect, useState } from "react";
+import { closestCenter, DndContext, DragEndEvent } from "@dnd-kit/core";
+import { useCallback, useEffect, useState } from "react";
+import { BoardHeader } from "./board-header";
+import { BoardMain } from "./board-main";
 
 export default function SolitairePage() {
   const [pack, setPack] = useState<Card[]>([]);
@@ -87,160 +85,16 @@ export default function SolitairePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const Header = memo(
-    ({
-      pack,
-      sequences,
-      drawnCards,
-    }: {
-      pack: Card[];
-      sequences: Record<CardSymbol, Card[]>;
-      drawnCards: Card[];
-    }) => {
-      const sqsDiv = (
-        <div className="flex flex-row w-[50%] justify-evenly items-center gap-6 p-2">
-          {Object.entries(sequences).map(([sym, sq], i) => {
-            if (sq.length === 0) {
-              if (sym === "spade")
-                return (
-                  <div
-                    key={i}
-                    className="flex justify-center items-center w-24 h-32 rounded-md bg-slate-400/70"
-                  >
-                    <Spade key={i} color="black" size={32} fill="black" />
-                  </div>
-                );
-              if (sym === "diamond")
-                return (
-                  <div
-                    key={i}
-                    className="flex justify-center items-center w-24 h-32 rounded-md bg-slate-400/70"
-                  >
-                    <Diamond key={i} color="red" size={32} fill="red" />
-                  </div>
-                );
-              if (sym === "heart")
-                return (
-                  <div
-                    key={i}
-                    className="flex justify-center items-center w-24 h-32 rounded-md bg-slate-400/70"
-                  >
-                    <Heart key={i} color="red" size={32} fill="red" />
-                  </div>
-                );
-              if (sym === "club")
-                return (
-                  <div
-                    key={i}
-                    className="flex justify-center items-center w-24 h-32 rounded-md bg-slate-400/70"
-                  >
-                    <Club key={i} color="black" size={32} fill="black" />
-                  </div>
-                );
-
-              return <div key={i} />;
-            }
-            return (
-              <div key={i} className="flex justify-center items-center">
-                {sq[sq.length - 1].value}
-              </div>
-            );
-          })}
-        </div>
-      );
-
-      const lastCard = drawnCards[drawnCards.length - 1];
-      const lastCardDrawnDiv = (
-        <div
-          className={`flex flex-col justify-center items-center w-24 h-32 ${
-            lastCard ? "bg-slate-200" : "bg-slate-400/70"
-          }  hover:cursor-pointer rounded-md gap-2`}
-        >
-          {lastCard && (
-            <>
-              <CardSymbolIcon symbol={lastCard.symbol} color={lastCard.color} />
-              <p className="text-lg font-bold">{lastCard.value}</p>
-            </>
-          )}
-        </div>
-      );
-
-      const packDiv = (
-        <div
-          onClick={draw}
-          className={`flex justify-center items-center w-24 h-32 rounded-md hover:cursor-pointer ${
-            pack.length > 0 ? "bg-red-700/60" : "bg-slate-400/70"
-          } `}
-        >
-          {pack.length > 0 && (
-            <p className="text-xl text-white">{pack.length}</p>
-          )}
-        </div>
-      );
-
-      return (
-        <div className="flex flex-row justify-between items-center h-52 p-2 select-none">
-          {sqsDiv}
-          <div className="flex flex-row w-[30%] justify-evenly items-center gap-6">
-            {lastCardDrawnDiv}
-            {packDiv}
-          </div>
-        </div>
-      );
-    }
-  );
-  Header.displayName = "Header";
-
-  const Piles = memo(({ piles }: { piles: Card[][] }) => (
-    <div className="flex flex-row justify-evenly w-full select-none">
-      {piles.map((pile, pileIndex) => (
-        <div key={pileIndex} className="relative w-24 min-h-fit bg-transparent">
-          <Droppable
-            id={`drop-pile-${pileIndex}`}
-            data={{ pile, pileIndex, accepts: ["col-drag", "draw-drag"] }}
-          >
-            {pile.map((card, cardIndex) => (
-              <Draggable
-                id={`drag-card-${Math.random().toString(16).substring(2)}`}
-                data={{ card, cardIndex, pileIndex, type: "col-drag" }}
-                disabled={card.isHidden}
-                key={cardIndex}
-              >
-                <div
-                  key={cardIndex}
-                  className={`
-                    absolute w-24 h-32 rounded-md border-2 border-black shadow-2xl
-                    ${
-                      card.isHidden
-                        ? "bg-red-700"
-                        : "bg-slate-200 hover:cursor-pointer"
-                    }
-                  `}
-                  style={{
-                    top: `${cardIndex * 36}px`,
-                  }}
-                >
-                  {!card.isHidden && (
-                    <div className="flex flex-col justify-center items-center gap-2 h-full">
-                      <CardSymbolIcon symbol={card.symbol} color={card.color} />
-                      <p className="text-lg font-bold">{card.value}</p>
-                    </div>
-                  )}
-                </div>
-              </Draggable>
-            ))}
-          </Droppable>
-        </div>
-      ))}
-    </div>
-  ));
-  Piles.displayName = "Piles";
-
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
       <div className="flex flex-col gap-2 w-[70vw] h-[80vh] bg-green-800 rounded-md">
-        <Header pack={pack} sequences={sequences} drawnCards={drawnCards} />
-        <Piles piles={piles} />
+        <BoardHeader
+          pack={pack}
+          sequences={sequences}
+          drawnCards={drawnCards}
+          draw={draw}
+        />
+        <BoardMain piles={piles} />
       </div>
     </DndContext>
   );

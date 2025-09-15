@@ -8,6 +8,13 @@ type Card = {
   isHidden: boolean;
 };
 
+export const SYMBOL_COLOR = {
+  club: "black",
+  spade: "black",
+  heart: "red",
+  diamond: "red",
+};
+
 export const generatePack = async () => {
   const suite = Array.from({ length: 10 }, (_, k) =>
     k === 0 ? "ace" : `${k + 1}`
