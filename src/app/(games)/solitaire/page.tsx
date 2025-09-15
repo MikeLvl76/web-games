@@ -9,6 +9,7 @@ import { closestCenter, DndContext, DragEndEvent } from "@dnd-kit/core";
 import { useCallback, useEffect, useState } from "react";
 import { BoardHeader } from "./board-header";
 import { BoardMain } from "./board-main";
+import { BoardTimer } from "./board-timer";
 
 export default function SolitairePage() {
   const [pack, setPack] = useState<Card[]>([]);
@@ -87,7 +88,8 @@ export default function SolitairePage() {
 
   return (
     <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
-      <div className="flex flex-col gap-2 w-[70vw] h-[80vh] bg-green-800 rounded-md">
+      <div className="flex flex-col w-[70vw] h-[80vh] bg-green-800 rounded-md">
+        <BoardTimer />
         <BoardHeader
           pack={pack}
           sequences={sequences}

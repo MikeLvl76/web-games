@@ -38,7 +38,7 @@ export const BoardMain = memo(({ piles }: Props) => (
                     }
                   `}
                 style={{
-                  top: `${cardIndex * 36}px`,
+                  top: `${cardIndex * 18}px`,
                 }}
               >
                 {!card.isHidden && (
