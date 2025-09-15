@@ -1,11 +1,14 @@
 "use client";
 
 import CardSymbolIcon from "@/components/generic/card-symbol-icon";
+import Draggable from "@/components/generic/draggable";
+import Droppable from "@/components/generic/droppable";
 import {
   Card,
   CardSymbol,
   generatePack,
 } from "@/server-actions/pack-generator";
+import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { Club, Diamond, Heart, Spade } from "lucide-react";
 import { memo, useCallback, useEffect, useState } from "react";
 
@@ -65,6 +68,19 @@ export default function SolitairePage() {
     setPack(_pack);
     setDrawnCards((prev) => (card ? [...prev, card] : prev));
   }, [drawnCards, pack]);
+
+  const handleDragEnd = (event?: DragEndEvent) => {
+    console.log(event);
+    const source = event?.active.data.current;
+    const dest = event?.over?.data.current;
+
+    if (dest?.accepts.includes(source?.type)) {
+      console.log("ACCEPTED");
+    }
+
+    console.log("Source:", source);
+    console.log("Dest:", dest);
+  };
 
   useEffect(() => {
     init();
@@ -179,29 +195,41 @@ export default function SolitairePage() {
     <div className="flex flex-row justify-evenly w-full select-none">
       {piles.map((pile, pileIndex) => (
         <div key={pileIndex} className="relative w-24 min-h-fit bg-transparent">
-          {pile.map((card, cardIndex) => (
-            <div
-              key={cardIndex}
-              className={`
-                absolute w-24 h-32 rounded-md border-2 border-black shadow-2xl
-                ${
-                  card.isHidden
-                    ? "bg-red-700"
-                    : "bg-slate-200 hover:cursor-pointer"
-                }
-              `}
-              style={{
-                top: `${cardIndex * 36}px`,
-              }}
-            >
-              {!card.isHidden && (
-                <div className="flex flex-col justify-center items-center gap-2 h-full">
-                  <CardSymbolIcon symbol={card.symbol} color={card.color} />
-                  <p className="text-lg font-bold">{card.value}</p>
+          <Droppable
+            id={`drop-pile-${pileIndex}`}
+            data={{ pile, pileIndex, accepts: ["col-drag", "draw-drag"] }}
+          >
+            {pile.map((card, cardIndex) => (
+              <Draggable
+                id={`drag-card-${Math.random().toString(16).substring(2)}`}
+                data={{ card, cardIndex, pileIndex, type: "col-drag" }}
+                disabled={card.isHidden}
+                key={cardIndex}
+              >
+                <div
+                  key={cardIndex}
+                  className={`
+                    absolute w-24 h-32 rounded-md border-2 border-black shadow-2xl
+                    ${
+                      card.isHidden
+                        ? "bg-red-700"
+                        : "bg-slate-200 hover:cursor-pointer"
+                    }
+                  `}
+                  style={{
+                    top: `${cardIndex * 36}px`,
+                  }}
+                >
+                  {!card.isHidden && (
+                    <div className="flex flex-col justify-center items-center gap-2 h-full">
+                      <CardSymbolIcon symbol={card.symbol} color={card.color} />
+                      <p className="text-lg font-bold">{card.value}</p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
+              </Draggable>
+            ))}
+          </Droppable>
         </div>
       ))}
     </div>
@@ -209,9 +237,11 @@ export default function SolitairePage() {
   Piles.displayName = "Piles";
 
   return (
-    <div className="flex flex-col gap-2 w-[70vw] h-[80vh] bg-green-800 rounded-md">
-      <Header pack={pack} sequences={sequences} drawnCards={drawnCards} />
-      <Piles piles={piles} />
-    </div>
+    <DndContext onDragEnd={handleDragEnd}>
+      <div className="flex flex-col gap-2 w-[70vw] h-[80vh] bg-green-800 rounded-md">
+        <Header pack={pack} sequences={sequences} drawnCards={drawnCards} />
+        <Piles piles={piles} />
+      </div>
+    </DndContext>
   );
 }

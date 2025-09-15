@@ -5,20 +5,11 @@ type Props = {
   id: string;
   children: ReactNode;
   data?: Record<string, unknown>;
-  disabled?: true;
+  disabled?: boolean;
 };
 
 export default function Droppable({ children, ...restProps }: Props) {
-  const { isOver, setNodeRef } = useDroppable(restProps);
+  const { setNodeRef } = useDroppable(restProps);
 
-  return (
-    <div
-      ref={setNodeRef}
-      className={`${
-        isOver ? "border-2 border-black" : "border-2 border-green"
-      }`}
-    >
-      {children}
-    </div>
-  );
+  return <div ref={setNodeRef}>{children}</div>;
 }

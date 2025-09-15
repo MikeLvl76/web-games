@@ -5,7 +5,7 @@ type Props = {
   id: string;
   children: ReactNode;
   data?: Record<string, unknown>;
-  disabled?: true;
+  disabled?: boolean;
 };
 
 export default function Draggable({ children, ...restProps }: Props) {
