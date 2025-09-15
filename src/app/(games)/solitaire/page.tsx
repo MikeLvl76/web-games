@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from "react";
 import { BoardHeader } from "./board-header";
 import { BoardMain } from "./board-main";
 import { BoardTimer } from "./board-timer";
+import { compareCards } from "@/utils/misc/compare-cards";
 
 export default function SolitairePage() {
   const [pack, setPack] = useState<Card[]>([]);
@@ -69,16 +70,61 @@ export default function SolitairePage() {
   }, [drawnCards, pack]);
 
   const handleDragEnd = (event?: DragEndEvent) => {
-    console.log(event);
     const source = event?.active.data.current;
     const dest = event?.over?.data.current;
 
     if (dest?.accepts.includes(source?.type)) {
-      console.log("ACCEPTED");
-    }
+      if (dest?.type === "pile") {
+        if (source?.type === "draw-drag") {
+          const { card, index } = source;
+          const { pile, pileIndex } = dest;
 
-    console.log("Source:", source);
-    console.log("Dest:", dest);
+          if (pile.length === 0) {
+            card.isHidden = false;
+            pile.push(card);
+          } else {
+            const lastCard = pile[pile.length - 1];
+            if (!compareCards(lastCard, card)) {
+              console.log(lastCard, card);
+              return;
+            }
+            card.isHidden = false;
+            pile.push(card);
+          }
+          const _piles = [...piles];
+          _piles.splice(pileIndex, 1, pile);
+          setPiles(_piles);
+          setDrawnCards((prev) => prev.slice(0, index));
+          return;
+        }
+
+        if (source?.type === "col-drag") {
+          const { card, cardIndex, dragPileIndex, dragPile } = source;
+          const { pile, dropPileIndex } = dest;
+
+          if (pile.length === 0) {
+            card.isHidden = false;
+            pile.push(card);
+          } else {
+            const lastCard = pile[pile.length - 1];
+            if (!compareCards(lastCard, card)) {
+              console.log(lastCard, card);
+              return;
+            }
+            card.isHidden = false;
+            pile.push(card);
+          }
+          dragPile.splice(cardIndex, 1);
+          dragPile[dragPile.length - 1].isHidden = false;
+
+          const _piles = [...piles];
+          _piles.splice(dragPileIndex, 1, dragPile);
+          _piles.splice(dropPileIndex, 1, pile);
+          setPiles(_piles);
+          return;
+        }
+      }
+    }
   };
 
   useEffect(() => {

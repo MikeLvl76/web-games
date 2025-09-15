@@ -1,8 +1,12 @@
 type CardSymbol = "heart" | "spade" | "diamond" | "club";
 type CardColor = "black" | "red";
+type CardRank = {
+  name: string;
+  value: number;
+};
 
 type Card = {
-  value: string;
+  rank: CardRank;
   symbol: CardSymbol;
   color: CardColor;
   isHidden: boolean;
@@ -16,15 +20,21 @@ export const SYMBOL_COLOR = {
 };
 
 export const generatePack = async () => {
-  const suite = Array.from({ length: 10 }, (_, k) =>
-    k === 0 ? "ace" : `${k + 1}`
-  ).concat("king", "queen", "jack");
+  const ranks: CardRank[] = Array.from({ length: 10 }, (_, k) => ({
+    name: k === 0 ? "ace" : `${k + 1}`,
+    value: k + 1,
+  })).concat(
+    { name: "king", value: 11 },
+    { name: "queen", value: 12 },
+    { name: "jack", value: 13 }
+  );
+
   const symbols = ["heart", "spade", "diamond", "club"] as const;
   const colors = ["black", "red"] as const;
 
   const pack: Card[] = [];
 
-  for (const value of suite) {
+  for (const rank of ranks) {
     for (const symbol of symbols) {
       for (const color of colors) {
         if (
@@ -34,7 +44,7 @@ export const generatePack = async () => {
           continue;
         }
         const card = {
-          value,
+          rank,
           symbol,
           color,
           isHidden: true,

@@ -27,9 +27,10 @@ export const BoardHeader = memo(
         {Object.entries(sequences).map(([sym, sq], index) => (
           <Droppable
             key={index}
-            nodeId={`drop-seq-${Math.random().toString(16).substring(2)}`}
+            nodeId={`drop-seq-${index}`}
             data={{
               accepts: ["draw-drag", "col-drag"],
+              type: "sequence",
               sequence: sq,
               index,
               symbol: sym,
@@ -51,7 +52,9 @@ export const BoardHeader = memo(
                     symbol={sym as CardSymbol}
                     color={SYMBOL_COLOR[sym as CardSymbol] as CardColor}
                   />
-                  <p className="text-lg font-bold">{sq[sq.length - 1].value}</p>
+                  <p className="text-lg font-bold">
+                    {sq[sq.length - 1].rank.name}
+                  </p>
                 </div>
               )}
             </div>
@@ -63,10 +66,12 @@ export const BoardHeader = memo(
           <div className="absolute inset-0 rounded-md bg-slate-400/70" />
           {lastCard && (
             <Draggable
-              nodeId={`drag-drawn-card-${Math.random()
-                .toString(16)
-                .substring(2)}`}
-              data={{ type: "draw-drag", card: lastCard }}
+              nodeId={`drag-drawn-card-${drawnCards.length - 1}`}
+              data={{
+                type: "draw-drag",
+                card: lastCard,
+                index: drawnCards.length - 1,
+              }}
               disabled={drawnCards.length === 0}
             >
               <div className="relative flex flex-col justify-center items-center w-24 h-32 bg-slate-200 hover:cursor-pointer rounded-md gap-2">
@@ -74,7 +79,7 @@ export const BoardHeader = memo(
                   symbol={lastCard.symbol}
                   color={lastCard.color}
                 />
-                <p className="text-lg font-bold">{lastCard.value}</p>
+                <p className="text-lg font-bold">{lastCard.rank.name}</p>
               </div>
             </Draggable>
           )}

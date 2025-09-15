@@ -16,14 +16,25 @@ export const BoardMain = memo(({ piles }: Props) => (
       <Droppable
         key={pileIndex}
         nodeId={`drop-pile-${pileIndex}`}
-        data={{ accepts: ["col-drag", "draw-drag"], pile, pileIndex }}
+        data={{
+          accepts: ["col-drag", "draw-drag"],
+          type: "pile",
+          pile,
+          dropPileIndex: pileIndex,
+        }}
       >
         <div className="relative w-24 h-32">
           <div className="absolute inset-0 rounded-md bg-slate-400/70" />
           {pile.map((card, cardIndex) => (
             <Draggable
               nodeId={`drag-card-${pileIndex}-${cardIndex}`}
-              data={{ type: "col-drag", card, cardIndex, pileIndex }}
+              data={{
+                type: "col-drag",
+                dragPile: pile,
+                card,
+                cardIndex,
+                dragPileIndex: pileIndex,
+              }}
               disabled={card.isHidden}
               key={cardIndex}
             >
@@ -44,7 +55,7 @@ export const BoardMain = memo(({ piles }: Props) => (
                 {!card.isHidden && (
                   <div className="flex flex-col justify-center items-center gap-2 h-full">
                     <CardSymbolIcon symbol={card.symbol} color={card.color} />
-                    <p className="text-lg font-bold">{card.value}</p>
+                    <p className="text-lg font-bold">{card.rank.name}</p>
                   </div>
                 )}
               </div>
