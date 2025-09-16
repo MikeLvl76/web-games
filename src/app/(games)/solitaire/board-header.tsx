@@ -9,6 +9,7 @@ import {
   SYMBOL_COLOR,
   CardColor,
 } from "@/server-actions/pack-generator";
+import { DraggableDataType, DroppableDataType } from "@/utils/misc/dnd-types";
 import { memo } from "react";
 
 type Props = {
@@ -24,17 +25,16 @@ export const BoardHeader = memo(
 
     return (
       <div className="flex flex-row justify-evenly items-center h-48 select-none">
-        {Object.entries(sequences).map(([sym, sq], index) => (
-          <Droppable
+        {Object.entries(sequences).map(([sym, sequence], index) => (
+          <Droppable<DroppableDataType>
             key={index}
             nodeId={`drop-seq-${index}`}
             data={{
               accepts: ["draw-drag", "col-drag"],
               type: "sequence",
-              sequence: sq,
-              symbol: sym,
+              symbol: sym as CardSymbol,
             }}
-            disabled={sq.length === 13}
+            disabled={sequence.length === 13}
           >
             <div className="relative w-24 h-32">
               <div className="absolute inset-0 flex justify-center items-center rounded-md bg-slate-400/70">
@@ -43,7 +43,7 @@ export const BoardHeader = memo(
                   color={SYMBOL_COLOR[sym as CardSymbol] as CardColor}
                 />
               </div>
-              {sq.length > 0 && (
+              {sequence.length > 0 && (
                 <div
                   className={`relative flex flex-col justify-center items-center gap-2 w-24 h-32 rounded-md bg-slate-200`}
                 >
@@ -52,7 +52,7 @@ export const BoardHeader = memo(
                     color={SYMBOL_COLOR[sym as CardSymbol] as CardColor}
                   />
                   <p className="text-lg font-bold">
-                    {sq[sq.length - 1].rank.name}
+                    {sequence[sequence.length - 1].rank.name}
                   </p>
                 </div>
               )}
@@ -62,14 +62,27 @@ export const BoardHeader = memo(
         <div className="relative w-24 h-32" />
 
         <div className="relative w-24 h-32">
-          <div className="absolute inset-0 rounded-md bg-slate-400/70" />
+          {drawnCards.length > 1 ? (
+            <div className="absolute inset-0 flex flex-col justify-center items-center w-24 h-32 bg-slate-200 hover:cursor-pointer rounded-md gap-2">
+              <CardSymbolIcon
+                symbol={drawnCards[drawnCards.length - 2].symbol}
+                color={drawnCards[drawnCards.length - 2].color}
+              />
+              <p className="text-lg font-bold">
+                {drawnCards[drawnCards.length - 2].rank.name}
+              </p>
+            </div>
+          ) : (
+            <div className="absolute inset-0 rounded-md bg-slate-400/70" />
+          )}
           {lastCard && (
-            <Draggable
+            <Draggable<DraggableDataType>
               nodeId={`drag-drawn-card-${drawnCards.length - 1}`}
               data={{
                 type: "draw-drag",
                 card: lastCard,
-                index: drawnCards.length - 1,
+                cardIndex: drawnCards.length - 1,
+                pileIndex: -1,
               }}
               disabled={drawnCards.length === 0}
             >

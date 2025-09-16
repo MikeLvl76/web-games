@@ -4,6 +4,7 @@ import CardSymbolIcon from "@/components/generic/card-symbol-icon";
 import Draggable from "@/components/generic/draggable";
 import Droppable from "@/components/generic/droppable";
 import { Card } from "@/server-actions/pack-generator";
+import { DraggableDataType, DroppableDataType } from "@/utils/misc/dnd-types";
 import { memo } from "react";
 
 type Props = {
@@ -13,27 +14,25 @@ type Props = {
 export const BoardMain = memo(({ piles }: Props) => (
   <div className="flex flex-row justify-evenly w-full select-none">
     {piles.map((pile, pileIndex) => (
-      <Droppable
+      <Droppable<DroppableDataType>
         key={pileIndex}
         nodeId={`drop-pile-${pileIndex}`}
         data={{
           accepts: ["col-drag", "draw-drag"],
           type: "pile",
-          pile,
-          dropPileIndex: pileIndex,
+          pileIndex,
         }}
       >
         <div className="relative w-24 h-32">
           <div className="absolute inset-0 rounded-md bg-slate-400/70" />
           {pile.map((card, cardIndex) => (
-            <Draggable
+            <Draggable<DraggableDataType>
               nodeId={`drag-card-${pileIndex}-${cardIndex}`}
               data={{
                 type: "col-drag",
-                dragPile: pile,
                 card,
                 cardIndex,
-                dragPileIndex: pileIndex,
+                pileIndex,
               }}
               disabled={card.isHidden}
               key={cardIndex}

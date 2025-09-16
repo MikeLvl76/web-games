@@ -11,6 +11,7 @@ import { BoardHeader } from "./board-header";
 import { BoardMain } from "./board-main";
 import { BoardTimer } from "./board-timer";
 import { compareCards } from "@/utils/misc/compare-cards";
+import { DraggableDataType, DroppableDataType } from "@/utils/misc/dnd-types";
 
 export default function SolitairePage() {
   const [pack, setPack] = useState<Card[]>([]);
@@ -69,109 +70,126 @@ export default function SolitairePage() {
     setDrawnCards((prev) => (card ? [...prev, card] : prev));
   }, [drawnCards, pack]);
 
-  const handleDragEnd = (event?: DragEndEvent) => {
-    const source = event?.active.data.current;
-    const dest = event?.over?.data.current;
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over) return;
 
-    if (dest?.accepts.includes(source?.type)) {
-      if (dest?.type === "pile") {
-        if (source?.type === "draw-drag") {
-          const { card, index } = source;
-          const { pile, pileIndex } = dest;
+    const source: DraggableDataType | undefined = active.data
+      .current as DraggableDataType;
 
-          if (pile.length === 0) {
-            card.isHidden = false;
-            pile.push(card);
-          } else {
-            const lastCard = pile[pile.length - 1];
+    const dest: DroppableDataType | undefined = over.data
+      .current as DroppableDataType;
+
+    if (!source || !dest) return;
+
+    if (dest.accepts?.includes(source.type)) {
+      if (dest.type === "pile") {
+        if (source.type === "draw-drag") {
+          const { card, cardIndex } = source;
+          const { pileIndex } = dest;
+
+          if (!pileIndex) return;
+          const _piles = [...piles];
+          const length = _piles[pileIndex].length;
+
+          if (length > 0) {
+            const lastCard = _piles[pileIndex][length - 1];
             if (!compareCards(lastCard, card)) {
-              console.log(lastCard, card);
               return;
             }
-            card.isHidden = false;
-            pile.push(card);
           }
-          const _piles = [...piles];
-          _piles.splice(pileIndex, 1, pile);
+
+          card.isHidden = false;
+          _piles[pileIndex].push(card);
+
           setPiles(_piles);
-          setDrawnCards((prev) => prev.slice(0, index));
+          setDrawnCards((prev) => prev.slice(0, cardIndex));
           return;
         }
 
-        if (source?.type === "col-drag") {
-          const { card, cardIndex, dragPileIndex, dragPile } = source;
-          const { pile, dropPileIndex } = dest;
+        if (source.type === "col-drag") {
+          const { card, pileIndex: dragPileIndex } = source;
+          const { pileIndex: dropPileIndex } = dest;
 
-          if (pile.length === 0) {
-            card.isHidden = false;
-            pile.push(card);
-          } else {
-            const lastCard = pile[pile.length - 1];
+          if (!dropPileIndex) return;
+          const _piles = [...piles];
+          const length = _piles[dropPileIndex].length;
+
+          if (length > 0) {
+            const lastCard = _piles[dropPileIndex][length - 1];
             if (!compareCards(lastCard, card)) {
-              console.log(lastCard, card);
               return;
             }
-            card.isHidden = false;
-            pile.push(card);
-          }
-          dragPile.splice(cardIndex, 1);
-          const lastCard = dragPile[dragPile.length - 1];
-          if (lastCard) {
-            lastCard.isHidden = false;
           }
 
-          const _piles = [...piles];
-          _piles.splice(dragPileIndex, 1, dragPile);
-          _piles.splice(dropPileIndex, 1, pile);
+          card.isHidden = false;
+          _piles[dropPileIndex].push(card);
+          _piles[dragPileIndex].pop();
+
+          const pileLastCard =
+            _piles[dragPileIndex][_piles[dragPileIndex].length - 1];
+          if (pileLastCard) {
+            pileLastCard.isHidden = false;
+          }
+
           setPiles(_piles);
           return;
         }
-      } else if (dest?.type === "sequence") {
-        if (source?.type === "draw-drag") {
-          const { card, index } = source;
-          const { sequence, symbol } = dest;
+      } else if (dest.type === "sequence") {
+        if (source.type === "draw-drag") {
+          const { card, cardIndex } = source;
+          const { symbol } = dest;
 
+          if (!symbol) return;
+
+          const sequence = sequences[symbol];
           const lastCard = sequence[sequence.length - 1];
-          if (!lastCard) {
-            if (card.rank.value > 1) {
-              return;
-            }
-          } else if (!compareCards(lastCard, card)) {
-            console.log(lastCard, card);
+
+          if (
+            (!lastCard && card.rank.value > 1) ||
+            (lastCard && !compareCards(lastCard, card, true))
+          ) {
             return;
           }
 
           card.isHidden = false;
-          sequence.push(card);
-
-          setSequences((prev) => ({ ...prev, [symbol]: sequence }));
-          setDrawnCards((prev) => prev.slice(0, index));
+          setSequences((prev) => ({
+            ...prev,
+            [symbol]: [...[symbol], card],
+          }));
+          setDrawnCards((prev) => prev.slice(0, cardIndex));
           return;
         }
 
-        if (source?.type === "col-drag") {
-          const { card, cardIndex, dragPileIndex, dragPile } = source;
-          const { sequence, symbol } = dest;
+        if (source.type === "col-drag") {
+          const { card, pileIndex } = source;
+          const { symbol } = dest;
 
+          if (!symbol) return;
+
+          const sequence = sequences[symbol];
           const lastCard = sequence[sequence.length - 1];
-          if (!lastCard) {
-            if (card.rank.value > 1) {
-              return;
-            }
-          } else if (!compareCards(lastCard, card)) {
-            console.log(lastCard, card);
+          const _piles = [...piles];
+
+          if (
+            (!lastCard && card.rank.value > 1) ||
+            (lastCard && !compareCards(lastCard, card, true))
+          ) {
             return;
           }
-          card.isHidden = false;
-          sequence.push(card);
-          dragPile.splice(cardIndex, 1);
-          dragPile[dragPile.length - 1].isHidden = false;
 
-          const _piles = [...piles];
-          _piles.splice(dragPileIndex, 1, dragPile);
+          card.isHidden = false;
+          setSequences((prev) => ({
+            ...prev,
+            [symbol]: [...[symbol], card],
+          }));
+
+          _piles[pileIndex].pop();
+          const pileLastCard = _piles[pileIndex][_piles[pileIndex].length - 1];
+          if (pileLastCard) {
+            pileLastCard.isHidden = false;
+          }
 
           setPiles(_piles);
-          setSequences((prev) => ({ ...prev, [symbol]: sequence }));
           return;
         }
       }
