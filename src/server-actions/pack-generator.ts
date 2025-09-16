@@ -24,9 +24,9 @@ export const generatePack = async () => {
     name: k === 0 ? "ace" : `${k + 1}`,
     value: k + 1,
   })).concat(
-    { name: "king", value: 11 },
+    { name: "jack", value: 11 },
     { name: "queen", value: 12 },
-    { name: "jack", value: 13 }
+    { name: "king", value: 13 }
   );
 
   const symbols = ["heart", "spade", "diamond", "club"] as const;

@@ -32,7 +32,6 @@ export const BoardHeader = memo(
               accepts: ["draw-drag", "col-drag"],
               type: "sequence",
               sequence: sq,
-              index,
               symbol: sym,
             }}
             disabled={sq.length === 13}

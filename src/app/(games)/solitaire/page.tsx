@@ -115,12 +115,63 @@ export default function SolitairePage() {
             pile.push(card);
           }
           dragPile.splice(cardIndex, 1);
-          dragPile[dragPile.length - 1].isHidden = false;
+          const lastCard = dragPile[dragPile.length - 1];
+          if (lastCard) {
+            lastCard.isHidden = false;
+          }
 
           const _piles = [...piles];
           _piles.splice(dragPileIndex, 1, dragPile);
           _piles.splice(dropPileIndex, 1, pile);
           setPiles(_piles);
+          return;
+        }
+      } else if (dest?.type === "sequence") {
+        if (source?.type === "draw-drag") {
+          const { card, index } = source;
+          const { sequence, symbol } = dest;
+
+          const lastCard = sequence[sequence.length - 1];
+          if (!lastCard) {
+            if (card.rank.value > 1) {
+              return;
+            }
+          } else if (!compareCards(lastCard, card)) {
+            console.log(lastCard, card);
+            return;
+          }
+
+          card.isHidden = false;
+          sequence.push(card);
+
+          setSequences((prev) => ({ ...prev, [symbol]: sequence }));
+          setDrawnCards((prev) => prev.slice(0, index));
+          return;
+        }
+
+        if (source?.type === "col-drag") {
+          const { card, cardIndex, dragPileIndex, dragPile } = source;
+          const { sequence, symbol } = dest;
+
+          const lastCard = sequence[sequence.length - 1];
+          if (!lastCard) {
+            if (card.rank.value > 1) {
+              return;
+            }
+          } else if (!compareCards(lastCard, card)) {
+            console.log(lastCard, card);
+            return;
+          }
+          card.isHidden = false;
+          sequence.push(card);
+          dragPile.splice(cardIndex, 1);
+          dragPile[dragPile.length - 1].isHidden = false;
+
+          const _piles = [...piles];
+          _piles.splice(dragPileIndex, 1, dragPile);
+
+          setPiles(_piles);
+          setSequences((prev) => ({ ...prev, [symbol]: sequence }));
           return;
         }
       }
