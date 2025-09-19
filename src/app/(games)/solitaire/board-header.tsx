@@ -11,6 +11,7 @@ import {
 } from "@/server-actions/pack-generator";
 import { DraggableDataType, DroppableDataType } from "@/utils/misc/dnd-types";
 import { memo } from "react";
+import { CardContainer } from "./card-container";
 
 type Props = {
   pack: Card[];
@@ -44,17 +45,12 @@ export const BoardHeader = memo(
                 />
               </div>
               {sequence.length > 0 && (
-                <div
-                  className={`relative flex flex-col justify-center items-center gap-2 w-24 h-32 rounded-md bg-slate-200`}
-                >
-                  <CardSymbolIcon
-                    symbol={sym as CardSymbol}
-                    color={SYMBOL_COLOR[sym as CardSymbol] as CardColor}
-                  />
-                  <p className="text-lg font-bold">
-                    {sequence[sequence.length - 1].rank.name}
-                  </p>
-                </div>
+                <CardContainer
+                  symbol={sym as CardSymbol}
+                  color={SYMBOL_COLOR[sym as CardSymbol] as CardColor}
+                  rank={sequence[sequence.length - 1].rank.name}
+                  className="relative flex flex-col justify-center items-center gap-2 w-24 h-32 rounded-md bg-slate-200"
+                />
               )}
             </div>
           </Droppable>
@@ -63,15 +59,12 @@ export const BoardHeader = memo(
 
         <div className="relative w-24 h-32">
           {drawnCards.length > 1 ? (
-            <div className="absolute inset-0 flex flex-col justify-center items-center w-24 h-32 bg-slate-200 hover:cursor-pointer rounded-md gap-2">
-              <CardSymbolIcon
-                symbol={drawnCards[drawnCards.length - 2].symbol}
-                color={drawnCards[drawnCards.length - 2].color}
-              />
-              <p className="text-lg font-bold">
-                {drawnCards[drawnCards.length - 2].rank.name}
-              </p>
-            </div>
+            <CardContainer
+              symbol={drawnCards[drawnCards.length - 2].symbol}
+              color={drawnCards[drawnCards.length - 2].color}
+              rank={drawnCards[drawnCards.length - 2].rank.name}
+              className="absolute inset-0 flex flex-col justify-center items-center w-24 h-32 bg-slate-200 hover:cursor-pointer rounded-md gap-2"
+            />
           ) : (
             <div className="absolute inset-0 rounded-md bg-slate-400/70" />
           )}
@@ -86,13 +79,12 @@ export const BoardHeader = memo(
               }}
               disabled={drawnCards.length === 0}
             >
-              <div className="relative flex flex-col justify-center items-center w-24 h-32 bg-slate-200 hover:cursor-pointer rounded-md gap-2">
-                <CardSymbolIcon
-                  symbol={lastCard.symbol}
-                  color={lastCard.color}
-                />
-                <p className="text-lg font-bold">{lastCard.rank.name}</p>
-              </div>
+              <CardContainer
+                symbol={lastCard.symbol}
+                color={lastCard.color}
+                rank={lastCard.rank.name}
+                className="relative flex flex-col justify-center items-center w-24 h-32 bg-slate-200 hover:cursor-pointer rounded-md gap-2"
+              />
             </Draggable>
           )}
         </div>
