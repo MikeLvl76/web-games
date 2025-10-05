@@ -87,19 +87,19 @@ export default function SolitairePage() {
           const { card, cardIndex } = source;
           const { pileIndex } = dest;
 
-          if (!pileIndex) return;
+          if (typeof pileIndex === "undefined") return;
           const _piles = [...piles];
-          const length = _piles[pileIndex].length;
+          const _pile = _piles[pileIndex];
 
-          if (length > 0) {
-            const lastCard = _piles[pileIndex][length - 1];
+          if (_pile.length > 0) {
+            const lastCard = _pile[_pile.length - 1];
             if (!compareCards(lastCard, card)) {
               return;
             }
           }
 
           card.isHidden = false;
-          _piles[pileIndex].push(card);
+          _pile.push(card);
 
           setPiles(_piles);
           setDrawnCards((prev) => prev.slice(0, cardIndex));
@@ -107,30 +107,29 @@ export default function SolitairePage() {
         }
 
         if (source.type === "col-drag") {
-          const { card, cardIndex, pileIndex: dragPileIndex, sub } = source;
+          const { cardIndex, pileIndex: dragPileIndex, sub } = source;
           const { pileIndex: dropPileIndex } = dest;
 
-          if (!dropPileIndex) return;
+          if (typeof dropPileIndex === "undefined" || sub.length === 0) return;
           const _piles = [...piles];
           const dragPile = _piles[dragPileIndex];
           const dropPile = _piles[dropPileIndex];
+          const subHead = sub[0];
 
           if (dropPile.length > 0) {
             const lastCard = dropPile[dropPile.length - 1];
-            if (!compareCards(lastCard, card)) {
+            if (!compareCards(lastCard, subHead)) {
               return;
             }
-          }
-
-          if (sub.length > 1) {
-            dropPile.push(...sub);
-            dragPile.splice(cardIndex, sub.length);
           } else {
-            dropPile.push(card);
-            dragPile.pop();
+            if (subHead.rank.name !== "king") return;
           }
 
-          card.isHidden = false;
+          sub.forEach((c) => {
+            c.isHidden = false;
+          });
+          dropPile.push(...sub);
+          dragPile.splice(cardIndex, sub.length);
 
           const pileLastCard = dragPile[dragPile.length - 1];
           if (pileLastCard) {

@@ -14,13 +14,16 @@ type Props = {
 
 export const BoardMain = memo(({ piles }: Props) => {
   const [activeStack, setActiveStack] = useState<Card[]>([]);
+  const [activeCard, setActiveCard] = useState<Card | null>();
 
   useDndMonitor({
     onDragStart({ active }: DragStartEvent) {
       setActiveStack(active.data?.current?.sub);
+      setActiveCard(active.data?.current?.card);
     },
     onDragEnd() {
       setActiveStack([]);
+      setActiveCard(null);
     },
   });
 
@@ -89,7 +92,7 @@ export const BoardMain = memo(({ piles }: Props) => {
         </Droppable>
       ))}
       <DragOverlay dropAnimation={{ duration: 250 }} zIndex={1}>
-        {activeStack && (
+        {activeStack.length > 0 && !activeCard && (
           <div className="relative w-24 h-32 translate-y-8">
             {activeStack.map((card, i) => (
               <div
@@ -107,9 +110,7 @@ export const BoardMain = memo(({ piles }: Props) => {
             ))}
           </div>
         )}
-      </DragOverlay>
-      {/* <DragOverlay dropAnimation={{ duration: 500 }} zIndex={1}>
-        {activeCard && (
+        {activeCard && activeStack.length < 2 && (
           <CardContainer
             symbol={activeCard.symbol}
             color={activeCard.color}
@@ -117,7 +118,7 @@ export const BoardMain = memo(({ piles }: Props) => {
             className="relative flex flex-col justify-center items-center gap-2 w-24 h-32 rounded-md bg-slate-200 border-2 border-black hover:cursor-grab"
           />
         )}
-      </DragOverlay> */}
+      </DragOverlay>
     </div>
   );
 });
