@@ -76,6 +76,7 @@ export const BoardHeader = memo(
                 card: lastCard,
                 cardIndex: drawnCards.length - 1,
                 pileIndex: -1,
+                sub: [],
               }}
               disabled={drawnCards.length === 0}
             >

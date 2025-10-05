@@ -107,26 +107,32 @@ export default function SolitairePage() {
         }
 
         if (source.type === "col-drag") {
-          const { card, pileIndex: dragPileIndex } = source;
+          const { card, cardIndex, pileIndex: dragPileIndex, sub } = source;
           const { pileIndex: dropPileIndex } = dest;
 
           if (!dropPileIndex) return;
           const _piles = [...piles];
-          const length = _piles[dropPileIndex].length;
+          const dragPile = _piles[dragPileIndex];
+          const dropPile = _piles[dropPileIndex];
 
-          if (length > 0) {
-            const lastCard = _piles[dropPileIndex][length - 1];
+          if (dropPile.length > 0) {
+            const lastCard = dropPile[dropPile.length - 1];
             if (!compareCards(lastCard, card)) {
               return;
             }
           }
 
-          card.isHidden = false;
-          _piles[dropPileIndex].push(card);
-          _piles[dragPileIndex].pop();
+          if (sub.length > 1) {
+            dropPile.push(...sub);
+            dragPile.splice(cardIndex, sub.length);
+          } else {
+            dropPile.push(card);
+            dragPile.pop();
+          }
 
-          const pileLastCard =
-            _piles[dragPileIndex][_piles[dragPileIndex].length - 1];
+          card.isHidden = false;
+
+          const pileLastCard = dragPile[dragPile.length - 1];
           if (pileLastCard) {
             pileLastCard.isHidden = false;
           }

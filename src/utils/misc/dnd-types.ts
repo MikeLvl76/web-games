@@ -10,6 +10,7 @@ export type DraggableDataType = DndDefaultDataType & {
   card: Card;
   cardIndex: number;
   pileIndex: number;
+  sub: Card[];
 };
 
 export type DroppableDataType = DndDefaultDataType & {

@@ -6,6 +6,7 @@ type CardRank = {
 };
 
 type Card = {
+  id: string;
   rank: CardRank;
   symbol: CardSymbol;
   color: CardColor;
@@ -44,6 +45,7 @@ export const generatePack = async () => {
           continue;
         }
         const card = {
+          id: `card-${rank.name}-${symbol}-${color}`,
           rank,
           symbol,
           color,

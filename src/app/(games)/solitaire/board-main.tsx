@@ -13,14 +13,14 @@ type Props = {
 };
 
 export const BoardMain = memo(({ piles }: Props) => {
-  const [activeCard, setActiveCard] = useState<Card | null>(null);
+  const [activeStack, setActiveStack] = useState<Card[]>([]);
 
   useDndMonitor({
     onDragStart({ active }: DragStartEvent) {
-      setActiveCard(active.data?.current?.card);
+      setActiveStack(active.data?.current?.sub);
     },
     onDragEnd() {
-      setActiveCard(null);
+      setActiveStack([]);
     },
   });
 
@@ -38,47 +38,77 @@ export const BoardMain = memo(({ piles }: Props) => {
         >
           <div className="relative w-24 h-32">
             <div className="absolute inset-0 rounded-md bg-slate-400/70" />
-            {pile.map((card, cardIndex) => (
-              <Draggable<DraggableDataType>
-                nodeId={`drag-card-${pileIndex}-${cardIndex}`}
-                data={{
-                  type: "col-drag",
-                  card,
-                  cardIndex,
-                  pileIndex,
-                }}
-                disabled={card.isHidden}
-                key={cardIndex}
-              >
-                <div
-                  key={cardIndex}
-                  className={`
-                    absolute w-24 h-32 rounded-md border-2 border-black shadow-2xl
-                    ${
-                      card.isHidden
-                        ? "bg-red-700"
-                        : "bg-slate-200 hover:cursor-pointer"
-                    }
-                  `}
-                  style={{
-                    top: `${cardIndex * 18}px`,
+            {pile.map((card, cardIndex) => {
+              const sub = pile.slice(cardIndex);
+
+              const isDragging =
+                activeStack.length > 0 &&
+                activeStack.some((c) => c.id === card.id);
+
+              return (
+                <Draggable<DraggableDataType>
+                  nodeId={card.id}
+                  data={{
+                    type: "col-drag",
+                    card,
+                    cardIndex,
+                    pileIndex,
+                    sub,
                   }}
+                  disabled={card.isHidden}
+                  key={card.id}
                 >
-                  {!card.isHidden && (
-                    <CardContainer
-                      symbol={card.symbol}
-                      color={card.color}
-                      rank={card.rank.name}
-                      className="flex flex-col justify-center items-center gap-2 h-full"
-                    />
-                  )}
-                </div>
-              </Draggable>
-            ))}
+                  <div
+                    key={cardIndex}
+                    className={`
+                      absolute w-24 h-32 rounded-md border-2 border-black shadow-2xl
+                      ${
+                        card.isHidden
+                          ? "bg-red-700"
+                          : "bg-slate-200 hover:cursor-pointer"
+                      }
+                      ${isDragging ? "opacity-0" : "opacity-100"}
+                    `}
+                    style={{
+                      top: `${cardIndex * 18}px`,
+                    }}
+                  >
+                    {!card.isHidden && (
+                      <CardContainer
+                        symbol={card.symbol}
+                        color={card.color}
+                        rank={card.rank.name}
+                        className="flex flex-col justify-center items-center gap-2 h-full"
+                      />
+                    )}
+                  </div>
+                </Draggable>
+              );
+            })}
           </div>
         </Droppable>
       ))}
-      <DragOverlay dropAnimation={{ duration: 500 }} zIndex={1}>
+      <DragOverlay dropAnimation={{ duration: 250 }} zIndex={1}>
+        {activeStack && (
+          <div className="relative w-24 h-32 translate-y-8">
+            {activeStack.map((card, i) => (
+              <div
+                key={card.id}
+                className="absolute w-full h-full rounded-md border-2 border-black bg-slate-200"
+                style={{ top: `${i * 18}px` }}
+              >
+                <CardContainer
+                  symbol={card.symbol}
+                  color={card.color}
+                  rank={card.rank.name}
+                  className="flex flex-col justify-center items-center gap-2 h-full hover:cursor-grab"
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </DragOverlay>
+      {/* <DragOverlay dropAnimation={{ duration: 500 }} zIndex={1}>
         {activeCard && (
           <CardContainer
             symbol={activeCard.symbol}
@@ -87,7 +117,7 @@ export const BoardMain = memo(({ piles }: Props) => {
             className="relative flex flex-col justify-center items-center gap-2 w-24 h-32 rounded-md bg-slate-200 border-2 border-black hover:cursor-grab"
           />
         )}
-      </DragOverlay>
+      </DragOverlay> */}
     </div>
   );
 });
