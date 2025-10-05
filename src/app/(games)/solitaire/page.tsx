@@ -12,6 +12,7 @@ import { BoardMain } from "./board-main";
 import { BoardTimer } from "./board-timer";
 import { compareCards } from "@/utils/misc/compare-cards";
 import { DraggableDataType, DroppableDataType } from "@/utils/misc/dnd-types";
+import { RotateCcw } from "lucide-react";
 
 export default function SolitairePage() {
   const [pack, setPack] = useState<Card[]>([]);
@@ -23,6 +24,7 @@ export default function SolitairePage() {
   });
   const [drawnCards, setDrawnCards] = useState<Card[]>([]);
   const [piles, setPiles] = useState<Card[][]>([[], [], [], [], [], [], []]);
+  const [isEnd, setIsEnd] = useState(false);
 
   const init = useCallback(async () => {
     try {
@@ -206,17 +208,60 @@ export default function SolitairePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const cards = Object.values(sequences);
+    setIsEnd(cards.every((sq) => sq.length === 13));
+  }, [sequences]);
+
   return (
     <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
-      <div className="flex flex-col w-[70vw] h-[80vh] bg-green-800 rounded-md">
-        <BoardTimer />
-        <BoardHeader
-          pack={pack}
-          sequences={sequences}
-          drawnCards={drawnCards}
-          draw={draw}
+      <div className="w-[70vw] h-[80vh] flex flex-row gap-2">
+        <div className="flex flex-col w-full h-full bg-green-800 rounded-md">
+          {isEnd ? (
+            <div className="self-center justify-self-center flex flex-col justify-center items-center gao-2 p-2">
+              <p className="text-3xl font-bold text-center text-white">
+                You win!
+              </p>
+              <button
+                onClick={() => {
+                  setIsEnd(false);
+                  setPack([]);
+                  setDrawnCards([]);
+                  setSequences({ club: [], diamond: [], heart: [], spade: [] });
+                  setPiles([]);
+                  init();
+                }}
+                className="bg-blue-500 rounded-md w-fit h-fit p-2 text-white"
+              >
+                Restart
+              </button>
+            </div>
+          ) : (
+            <>
+              <BoardTimer />
+              <BoardHeader
+                pack={pack}
+                sequences={sequences}
+                drawnCards={drawnCards}
+                draw={draw}
+              />
+              <BoardMain piles={piles} />
+            </>
+          )}
+        </div>
+        <RotateCcw
+          color="white"
+          size={32}
+          onClick={() => {
+            setIsEnd(false);
+            setPack([]);
+            setDrawnCards([]);
+            setSequences({ club: [], diamond: [], heart: [], spade: [] });
+            setPiles([]);
+            init();
+          }}
+          className="self-start w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
         />
-        <BoardMain piles={piles} />
       </div>
     </DndContext>
   );
