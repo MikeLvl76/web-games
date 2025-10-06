@@ -44,11 +44,21 @@ export class Cell {
   }
 
   draw() {
-    this.p.stroke(127);
-    this.p.strokeWeight(2);
-
     const [x, y] = this.position;
     const [w, h] = this.dimensions;
+
+    if (this.type !== "normal") {
+      this.p.noStroke();
+      if (this.type === "entry") {
+        this.p.fill(2, 224, 36);
+      } else {
+        this.p.fill(235, 64, 12);
+      }
+      this.p.rect(x, y, w, h);
+    }
+
+    this.p.stroke(190);
+    this.p.strokeWeight(2);
 
     if (this.walls.left) {
       this.p.line(x, y, x, y + h);
@@ -64,16 +74,6 @@ export class Cell {
 
     if (this.walls.bottom) {
       this.p.line(x, y + h, x + w, y + h);
-    }
-
-    if (this.type !== "normal") {
-      this.p.noStroke();
-      if (this.type === "entry") {
-        this.p.fill(2, 224, 36);
-      } else {
-        this.p.fill(235, 64, 12);
-      }
-      this.p.rect(x + w * 0.1, y + h * 0.1, w * 0.8, h * 0.8);
     }
   }
 }

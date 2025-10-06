@@ -4,10 +4,6 @@ import { Cell, CellType, CellWallsDisplay } from "./cell";
 export class Maze {
   p: p5;
   cells: Cell[];
-  visitedCells: Cell[];
-  currentCell: Cell | null;
-  moves: number;
-  exitFound: boolean;
 
   constructor(_p: p5, size: number) {
     this.p = _p;
@@ -27,10 +23,8 @@ export class Maze {
       );
     }
 
-    this.visitedCells = [];
-    this.currentCell = null;
-    this.moves = 0;
-    this.exitFound = false;
+    this.generate();
+    this.setEntryAndExit();
   }
 
   isEmpty() {
@@ -62,8 +56,15 @@ export class Maze {
     exitCell.type = "exit";
   }
 
-  getEntryOrExit(_type: Exclude<CellType, "normal">): Cell | undefined {
-    return this.cells.find(({ type }) => type === _type);
+  getEntryOrExit(_type: Exclude<CellType, "normal">): [Cell, number] | null {
+    for (let i = 0; i < this.cells.length; i++) {
+      const cell = this.cells[i];
+      if (cell.type === _type) {
+        return [cell, i];
+      }
+    }
+
+    return null;
   }
 
   cellNeighbors(index: number, includeVisited: boolean) {
