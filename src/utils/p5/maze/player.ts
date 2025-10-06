@@ -40,6 +40,13 @@ export class Player {
     ) as [number, number];
   }
 
+  reset() {
+    const [cell, index] = this.maze.getEntryOrExit("entry")!;
+    this.updatePosition(cell);
+    this.info = { cell, index };
+    this.visitedCells.splice(0, this.visitedCells.length, cell);
+  }
+
   move() {
     const moveTo = (
       dx: number,

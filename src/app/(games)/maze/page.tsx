@@ -38,6 +38,10 @@ export default function MazePage() {
       if (p.key === "h") {
         player.showVisitedCells = !player.showVisitedCells;
       }
+
+      if (p.key === "r") {
+        player.reset();
+      }
     };
   };
 
