@@ -73,7 +73,7 @@ export class Cell {
       } else {
         this.p.fill(235, 64, 12);
       }
-      this.p.rect(x, y, w, h);
+      this.p.rect(x + w * 0.1, y + h * 0.1, w * 0.8, h * 0.8);
     }
   }
 }
