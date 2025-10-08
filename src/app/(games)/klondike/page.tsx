@@ -14,7 +14,7 @@ import { compareCards } from "@/utils/misc/compare-cards";
 import { DraggableDataType, DroppableDataType } from "@/utils/misc/dnd-types";
 import { RotateCcw } from "lucide-react";
 
-export default function SolitairePage() {
+export default function KlondikePage() {
   const [pack, setPack] = useState<Card[]>([]);
   const [sequences, setSequences] = useState<Record<CardSymbol, Card[]>>({
     club: [],
