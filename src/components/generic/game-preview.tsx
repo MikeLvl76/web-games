@@ -1,10 +1,9 @@
-"use client";
-
 import { Preview } from "@/server-actions/preview";
-import { CircleSlash, HeartPlus } from "lucide-react";
+import { CircleSlash, Heart, HeartPlus } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { useStorageContext } from "../provider/storage";
 
 type Props = {
   data: Preview;
@@ -12,7 +11,9 @@ type Props = {
 
 export default function GamePreview({ data }: Props) {
   const { name, url, estimatedPlaytime, type, filepath } = data;
+  const { content, setContent } = useStorageContext();
   const [error, setError] = useState(false);
+  const [added, setAdded] = useState(content.favoriteGames.includes(name));
 
   return (
     <div className="w-[50vw] h-[30vh] rounded-md shadow-2xl/50">
@@ -40,16 +41,44 @@ export default function GamePreview({ data }: Props) {
             <p className="text-sm font-medium text-white bg-black rounded-2xl p-2 w-fit h-fit">
               {name}
             </p>
-            <HeartPlus
-              size={20}
-              color="white"
-              className="text-sm font-medium bg-black rounded-2xl p-2 w-fit h-fit"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                alert("Clicked");
-              }}
-            />
+            {added ? (
+              <Heart
+                size={20}
+                color="white"
+                fill="white"
+                className="text-sm font-medium bg-black rounded-2xl p-2 w-fit h-fit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  setContent((prev) => ({
+                    ...prev,
+                    favoriteGames: prev.favoriteGames.filter(
+                      (_n) => _n !== name
+                    ),
+                  }));
+
+                  setAdded(!added);
+                }}
+              />
+            ) : (
+              <HeartPlus
+                size={20}
+                color="white"
+                className="text-sm font-medium bg-black rounded-2xl p-2 w-fit h-fit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  setContent((prev) => ({
+                    ...prev,
+                    favoriteGames: [...prev.favoriteGames, name],
+                  }));
+
+                  setAdded(!added);
+                }}
+              />
+            )}
           </div>
           <div
             className="absolute bottom-0 left-0 w-full flex flex-row items-center justify-end gap-2 translate-y-full group-hover:translate-y-0
