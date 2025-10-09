@@ -1,3 +1,5 @@
+"use client";
+
 import { CardColor, CardSymbol } from "@/server-actions/pack-generator";
 import { Club, Spade, Heart, Diamond, TriangleAlert } from "lucide-react";
 

@@ -9,7 +9,7 @@ import {
   SYMBOL_COLOR,
   CardColor,
 } from "@/server-actions/pack-generator";
-import { DraggableDataType, DroppableDataType } from "@/utils/misc/dnd-types";
+import { DraggableDataType, DroppableDataType } from "@/lib/utils";
 import { memo } from "react";
 import { CardContainer } from "./card-container";
 

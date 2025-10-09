@@ -1,5 +1,6 @@
 "use client";
 
+import { stringifyTime } from "@/lib/utils";
 import { memo, useEffect, useState } from "react";
 
 type Props = {
@@ -7,7 +8,9 @@ type Props = {
 };
 
 export const BoardTimer = memo(({ hasEnded }: Props) => {
-  const [timer, setTimer] = useState("0d 00:00:00");
+  const [timer, setTimer] = useState(
+    stringifyTime(0, { includeDay: true, includeHour: true })
+  );
 
   useEffect(() => {
     if (hasEnded) return;
@@ -16,16 +19,7 @@ export const BoardTimer = memo(({ hasEnded }: Props) => {
     const interval = setInterval(() => {
       time++;
 
-      const days = Math.floor(time / (3600 * 24));
-      const hours = Math.floor((time % (3600 * 24)) / 3600);
-      const minutes = Math.floor((time % 3600) / 60);
-      const seconds = time % 60;
-
-      setTimer(
-        `${days}d ${hours.toString().padStart(2, "0")}:${minutes
-          .toString()
-          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
-      );
+      setTimer(stringifyTime(time, { includeDay: true, includeHour: true }));
     }, 1000);
 
     return () => clearInterval(interval);

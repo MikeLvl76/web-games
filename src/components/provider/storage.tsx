@@ -1,11 +1,11 @@
 "use client";
 
 import {
+  StorageData,
   createDefaultData,
   getStorageData,
   setStorageData,
-  StorageData,
-} from "@/utils/misc/local-storage";
+} from "@/lib/utils";
 import {
   createContext,
   Dispatch,

@@ -3,7 +3,7 @@
 import Draggable from "@/components/generic/draggable";
 import Droppable from "@/components/generic/droppable";
 import { Card } from "@/server-actions/pack-generator";
-import { DraggableDataType, DroppableDataType } from "@/utils/misc/dnd-types";
+import { DraggableDataType, DroppableDataType } from "@/lib/utils";
 import { memo, useState } from "react";
 import { CardContainer } from "./card-container";
 import { DragOverlay, DragStartEvent, useDndMonitor } from "@dnd-kit/core";

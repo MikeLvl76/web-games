@@ -1,8 +1,8 @@
 "use client";
 
-import P5Sketch from "@/components/ui/p5-sketch";
-import { Food } from "@/utils/p5/snake/food";
-import { Snake } from "@/utils/p5/snake/snake";
+import P5Sketch from "@/components/generic/p5-sketch";
+import { Food } from "@/lib/p5/snake/food";
+import { Snake } from "@/lib/p5/snake/snake";
 import { RotateCcw } from "lucide-react";
 import p5 from "p5";
 import { useState } from "react";

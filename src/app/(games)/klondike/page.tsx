@@ -10,8 +10,11 @@ import { useCallback, useEffect, useState } from "react";
 import { BoardHeader } from "./board-header";
 import { BoardMain } from "./board-main";
 import { BoardTimer } from "./board-timer";
-import { compareCards } from "@/utils/misc/compare-cards";
-import { DraggableDataType, DroppableDataType } from "@/utils/misc/dnd-types";
+import {
+  compareCards,
+  DraggableDataType,
+  DroppableDataType,
+} from "@/lib/utils";
 import { RotateCcw } from "lucide-react";
 
 export default function KlondikePage() {

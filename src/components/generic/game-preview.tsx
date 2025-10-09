@@ -1,3 +1,5 @@
+"use client";
+
 import { Preview } from "@/server-actions/preview";
 import { CircleSlash, Heart, HeartPlus } from "lucide-react";
 import Link from "next/link";
