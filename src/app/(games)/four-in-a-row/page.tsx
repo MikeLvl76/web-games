@@ -1,11 +1,13 @@
 "use client";
 
+import { ArrowBigDown } from "lucide-react";
 import { memo, useCallback, useState } from "react";
 
 type Token = "red" | "yellow" | undefined;
 
 export default function FourInARowPage() {
   const [tokens, setTokens] = useState<Token[]>(Array(42).fill(undefined));
+  const [isHoveringIndex, setIsHoveringIndex] = useState(-1);
 
   const findSuitableIndex = useCallback(
     (colIndex: number) => {
@@ -42,19 +44,58 @@ export default function FourInARowPage() {
     [findSuitableIndex, tokens]
   );
 
-  const Board = memo(() => (
-    <div className="grid grid-cols-7 items-center gap-2 bg-blue-600 w-[40vw] h-full rounded-lg p-2">
-      {tokens.map((token, i) => (
+  const Column = memo(({ index }: { index: number }) => {
+    const rowSize = 7;
+    const colSize = 6;
+
+    const elements = Array.from(
+      { length: colSize },
+      (_, k) => tokens[k * rowSize + index]
+    );
+
+    return (
+      <div className="relative">
+        {isHoveringIndex === index && (
+          <ArrowBigDown
+            color="black"
+            fill="red"
+            size={64}
+            className="absolute -top-20"
+          />
+        )}
         <div
-          key={i}
-          onClick={() => handleClick(i)}
-          className={`${
-            token ? "bg-red-400" : "bg-white"
-          } rounded-full w-16 h-16 place-self-center hover:cursor-pointer`}
-        />
-      ))}
-    </div>
-  ));
+          onMouseEnter={() => setIsHoveringIndex(index)}
+          onMouseLeave={() => setIsHoveringIndex(-1)}
+          className="flex flex-col gap-4 items-center"
+        >
+          {elements.map((elt, i) => (
+            <div
+              key={i}
+              onClick={() => handleClick(index)}
+              className={`${
+                elt ? "bg-red-400" : "bg-white"
+              } rounded-full w-16 h-16 place-self-center hover:cursor-pointer`}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  });
+  Column.displayName = "Column";
+
+  const Board = memo(() => {
+    const rowSize = 7;
+
+    const columns = Array.from({ length: rowSize }, (_, k) => (
+      <Column key={k} index={k} />
+    ));
+
+    return (
+      <div className="flex flex-row w-fit h-fit gap-4 justify-center items-center bg-blue-600 rounded-lg p-4">
+        {columns}
+      </div>
+    );
+  });
   Board.displayName = "Board";
 
   return (
