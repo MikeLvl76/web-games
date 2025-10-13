@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowBigDown } from "lucide-react";
+import { ArrowBigDown, RotateCcw } from "lucide-react";
 import { memo, useCallback, useState } from "react";
 
 type Token = "red" | "yellow" | undefined;
@@ -8,6 +8,7 @@ type Token = "red" | "yellow" | undefined;
 export default function FourInARowPage() {
   const [tokens, setTokens] = useState<Token[]>(Array(42).fill(undefined));
   const [isHoveringIndex, setIsHoveringIndex] = useState(-1);
+  const [playerColor, setPlayerColor] = useState<NonNullable<Token>>("red");
 
   const findSuitableIndex = useCallback(
     (colIndex: number) => {
@@ -33,15 +34,16 @@ export default function FourInARowPage() {
       if (index < 0 || index >= rowSize) return;
 
       const col = index % rowSize;
-      const _cells = [...tokens];
+      const _tokens = [...tokens];
 
       const suitableIndex = findSuitableIndex(col);
       if (suitableIndex !== -1) {
-        _cells[suitableIndex] = "red";
-        setTokens(_cells);
+        _tokens[suitableIndex] = playerColor;
+        setTokens(_tokens);
+        setPlayerColor((prev) => (prev === "red" ? "yellow" : "red"));
       }
     },
-    [findSuitableIndex, tokens]
+    [findSuitableIndex, playerColor, tokens]
   );
 
   const Column = memo(({ index }: { index: number }) => {
@@ -73,7 +75,11 @@ export default function FourInARowPage() {
               key={i}
               onClick={() => handleClick(index)}
               className={`${
-                elt ? "bg-red-400" : "bg-white"
+                elt
+                  ? elt === "red"
+                    ? "bg-red-400"
+                    : "bg-amber-200"
+                  : "bg-white"
               } rounded-full w-16 h-16 place-self-center hover:cursor-pointer`}
             />
           ))}
@@ -101,6 +107,31 @@ export default function FourInARowPage() {
   return (
     <div className="flex flex-row justify-center w-[80vw] h-[70vh] gap-4">
       <Board />
+      <div className="flex flex-col items-start gap-4 w-[15vw]">
+        <span className="font-bold text-xl">Player vs Player</span>
+        <div className="w-full">
+          <div className="flex flex-row items-center justify-between">
+            <p>Current turn</p>
+            <p className="font-bold text-slate-700">
+              {playerColor === "red" ? "Player 1" : "Player 2"}
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-row items-center justify-between w-full">
+          <p>Time</p>
+          <p className="font-bold text-slate-700">TODO</p>
+        </div>
+        <div className="flex w-full">
+          <RotateCcw
+            color="white"
+            size={24}
+            onClick={() => {
+              alert("TODO");
+            }}
+            className="self-start w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+          />
+        </div>
+      </div>
     </div>
   );
 }
