@@ -1,7 +1,8 @@
 "use client";
 
+import { stringifyTime } from "@/lib/utils";
 import { ArrowBigDown, RotateCcw } from "lucide-react";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 
 type Token = "red" | "yellow" | undefined;
 
@@ -9,6 +10,10 @@ export default function FourInARowPage() {
   const [tokens, setTokens] = useState<Token[]>(Array(42).fill(undefined));
   const [isHoveringIndex, setIsHoveringIndex] = useState(-1);
   const [playerColor, setPlayerColor] = useState<NonNullable<Token>>("red");
+  const [timer, setTimer] = useState<{ value: number; text: string }>({
+    value: 0,
+    text: "00:00",
+  });
 
   const findSuitableIndex = useCallback(
     (colIndex: number) => {
@@ -45,6 +50,17 @@ export default function FourInARowPage() {
     },
     [findSuitableIndex, playerColor, tokens]
   );
+
+  useEffect(() => {
+    let time = 0;
+    const interval = setInterval(() => {
+      time++;
+
+      setTimer({ value: time, text: stringifyTime(time) });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const Column = memo(({ index }: { index: number }) => {
     const rowSize = 7;
@@ -119,7 +135,7 @@ export default function FourInARowPage() {
         </div>
         <div className="flex flex-row items-center justify-between w-full">
           <p>Time</p>
-          <p className="font-bold text-slate-700">TODO</p>
+          <p className="font-bold text-slate-700">{timer.text}</p>
         </div>
         <div className="flex w-full">
           <RotateCcw
