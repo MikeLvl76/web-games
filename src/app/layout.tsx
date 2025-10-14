@@ -33,9 +33,11 @@ export default function RootLayout({
         <StorageProvider>
           <SidebarProvider defaultOpen={false}>
             <AppSidebar />
-            <main className="flex-1">
-              <SidebarTrigger />
-              {children}
+            <main className="relative flex-1">
+              <SidebarTrigger className="fixed top-4 z-50" />
+              <div className="overflow-y-auto h-full no-scrollbar">
+                {children}
+              </div>
             </main>
           </SidebarProvider>
         </StorageProvider>

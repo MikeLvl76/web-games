@@ -23,14 +23,14 @@ const items: SidebarItem[] = [
 
 export function AppSidebar() {
   return (
-    <Sidebar className="border-none shadow-2xl/50 bg-black/80">
+    <Sidebar className="border-none shadow-2xl/50 bg-black/80 fixed z-50">
       <SidebarContent className="w-full h-full">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item, i) => (
                 <SidebarMenuItem
-                  key={item.title}
+                  key={item.title ?? i}
                   className="flex w-full h-[10vh] items-center hover:bg-black/50"
                 >
                   <SidebarMenuButton size="lg" asChild>

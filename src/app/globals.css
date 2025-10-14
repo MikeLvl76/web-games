@@ -24,3 +24,13 @@ body {
 nextjs-portal {
   display: none;
 }
+
+@layer components {
+  .hide-scrollbar {
+    scrollbar-width: 0px;
+    scrollbar-color: transparent;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}

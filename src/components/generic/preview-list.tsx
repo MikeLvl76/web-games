@@ -3,6 +3,12 @@
 import { Preview } from "@/server-actions/preview";
 import { useState, useEffect } from "react";
 import GamePreview from "./game-preview";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 
 type Props = {
   previews: Preview[];
@@ -35,8 +41,8 @@ export default function PreviewList({ previews }: Props) {
   }, [previews, searchText, type]);
 
   return (
-    <div className="flex flex-col w-full h-full items-center gap-4 p-2">
-      <div className="flex flex-row items-center justify-center gap-8 w-full">
+    <div className="relative flex flex-col w-full h-full items-center p-2">
+      <div className="fixed top-0 z-10 flex flex-row items-center justify-center gap-8 w-[80%] h-16 bg-white">
         <div className="flex flex-row items-center justify-center gap-2">
           <input
             type="text"
@@ -67,7 +73,7 @@ export default function PreviewList({ previews }: Props) {
           </select>
         </div>
       </div>
-      <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-16">
         {filteredPreviews.map((preview) => (
           <li
             key={preview.id}
@@ -77,6 +83,13 @@ export default function PreviewList({ previews }: Props) {
           </li>
         ))}
       </ul>
+      <div className="fixed bottom-0 z-20 flex flex-row justify-center items-center gap-4 w-full h-12 bg-white">
+        <ChevronsLeft />
+        <ChevronLeft />
+        <span>0</span>
+        <ChevronRight />
+        <ChevronsRight />
+      </div>
     </div>
   );
 }

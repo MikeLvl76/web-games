@@ -79,6 +79,14 @@ export const getGamesPreview = async () => {
       filepath: getFilepath("four-in-a-row"),
       id: "four-in-a-row-game",
     },
+    {
+      name: "Match 3",
+      url: "match-3",
+      id: "match-3-game",
+      filepath: getFilepath("match-3"),
+      type: "solo",
+      estimatedPlaytime: "5 min",
+    },
   ];
 
   return PREVIEWS;
