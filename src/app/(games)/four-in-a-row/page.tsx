@@ -2,9 +2,10 @@
 
 import { stringifyTime } from "@/lib/utils";
 import { ArrowBigDown, RotateCcw } from "lucide-react";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 type Token = "red" | "yellow" | undefined;
+const WINNING_COLLECTION_LENGTH = 4;
 
 export default function FourInARowPage() {
   const [tokens, setTokens] = useState<Token[]>(Array(42).fill(undefined));
@@ -12,8 +13,10 @@ export default function FourInARowPage() {
   const [playerColor, setPlayerColor] = useState<NonNullable<Token>>("red");
   const [timer, setTimer] = useState<{ value: number; text: string }>({
     value: 0,
-    text: "00:00",
+    text: stringifyTime(0),
   });
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isEnd, setIsEnd] = useState(false);
 
   const findSuitableIndex = useCallback(
     (colIndex: number) => {
@@ -32,8 +35,72 @@ export default function FourInARowPage() {
     [tokens]
   );
 
+  const checkEndGame = useCallback(
+    (_tokens: Token[], index: number, color: NonNullable<Token>) => {
+      const rowSize = 7;
+      const colSize = 6;
+
+      for (let r = 0; r < colSize; r++) {
+        for (let c = 0; c < rowSize - 3; c++) {
+          const collection = Array.from(
+            { length: WINNING_COLLECTION_LENGTH },
+            (_, k) => _tokens[index + k]
+          );
+
+          if (collection.every((token) => token === color)) {
+            return true;
+          }
+        }
+      }
+
+      for (let r = 0; r < colSize - 3; r++) {
+        for (let c = 0; c < rowSize; c++) {
+          const collection = Array.from(
+            { length: WINNING_COLLECTION_LENGTH },
+            (_, k) => _tokens[index + k * rowSize]
+          );
+
+          if (collection.every((token) => token === color)) {
+            return true;
+          }
+        }
+      }
+
+      for (let r = 0; r < colSize - 3; r++) {
+        for (let c = 0; c < rowSize - 3; c++) {
+          const collection = Array.from(
+            { length: WINNING_COLLECTION_LENGTH },
+            (_, k) => _tokens[index + k * (rowSize + 1)]
+          );
+
+          if (collection.every((token) => token === color)) {
+            return true;
+          }
+        }
+      }
+
+      for (let r = 3; r < colSize; r++) {
+        for (let c = 0; c < rowSize - 3; c++) {
+          const collection = Array.from(
+            { length: WINNING_COLLECTION_LENGTH },
+            (_, k) => _tokens[index + k * (rowSize - 1)]
+          );
+
+          if (collection.every((token) => token === color)) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    },
+    []
+  );
+
   const handleClick = useCallback(
     (index: number) => {
+      if (isEnd) return;
+
       const rowSize = 7;
 
       if (index < 0 || index >= rowSize) return;
@@ -44,23 +111,35 @@ export default function FourInARowPage() {
       const suitableIndex = findSuitableIndex(col);
       if (suitableIndex !== -1) {
         _tokens[suitableIndex] = playerColor;
+
+        const isWin = checkEndGame(_tokens, suitableIndex, playerColor);
+
+        if (isWin) {
+          setIsEnd(true);
+        } else {
+          setPlayerColor((prev) => (prev === "red" ? "yellow" : "red"));
+        }
+
         setTokens(_tokens);
-        setPlayerColor((prev) => (prev === "red" ? "yellow" : "red"));
       }
     },
-    [findSuitableIndex, playerColor, tokens]
+    [checkEndGame, findSuitableIndex, isEnd, playerColor, tokens]
   );
 
   useEffect(() => {
-    let time = 0;
-    const interval = setInterval(() => {
-      time++;
+    if (isEnd) return;
 
-      setTimer({ value: time, text: stringifyTime(time) });
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    intervalRef.current = setInterval(() => {
+      setTimer((prev) => ({
+        value: prev.value + 1,
+        text: stringifyTime(prev.value + 1),
+      }));
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(intervalRef.current!);
+  }, [isEnd]);
 
   const Column = memo(({ index }: { index: number }) => {
     const rowSize = 7;
@@ -137,12 +216,29 @@ export default function FourInARowPage() {
           <p>Time</p>
           <p className="font-bold text-slate-700">{timer.text}</p>
         </div>
-        <div className="flex w-full">
+        <div className="flex flex-row justify-between items-center w-full">
+          {isEnd &&
+            (playerColor === "red" ? (
+              <span className="text-lg font-bold">Player 1 won!</span>
+            ) : (
+              <span className="text-lg font-bold">Player 2 won!</span>
+            ))}
           <RotateCcw
             color="white"
             size={24}
             onClick={() => {
-              alert("TODO");
+              setIsEnd(false);
+              setTimer({ value: 0, text: stringifyTime(0) });
+              setPlayerColor("red");
+              setIsHoveringIndex(-1);
+              setTokens(Array(42).fill(undefined));
+              clearInterval(intervalRef.current!);
+              intervalRef.current = setInterval(() => {
+                setTimer((prev) => ({
+                  value: prev.value + 1,
+                  text: stringifyTime(prev.value + 1),
+                }));
+              }, 1000);
             }}
             className="self-start w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
           />
