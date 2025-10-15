@@ -1,17 +1,10 @@
 "use client";
 
 import PreviewList from "@/components/generic/preview-list";
-import { getGamesPreview, Preview } from "@/server-actions/preview";
-import { useEffect, useState } from "react";
+import { usePreviews } from "@/hooks/use-previews";
 
 export default function HomePage() {
-  const [previews, setPreviews] = useState<Preview[]>([]);
-
-  useEffect(() => {
-    getGamesPreview()
-      .then((res) => setPreviews(res))
-      .catch((e) => console.error(e));
-  }, []);
+  const previews = usePreviews({ sort: "asc" });
 
   return <PreviewList previews={previews} />;
 }

@@ -7,6 +7,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export type Preview = {
+  id: string;
+  name: string;
+  url: string;
+  filepath: string;
+  type: "puzzle" | "versus" | "solo";
+  estimatedPlaytime: string;
+};
+
+export const getFilepath = (filename: string) => {
+  return `/images/${filename}.png`;
+};
+
 export const compareCards = (c1: Card, c2: Card, includeSequence?: boolean) =>
   (includeSequence &&
     c2.rank.value - c1.rank.value === 1 &&

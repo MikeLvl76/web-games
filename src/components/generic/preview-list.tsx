@@ -1,6 +1,5 @@
 "use client";
 
-import { Preview } from "@/server-actions/preview";
 import { useState, useEffect } from "react";
 import GamePreview from "./game-preview";
 import {
@@ -9,6 +8,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
+import { Preview } from "@/lib/utils";
 
 type Props = {
   previews: Preview[];
