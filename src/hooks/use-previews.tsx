@@ -73,10 +73,18 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("four-in-a-row"),
     id: "four-in-a-row-game",
   },
+  {
+    name: "Rock, Paper, Scissors",
+    url: "rock-paper-scissors",
+    type: "versus",
+    estimatedPlaytime: "30 sec",
+    filepath: getFilepath("rock-paper-scissors"),
+    id: "rock-paper-scissors-game",
+  },
 ];
 
 export function usePreviews({ sort, filter }: Props = {}) {
-  const getPreviews = useMemo(() => {
+  const previews = useMemo(() => {
     const previews = [...DEFAULT_PREVIEWS];
 
     if (filter) {
@@ -98,5 +106,5 @@ export function usePreviews({ sort, filter }: Props = {}) {
     return previews;
   }, [filter, sort]);
 
-  return getPreviews;
+  return previews;
 }

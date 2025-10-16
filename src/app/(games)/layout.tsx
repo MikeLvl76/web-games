@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 
 export default function TicTacToeLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex flex-col max-w-screen max-h-screen items-center">
+    <div className="flex max-w-screen h-screen max-h-screen justify-center items-center">
       {children}
     </div>
   );
