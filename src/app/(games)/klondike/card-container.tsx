@@ -1,7 +1,7 @@
 "use client";
 
 import CardSymbolIcon from "@/components/generic/card-symbol-icon";
-import { CardSymbol, CardColor } from "@/server-actions/pack-generator";
+import { CardSymbol, CardColor } from "@/lib/utils";
 import { memo } from "react";
 
 type Props = {

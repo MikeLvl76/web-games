@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardSymbol,
-  generatePack,
-} from "@/server-actions/pack-generator";
+import { Card, CardSymbol } from "@/lib/utils";
 import { closestCenter, DndContext, DragEndEvent } from "@dnd-kit/core";
 import { useCallback, useEffect, useState } from "react";
 import { BoardHeader } from "./board-header";
@@ -16,8 +12,10 @@ import {
   DroppableDataType,
 } from "@/lib/utils";
 import { RotateCcw } from "lucide-react";
+import { usePackGenerator } from "@/hooks/games/klondike/use-pack-generator";
 
 export default function KlondikePage() {
+  const defaultPack = usePackGenerator();
   const [pack, setPack] = useState<Card[]>([]);
   const [sequences, setSequences] = useState<Record<CardSymbol, Card[]>>({
     club: [],
@@ -29,33 +27,29 @@ export default function KlondikePage() {
   const [piles, setPiles] = useState<Card[][]>([[], [], [], [], [], [], []]);
   const [isEnd, setIsEnd] = useState(false);
 
-  const init = useCallback(async () => {
-    try {
-      const _pack = await generatePack();
-      const _piles: typeof piles = Array.from({ length: 7 }, (_, k) => {
-        const pile: Card[] = [];
+  const init = useCallback(() => {
+    const _pack = [...defaultPack];
+    const _piles: typeof piles = Array.from({ length: 7 }, (_, k) => {
+      const pile: Card[] = [];
 
-        for (let i = 0; i < k + 1; i++) {
-          const randomIdx = Math.floor(Math.random() * _pack.length);
-          const [card] = _pack.splice(randomIdx, 1);
+      for (let i = 0; i < k + 1; i++) {
+        const randomIdx = Math.floor(Math.random() * _pack.length);
+        const [card] = _pack.splice(randomIdx, 1);
 
-          if (i === k) {
-            card.isHidden = false;
-          }
-          pile.push(card);
+        if (i === k) {
+          card.isHidden = false;
         }
+        pile.push(card);
+      }
 
-        return pile;
-      });
+      return pile;
+    });
 
-      _pack.sort(() => Math.random() - 0.5);
+    _pack.sort(() => Math.random() - 0.5);
 
-      setPiles(_piles);
-      setPack(_pack);
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+    setPiles(_piles);
+    setPack(_pack);
+  }, [defaultPack]);
 
   const draw = useCallback(() => {
     const _pack = [...pack];

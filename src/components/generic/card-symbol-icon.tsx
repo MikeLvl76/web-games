@@ -1,6 +1,6 @@
 "use client";
 
-import { CardColor, CardSymbol } from "@/server-actions/pack-generator";
+import { CardColor, CardSymbol } from "@/lib/utils";
 import { Club, Spade, Heart, Diamond, TriangleAlert } from "lucide-react";
 
 type Props = {

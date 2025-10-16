@@ -3,12 +3,7 @@
 import CardSymbolIcon from "@/components/generic/card-symbol-icon";
 import Draggable from "@/components/generic/draggable";
 import Droppable from "@/components/generic/droppable";
-import {
-  Card,
-  CardSymbol,
-  SYMBOL_COLOR,
-  CardColor,
-} from "@/server-actions/pack-generator";
+import { Card, CardSymbol, SYMBOL_COLOR, CardColor } from "@/lib/utils";
 import { DraggableDataType, DroppableDataType } from "@/lib/utils";
 import { memo } from "react";
 import { CardContainer } from "./card-container";

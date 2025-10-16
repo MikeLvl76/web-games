@@ -2,7 +2,7 @@
 
 import Draggable from "@/components/generic/draggable";
 import Droppable from "@/components/generic/droppable";
-import { Card } from "@/server-actions/pack-generator";
+import { Card } from "@/lib/utils";
 import { DraggableDataType, DroppableDataType } from "@/lib/utils";
 import { memo, useState } from "react";
 import { CardContainer } from "./card-container";

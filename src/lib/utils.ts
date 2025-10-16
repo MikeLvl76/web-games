@@ -1,8 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { Card, CardSymbol } from "@/server-actions/pack-generator";
-
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -18,6 +16,27 @@ export type Preview = {
 
 export const getFilepath = (filename: string) => {
   return `/images/${filename}.png`;
+};
+
+export type CardSymbol = "heart" | "spade" | "diamond" | "club";
+export type CardColor = "black" | "red";
+export type CardRank = {
+  name: string;
+  value: number;
+};
+export type Card = {
+  id: string;
+  rank: CardRank;
+  symbol: CardSymbol;
+  color: CardColor;
+  isHidden: boolean;
+};
+
+export const SYMBOL_COLOR = {
+  club: "black",
+  spade: "black",
+  heart: "red",
+  diamond: "red",
 };
 
 export const compareCards = (c1: Card, c2: Card, includeSequence?: boolean) =>
