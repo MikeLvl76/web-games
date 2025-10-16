@@ -32,8 +32,11 @@ export default function GamePreview({ data }: Props) {
               className="object-cover rounded-md"
             />
           ) : (
-            <div className="flex flex-col justify-center items-center gap-2 bg-slate-200 w-full h-full">
+            <div className="flex flex-col justify-center items-center gap-4 bg-slate-200 w-full h-full">
               <CircleSlash size={32} color="#5c5958" />
+              <span className="text-md font-medium text-slate-600">
+                Image not found.
+              </span>
             </div>
           )}
           <div
