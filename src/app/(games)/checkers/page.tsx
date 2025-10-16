@@ -1,15 +1,17 @@
 "use client";
 
-import { Crown } from "lucide-react";
-import { memo, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Board } from "./board";
+import { GameStatus } from "./game-status";
+import { stringifyTime } from "@/lib/utils";
 
-type Tile = {
+export type Tile = {
   piece?: "pawn" | "dame";
   pieceColor?: "black" | "white";
   boardIndex?: number;
 };
 
-type NextMove = {
+export type NextMove = {
   indices: number[];
   captures: { fromIdx: number; targetIdx: number; jumpIdx: number }[];
 };
@@ -27,6 +29,11 @@ export default function CheckersPage() {
     useState<Tile["pieceColor"]>("black");
   const [canContinue, setCanContinue] = useState(false);
   const [winner, setWinner] = useState<Tile["pieceColor"]>();
+  const [timer, setTimer] = useState<{ value: number; text: string }>({
+    value: 0,
+    text: stringifyTime(0),
+  });
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const generate = useCallback(() => {
     const _tiles: Tile[] = Array(64).fill({});
@@ -76,6 +83,21 @@ export default function CheckersPage() {
   useEffect(() => {
     init();
   }, [generate, init]);
+
+  useEffect(() => {
+    if (winner) return;
+
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    intervalRef.current = setInterval(() => {
+      setTimer((prev) => ({
+        value: prev.value + 1,
+        text: stringifyTime(prev.value + 1),
+      }));
+    }, 1000);
+
+    return () => clearInterval(intervalRef.current!);
+  }, [winner]);
 
   const checkWinner = useCallback(() => {
     if (pieces.length === 0) setWinner("white");
@@ -321,7 +343,7 @@ export default function CheckersPage() {
   );
 
   const handleClick = useCallback(
-    (idx: number, tile: Tile) => {
+    (tile: Tile, idx: number) => {
       if (winner) return;
 
       if (selectedIdx === -1 && tile.piece) {
@@ -352,93 +374,41 @@ export default function CheckersPage() {
     ]
   );
 
-  const Tile = memo(({ tile, idx }: { tile: Tile; idx: number }) => {
-    const isSelected = selectedIdx === idx;
-    const canMoveHere =
-      nextMove.indices.includes(idx) &&
-      selectedIdx !== -1 &&
-      tiles[selectedIdx].pieceColor === playerTurnColor;
-
-    const tileBg =
-      (Math.floor(idx / 8) + (idx % 8)) % 2 === 0
-        ? "bg-amber-200"
-        : "bg-amber-900";
-
-    const tileContentClasses = [
-      "flex",
-      "justify-center",
-      "items-center",
-      "rounded-full",
-      "hover:cursor-pointer",
-      canMoveHere
-        ? "bg-green-500 w-4 h-4"
-        : tile.pieceColor === "black"
-        ? "bg-black w-12 h-12"
-        : "bg-white w-12 h-12 border-1 border-black",
-      isSelected && !canMoveHere ? "border-4 border-green-400" : "",
-    ]
-      .filter(Boolean)
-      .join(" ");
-
-    return (
-      <span
-        className={`flex w-18 h-18 border-1 border-black font-bold text-2xl text-center justify-center items-center select-none ${tileBg}`}
-        key={idx}
-        onClick={() =>
-          canMoveHere || tile.piece ? handleClick(idx, tile) : undefined
-        }
-      >
-        {(canMoveHere || tile.piece) && (
-          <div className={tileContentClasses}>
-            {tile.piece === "dame" && <Crown size="20" color="yellow" />}
-          </div>
-        )}
-      </span>
-    );
-  });
-  Tile.displayName = "Tile";
-
-  const Board = memo(({ tiles }: { tiles: Tile[] }) => (
-    <div className="grid grid-cols-8">
-      {tiles.map((tile, idx) => (
-        <Tile tile={tile} idx={idx} key={idx} />
-      ))}
-    </div>
-  ));
-  Board.displayName = "Board";
-
   return (
-    <div className="flex flex-col items-center gap-2 p-2">
-      <div className="flex flex-row items-center justify-between p-2 w-full">
-        {winner ? (
-          <>
-            <h1 className="text-2xl font-bold text-center">
-              {winner === "black" ? "Black" : "White"} wins!
-            </h1>
-            <button
-              onClick={() => {
-                init();
-                setCanContinue(false);
-                setPlayerTurnColor(() =>
-                  winner === "black" ? "white" : "black"
-                );
-                setWinner(undefined);
-                setSelectedIdx(-1);
-                setNextMove({ indices: [], captures: [] });
-              }}
-              className="w-fit h-fit p-2 rounded-sm bg-blue-500 text-white"
-            >
-              Restart
-            </button>
-          </>
-        ) : (
-          <>
-            <h1 className="text-2xl font-bold text-center">
-              {playerTurnColor === "black"
-                ? "Turn of Player 1"
-                : "Turn of Player 2"}
-            </h1>
-            {canContinue && (
+    <div className="flex flex-row justify-center gap-8 p-2">
+      <div className="flex w-[80%] justify-end">
+        <Board
+          tiles={tiles}
+          selectedIndex={selectedIdx}
+          nextMove={nextMove}
+          playerColor={playerTurnColor}
+          onClick={handleClick}
+        />
+      </div>
+
+      <div className="flex w-[20%]">
+        <GameStatus
+          playtime={timer.text}
+          playerColor={playerTurnColor!}
+          winner={winner}
+          onRestart={() => {
+            init();
+            setCanContinue(false);
+            setPlayerTurnColor(() => (winner === "black" ? "white" : "black"));
+            setWinner(undefined);
+            setSelectedIdx(-1);
+            setNextMove({ indices: [], captures: [] });
+            setTimer({ value: 0, text: stringifyTime(0) });
+            clearInterval(intervalRef.current!);
+            intervalRef.current = setInterval(() => {
+              setTimer((prev) => ({
+                value: prev.value + 1,
+                text: stringifyTime(prev.value + 1),
+              }));
+            }, 1000);
+          }}
+          otherComponent={
+            canContinue && (
               <button
                 onClick={() => {
                   setCanContinue(false);
@@ -446,15 +416,14 @@ export default function CheckersPage() {
                     prev === "black" ? "white" : "black"
                   );
                 }}
-                className="w-fit h-fit p-2 rounded-sm bg-blue-500 text-white"
+                className="w-fit h-fit p-2 rounded-sm bg-red-500 text-white hover:cursor-pointer"
               >
                 End turn
               </button>
-            )}
-          </>
-        )}
+            )
+          }
+        />
       </div>
-      <Board tiles={tiles} />
     </div>
   );
 }
