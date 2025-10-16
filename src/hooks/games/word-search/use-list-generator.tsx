@@ -1,6 +1,13 @@
-"use server";
+"use client";
 
-const words = [
+import { useMemo } from "react";
+
+type Props = {
+  maxSize: number;
+  wordLength?: number;
+};
+
+const DEFAULT_LIST = [
   "cat",
   "dog",
   "sun",
@@ -225,28 +232,25 @@ const words = [
   "zone",
 ];
 
-type GenerationParams = {
-  maxSize: number;
-  wordLength?: number;
-};
+export function useListGenerator({ maxSize, wordLength }: Props) {
+  const list = useMemo(() => {
+    const pool = wordLength
+      ? DEFAULT_LIST.filter((w) => w.length === wordLength)
+      : DEFAULT_LIST;
 
-const generateList = async ({ maxSize, wordLength }: GenerationParams) => {
-  const pool = wordLength
-    ? words.filter((w) => w.length === wordLength)
-    : words;
+    const list: string[] = [];
 
-  const list: string[] = [];
+    while (list.length < maxSize) {
+      const randomIdx = Math.floor(Math.random() * pool.length);
+      const word = pool[randomIdx];
 
-  while (list.length < maxSize) {
-    const randomIdx = Math.floor(Math.random() * pool.length);
-    const word = pool[randomIdx];
-
-    if (!list.includes(word)) {
-      list.push(word);
+      if (!list.includes(word)) {
+        list.push(word);
+      }
     }
-  }
+
+    return list;
+  }, [maxSize, wordLength]);
 
   return list;
-};
-
-export default generateList;
+}

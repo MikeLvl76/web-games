@@ -1,9 +1,10 @@
 "use client";
 
-import generateList from "@/server-actions/word-generator";
+import { useListGenerator } from "@/hooks/games/word-search/use-list-generator";
 import { memo, useCallback, useEffect, useState } from "react";
 
 export default function WordSearch() {
+  const randomList = useListGenerator({ maxSize: 8, wordLength: 5 });
   const [words, setWords] = useState<{ value: string; isFound: boolean }[]>([]);
   const [content, setContent] = useState<string[]>([]);
   const [isHolding, setIsHolding] = useState(false);
@@ -13,12 +14,12 @@ export default function WordSearch() {
   const [generate, setGenerate] = useState(true);
 
   const generateGridContent = useCallback(
-    (words: string[], size: number = 100) => {
-      setWords(words.map((w) => ({ value: w, isFound: false })));
+    (size: number = 100) => {
+      setWords(randomList.map((w) => ({ value: w, isFound: false })));
 
       const _content: string[] = Array(size).fill("");
 
-      const _words = [...words];
+      const _words = [...randomList];
       const rowSize = size / 10;
       const rowCount = Math.ceil(size / rowSize);
       const limit = _words.length;
@@ -115,18 +116,14 @@ export default function WordSearch() {
 
       setGenerate((prev) => !prev);
     },
-    []
+    [randomList]
   );
 
   useEffect(() => {
     if (!generate) return;
 
-    generateList({ maxSize: 8, wordLength: 5 })
-      .then((list) => generateGridContent(list))
-      .catch((err) => console.error(err));
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [generate]);
+    generateGridContent();
+  }, [generate, generateGridContent, randomList]);
 
   useEffect(() => {
     if (isEnd) {
