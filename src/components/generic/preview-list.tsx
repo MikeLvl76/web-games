@@ -9,13 +9,14 @@ import {
   ChevronsRight,
 } from "lucide-react";
 import { Preview } from "@/lib/utils";
+import { usePagination } from "@/hooks/use-pagination";
 
 type Props = {
   previews: Preview[];
 };
 
 export default function PreviewList({ previews }: Props) {
-  const [filteredPreviews, setFilteredPreviews] = useState<Preview[]>([]);
+  const pagination = usePagination<Preview>();
   const [searchText, setSearchText] = useState("");
   const [type, setType] = useState<Preview["type"] | undefined>();
 
@@ -25,19 +26,22 @@ export default function PreviewList({ previews }: Props) {
 
     const compareTypes = (_type: Preview["type"]) => _type === type;
 
+    const _previews = [];
+
     if (searchText.length > 0 && !type) {
-      setFilteredPreviews(previews.filter(({ name }) => compareNames(name)));
+      _previews.push(...previews.filter(({ name }) => compareNames(name)));
     } else if (type && searchText.length === 0) {
-      setFilteredPreviews(previews.filter(({ type }) => compareTypes(type)));
-    } else if (searchText.length > 0 && type) {
-      setFilteredPreviews(
-        previews.filter(
+      _previews.push(
+        ...previews.filter(
           ({ name, type }) => compareNames(name) && compareTypes(type)
         )
       );
     } else if (searchText.length === 0 && !type) {
-      setFilteredPreviews(previews);
+      _previews.push(...previews);
     }
+
+    pagination.paginate(_previews);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [previews, searchText, type]);
 
   return (
@@ -71,15 +75,27 @@ export default function PreviewList({ previews }: Props) {
           </select>
         </div>
         <div className="flex flex-row justify-center items-center gap-4 bg-white">
-          <ChevronsLeft className="hover:cursor-pointer" />
-          <ChevronLeft className="hover:cursor-pointer" />
-          <span>0</span>
-          <ChevronRight className="hover:cursor-pointer" />
-          <ChevronsRight className="hover:cursor-pointer" />
+          <ChevronsLeft
+            className="hover:cursor-pointer"
+            onClick={pagination.first}
+          />
+          <ChevronLeft
+            className="hover:cursor-pointer"
+            onClick={pagination.previous}
+          />
+          <span>{pagination.pageNumber}</span>
+          <ChevronRight
+            className="hover:cursor-pointer"
+            onClick={pagination.next}
+          />
+          <ChevronsRight
+            className="hover:cursor-pointer"
+            onClick={pagination.last}
+          />
         </div>
       </div>
       <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-16">
-        {filteredPreviews.map((preview) => (
+        {pagination.data.map((preview) => (
           <li
             key={preview.id}
             className="flex items-center justify-center rounded-sm w-60 h-60 gap-1 hover:cursor-pointer"
