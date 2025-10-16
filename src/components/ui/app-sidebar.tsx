@@ -45,6 +45,7 @@ export function AppSidebar() {
                           alt="Logo"
                           width={92}
                           height={92}
+                          className="w-auto h-auto"
                         />
                       ) : (
                         <item.icon
