@@ -42,6 +42,8 @@ export default function MazePage() {
   useEffect(() => {
     if (!options.enableCountdown || gameOver) return;
 
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
     intervalRef.current = setInterval(() => {
       setCountdown((prev) => {
         const time = Math.max(prev.value - 1, 0);
