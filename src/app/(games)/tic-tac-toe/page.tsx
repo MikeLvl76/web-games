@@ -1,11 +1,15 @@
 "use client";
 
+import { GameStatus } from "@/components/generic/game-status";
+import { Button } from "@/components/ui/button";
+import { RotateCcw } from "lucide-react";
 import { memo, useCallback, useState } from "react";
 
 type Tile = {
   symbol?: "x" | "o";
 };
 
+// TODO: add timer (maybe)
 export default function TicTacToePage() {
   const [tiles, setTiles] = useState<Tile[]>(
     Array.from({ length: 9 }, () => ({}))
@@ -92,25 +96,38 @@ export default function TicTacToePage() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4 p-2">
-      {winner ? (
-        <div className="flex flex-col items-center gap-2">
-          <h1 className="font-bold text-2xl">
-            {winner === "o" ? "Player 1" : "Player 2"} wins!
-          </h1>
-          <button
-            onClick={reset}
-            className="bg-blue-500 text-center text-white w-fit h-fit p-2 rounded-sm hover:cursor-pointer"
-          >
-            Restart
-          </button>
-        </div>
-      ) : (
-        <h1 className="font-bold text-2xl">
-          {player === "o" ? "Player 1" : "Player 2"} turn
-        </h1>
-      )}
-      <Board tiles={tiles} />
+    <div className="flex flex-row justify-center gap-8 p-2">
+      <div className="flex w-[80%] justify-end">
+        <Board tiles={tiles} />
+      </div>
+      <div className="flex w-[20%]">
+        <GameStatus
+          title="Show you're the best"
+          infos={[
+            {
+              label: "Current turn",
+              value: player === "o" ? "Player 1" : "Player 2",
+            },
+            {
+              label: "Winner",
+              value: winner ? (winner === "o" ? "Player 1" : "Player 2") : "/",
+            },
+          ]}
+          options={[
+            <Button
+              key="restart-button"
+              variant="default"
+              className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+              onClick={reset}
+            >
+              <p className="text-white font-bold text-md text-center">
+                Restart
+              </p>
+              <RotateCcw color="white" size={32} />
+            </Button>,
+          ]}
+        />
+      </div>
     </div>
   );
 }

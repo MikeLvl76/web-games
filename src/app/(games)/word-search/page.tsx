@@ -1,8 +1,12 @@
 "use client";
 
+import { GameStatus } from "@/components/generic/game-status";
+import { Button } from "@/components/ui/button";
 import { useListGenerator } from "@/hooks/games/word-search/use-list-generator";
+import { RotateCcw } from "lucide-react";
 import { memo, useCallback, useEffect, useState } from "react";
 
+// TODO: add timer
 export default function WordSearch() {
   const randomList = useListGenerator({ maxSize: 8, wordLength: 5 });
   const [words, setWords] = useState<{ value: string; isFound: boolean }[]>([]);
@@ -216,30 +220,44 @@ export default function WordSearch() {
   Grid.displayName = "Grid";
 
   return (
-    <div className="flex flex-col items-center gap-4 p-2 w-full">
-      {isEnd && (
-        <div className="flex flex-col items-center gap-1">
-          <h1 className="text-xl font-bold text-center">
-            Congrats! You found all words!
-          </h1>
-          <button
-            onClick={() => {
-              setIsEnd(false);
-              setContent([]);
-              setWords([]);
-              setHighlightIndices([]);
-              setIsHolding(false);
-              setSelectedIndices([]);
-              setGenerate((prev) => !prev);
-            }}
-            className="w-fit h-fit p-2 rounded-sm bg-blue-500 text-white hover:cursor-pointer"
-          >
-            Play again
-          </button>
-        </div>
-      )}
-      <Grid content={content} />
-      <WordList words={words} />
+    <div className="flex flex-row justify-center gap-8 p-2">
+      <div className="flex flex-col w-[80%] items-center gap-4 p-2 justify-end">
+        <Grid content={content} />
+        <WordList words={words} />
+      </div>
+      <div className="flex w-[20%]">
+        <GameStatus
+          title="Read carefully"
+          infos={[
+            { label: "Words", value: `${words.length}` },
+            {
+              label: "Found",
+              value: `${words.filter((w) => w.isFound).length}`,
+            },
+          ]}
+          options={[
+            <Button
+              key="restart-button"
+              variant="default"
+              className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+              onClick={() => {
+                setIsEnd(false);
+                setContent([]);
+                setWords([]);
+                setHighlightIndices([]);
+                setIsHolding(false);
+                setSelectedIndices([]);
+                setGenerate((prev) => !prev);
+              }}
+            >
+              <p className="text-white font-bold text-md text-center">
+                Restart
+              </p>
+              <RotateCcw color="white" size={32} />
+            </Button>,
+          ]}
+        />
+      </div>
     </div>
   );
 }

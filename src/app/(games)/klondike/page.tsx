@@ -1,11 +1,10 @@
 "use client";
 
-import { Card, CardSymbol } from "@/lib/utils";
+import { Card, CardSymbol, stringifyTime } from "@/lib/utils";
 import { closestCenter, DndContext, DragEndEvent } from "@dnd-kit/core";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BoardHeader } from "./board-header";
 import { BoardMain } from "./board-main";
-import { BoardTimer } from "./board-timer";
 import {
   compareCards,
   DraggableDataType,
@@ -13,6 +12,8 @@ import {
 } from "@/lib/utils";
 import { RotateCcw } from "lucide-react";
 import { usePackGenerator } from "@/hooks/games/klondike/use-pack-generator";
+import { GameStatus } from "@/components/generic/game-status";
+import { Button } from "@/components/ui/button";
 
 export default function KlondikePage() {
   const defaultPack = usePackGenerator();
@@ -26,6 +27,11 @@ export default function KlondikePage() {
   const [drawnCards, setDrawnCards] = useState<Card[]>([]);
   const [piles, setPiles] = useState<Card[][]>([[], [], [], [], [], [], []]);
   const [isEnd, setIsEnd] = useState(false);
+  const [timer, setTimer] = useState<{ value: number; text: string }>({
+    value: 0,
+    text: stringifyTime(0),
+  });
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const init = useCallback(() => {
     const _pack = [...defaultPack];
@@ -201,6 +207,21 @@ export default function KlondikePage() {
   };
 
   useEffect(() => {
+    if (isEnd) return;
+
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    intervalRef.current = setInterval(() => {
+      setTimer((prev) => ({
+        value: prev.value + 1,
+        text: stringifyTime(prev.value + 1),
+      }));
+    }, 1000);
+
+    return () => clearInterval(intervalRef.current!);
+  }, [isEnd]);
+
+  useEffect(() => {
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -212,53 +233,59 @@ export default function KlondikePage() {
 
   return (
     <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
-      <div className="w-[70vw] h-[80vh] flex flex-row gap-2">
-        <div className="flex flex-col w-full h-full bg-green-800 rounded-md">
-          {isEnd ? (
-            <div className="self-center justify-self-center flex flex-col justify-center items-center gao-2 p-2">
-              <p className="text-3xl font-bold text-center text-white">
-                You win!
-              </p>
-              <button
+      <div className="flex flex-row justify-center items-center h-full gap-8 p-2">
+        <div className="flex flex-col w-[80%] h-[75%] bg-green-800 rounded-md">
+          <BoardHeader
+            pack={pack}
+            sequences={sequences}
+            drawnCards={drawnCards}
+            draw={draw}
+          />
+          <BoardMain piles={piles} />
+        </div>
+        <div className="flex w-[20%] h-[75%] items-start">
+          <GameStatus
+            title="Finish the game"
+            infos={[
+              { label: "Game time", value: timer.text },
+              {
+                label: "Recreated sequences",
+                value: `${
+                  Object.values(sequences).filter((sq) => sq.length === 13)
+                    .length
+                }`,
+              },
+            ]}
+            options={[
+              <Button
+                key="restart-button"
+                variant="default"
+                className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
                 onClick={() => {
                   setIsEnd(false);
+                  setTimer({ value: 0, text: stringifyTime(0) });
                   setPack([]);
                   setDrawnCards([]);
                   setSequences({ club: [], diamond: [], heart: [], spade: [] });
                   setPiles([]);
                   init();
+                  clearInterval(intervalRef.current!);
+                  intervalRef.current = setInterval(() => {
+                    setTimer((prev) => ({
+                      value: prev.value + 1,
+                      text: stringifyTime(prev.value + 1),
+                    }));
+                  }, 1000);
                 }}
-                className="bg-blue-500 rounded-md w-fit h-fit p-2 text-white"
               >
-                Restart
-              </button>
-            </div>
-          ) : (
-            <>
-              <BoardTimer />
-              <BoardHeader
-                pack={pack}
-                sequences={sequences}
-                drawnCards={drawnCards}
-                draw={draw}
-              />
-              <BoardMain piles={piles} />
-            </>
-          )}
+                <p className="text-white font-bold text-md text-center">
+                  Restart
+                </p>
+                <RotateCcw color="white" size={32} />
+              </Button>,
+            ]}
+          />
         </div>
-        <RotateCcw
-          color="white"
-          size={32}
-          onClick={() => {
-            setIsEnd(false);
-            setPack([]);
-            setDrawnCards([]);
-            setSequences({ club: [], diamond: [], heart: [], spade: [] });
-            setPiles([]);
-            init();
-          }}
-          className="self-start w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
-        />
       </div>
     </DndContext>
   );

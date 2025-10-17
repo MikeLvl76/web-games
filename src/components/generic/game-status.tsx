@@ -8,13 +8,14 @@ type GameInfo = {
 };
 
 type Props = {
+  title: string;
   infos: GameInfo[];
   options: JSX.Element[];
 };
 
-const GameStatus = memo(({ infos, options }: Props) => (
-  <div className="flex flex-col items-start gap-4 w-[25vw] h-fit bg-slate-200 shadow-2xl/50 rounded-md p-2">
-    <span className="font-bold text-xl">Player vs Player</span>
+const GameStatus = memo(({ title, infos, options }: Props) => (
+  <div className="flex flex-col items-start gap-4 min-w-[15vw] w-fit h-fit bg-slate-200 shadow-2xl/50 rounded-md p-4">
+    <span className="font-bold text-xl">{title}</span>
     {infos.map(({ label, value }, i) => (
       <div
         key={i}

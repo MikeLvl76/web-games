@@ -1,11 +1,15 @@
 "use client";
 
+import { GameStatus } from "@/components/generic/game-status";
+import { Button } from "@/components/ui/button";
+import { RotateCcw } from "lucide-react";
 import { memo, useState, MouseEvent, useCallback, useEffect } from "react";
 
 type Cell = {
   digit?: number;
 };
 
+// TODO: add timer + valid/wrong cells count
 export default function SudokuPage() {
   const [cells, setCells] = useState<Cell[]>(
     Array.from({ length: 81 }, () => ({}))
@@ -164,24 +168,38 @@ export default function SudokuPage() {
   Grid.displayName = "Grid";
 
   return (
-    <div className="flex flex-col items-center gap-4 p-2">
-      {isWin ? (
-        <div className="flex flex-col gap-2 items-center">
-          <h2 className="font-bold text-x1 text-center">You win!</h2>
-          <button
-            onClick={() => generate(60)}
-            className="bg-blue-500 text-center text-white w-fit h-fit p-2 rounded-sm hover:cursor-pointer"
-          >
-            Restart
-          </button>
-        </div>
-      ) : (
-        <h1 className="text-center font-bold text-xl">
-          Click in a cell to increase/decrease digit. Use mouse left button to
-          increase and mouse right button to decrease.
-        </h1>
-      )}
-      <Grid cells={cells} />
+    <div className="flex flex-row justify-center gap-8 p-2">
+      <div className="flex w-[80%] justify-end">
+        <Grid cells={cells} />
+      </div>
+      <div className="flex w-[20%]">
+        <GameStatus
+          title="Fill the grid"
+          infos={[
+            { label: "Increase", value: "Left mouse" },
+            { label: "Decrease", value: "Right mouse" },
+            {
+              label: "Remaining cells",
+              value: `${cells.filter((c) => !c.digit).length}`,
+            },
+          ]}
+          options={[
+            <Button
+              key="restart-button"
+              variant="default"
+              className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+              onClick={() => {
+                generate(60);
+              }}
+            >
+              <p className="text-white font-bold text-md text-center">
+                Restart
+              </p>
+              <RotateCcw color="white" size={32} />
+            </Button>,
+          ]}
+        />
+      </div>
     </div>
   );
 }

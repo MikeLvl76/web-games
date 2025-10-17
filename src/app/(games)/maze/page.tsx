@@ -4,9 +4,11 @@ import P5Sketch from "@/components/generic/p5-sketch";
 import { stringifyTime } from "@/lib/utils";
 import { Maze } from "@/lib/p5/maze/maze";
 import { Player } from "@/lib/p5/maze/player";
-import { RotateCcw } from "lucide-react";
+import { CornerDownLeft, RotateCcw } from "lucide-react";
 import p5 from "p5";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { GameStatus } from "@/components/generic/game-status";
+import { Button } from "@/components/ui/button";
 
 type Options = {
   size: number;
@@ -40,10 +42,14 @@ export default function MazePage() {
   useEffect(() => {
     if (!options.enableCountdown || gameOver) return;
 
-    let time = 60 * Math.floor(options.size / 10);
     intervalRef.current = setInterval(() => {
-      time = Math.max(time - 1, 0);
-      setCountdown({ value: time, text: stringifyTime(time) });
+      setCountdown((prev) => {
+        const time = Math.max(prev.value - 1, 0);
+        return {
+          value: time,
+          text: stringifyTime(time),
+        };
+      });
     }, 1000);
 
     return () => clearInterval(intervalRef.current!);
@@ -218,87 +224,93 @@ export default function MazePage() {
   );
   OptionsMenu.displayName = "OptionsMenu";
 
-  return (
-    <div className="flex flex-row gap-2">
-      {startGame ? (
-        <>
-          <P5Sketch sketch={sketch} refresh={refresh} />
-          <div className="flex flex-col items-start gap-4 w-[15vw]">
-            <span className="font-bold text-3xl">Find exit.</span>
-            <div className="w-full">
-              <label className="place-self-center text-center text-xl text-slate-600 font-bold">
-                Controls
-              </label>
-              <div className="grid grid-rows-4">
-                <div className="flex flex-row items-center justify-between">
-                  <p>Move</p>
-                  <p className="font-bold text-slate-700">ZQSD / Arrow keys</p>
-                </div>
-                <div className="flex flex-row items-center justify-between">
-                  <p>Show path</p>
-                  {options.enablePlayerPath ? (
-                    <p className="font-bold text-slate-700">H</p>
-                  ) : (
-                    <p className="text-red-600 font-bold">Disabled</p>
-                  )}
-                </div>
-                <div className="flex flex-row items-center justify-between">
-                  <p>Reset position</p>
-                  {options.enableReset ? (
-                    <p className="font-bold text-slate-700">R</p>
-                  ) : (
-                    <p className="text-red-600 font-bold">Disabled</p>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-row items-center justify-between w-full">
-              <p>Countdown</p>
-              {options.enableCountdown ? (
-                <p className="font-bold text-slate-700">{countdown.text}</p>
-              ) : (
-                <p className="text-red-600 font-bold">Disabled</p>
-              )}
-            </div>
-            <div className="flex flex-row items-center justify-evenly w-full">
-              <button
-                onClick={() => {
-                  setStartGame(false);
-                  clearInterval(intervalRef.current!);
-                  intervalRef.current = null;
-                  gameOverRef.current = false;
-                  setGameOver(false);
-                  setCountdown({
-                    value: 60 * Math.floor(options.size / 10),
-                    text: stringifyTime(60 * Math.floor(options.size / 10)),
+  return startGame ? (
+    <div className="flex flex-row justify-center gap-8 p-2">
+      <div className="flex w-[80%] justify-end">
+        <P5Sketch sketch={sketch} refresh={refresh} />
+      </div>
+      <div className="flex w-[20%]">
+        <GameStatus
+          title="Find exit"
+          infos={[
+            { label: "Move", value: "ZQSD / Arrow keys" },
+            {
+              label: "Show path",
+              value: options.enablePlayerPath ? "H" : "Disabled",
+            },
+            {
+              label: "Reset position",
+              value: options.enableReset ? "R" : "Disabled",
+            },
+            {
+              label: "Countdown",
+              value: options.enableCountdown ? countdown.text : "Disabled",
+            },
+          ]}
+          options={[
+            <Button
+              key="menu-button"
+              variant="default"
+              className="flex w-fit h-fit p-2 bg-green-700 rounded-md hover:cursor-pointer"
+              onClick={() => {
+                setStartGame(false);
+                gameOverRef.current = false;
+                setGameOver(false);
+                setCountdown({
+                  value: 60 * Math.floor(options.size / 10),
+                  text: stringifyTime(60 * Math.floor(options.size / 10)),
+                });
+                clearInterval(intervalRef.current!);
+                intervalRef.current = setInterval(() => {
+                  setCountdown((prev) => {
+                    const time = Math.max(prev.value - 1, 0);
+                    return {
+                      value: time,
+                      text: stringifyTime(time),
+                    };
                   });
-                }}
-                className="w-fit h-fit p-2 bg-green-700 text-white font-bold rounded-md hover:cursor-pointer"
-              >
-                Return to menu
-              </button>
-              <RotateCcw
-                color="white"
-                size={24}
-                onClick={() => {
-                  setRefresh((prev) => prev + 1);
-                  clearInterval(intervalRef.current!);
-                  intervalRef.current = null;
-                  gameOverRef.current = false;
-                  setGameOver(false);
-                  setCountdown({
-                    value: 60 * Math.floor(options.size / 10),
-                    text: stringifyTime(60 * Math.floor(options.size / 10)),
+                }, 1000);
+              }}
+            >
+              <p className="text-white font-bold text-md text-center">Menu</p>
+              <CornerDownLeft color="white" size={32} />
+            </Button>,
+            <Button
+              key="restart-button"
+              variant="default"
+              className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+              onClick={() => {
+                setRefresh((prev) => prev + 1);
+                gameOverRef.current = false;
+                setGameOver(false);
+                setCountdown({
+                  value: 60 * Math.floor(options.size / 10),
+                  text: stringifyTime(60 * Math.floor(options.size / 10)),
+                });
+                clearInterval(intervalRef.current!);
+                intervalRef.current = setInterval(() => {
+                  setCountdown((prev) => {
+                    const time = Math.max(prev.value - 1, 0);
+                    return {
+                      value: time,
+                      text: stringifyTime(time),
+                    };
                   });
-                }}
-                className="self-start w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
-              />
-            </div>
-          </div>
-        </>
-      ) : (
-        <OptionsMenu {...options} />
-      )}
+                }, 1000);
+              }}
+            >
+              <p className="text-white font-bold text-md text-center">
+                Restart
+              </p>
+              <RotateCcw color="white" size={32} />
+            </Button>,
+          ]}
+        />
+      </div>
+    </div>
+  ) : (
+    <div className="flex flex-1 justify-center items-center h-full">
+      <OptionsMenu {...options} />
     </div>
   );
 }

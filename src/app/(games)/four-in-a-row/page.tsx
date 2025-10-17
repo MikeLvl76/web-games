@@ -1,5 +1,7 @@
 "use client";
 
+import { GameStatus } from "@/components/generic/game-status";
+import { Button } from "@/components/ui/button";
 import { stringifyTime } from "@/lib/utils";
 import { ArrowBigDown, RotateCcw } from "lucide-react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
@@ -200,49 +202,55 @@ export default function FourInARowPage() {
   Board.displayName = "Board";
 
   return (
-    <div className="flex flex-row justify-center w-[80vw] h-[70vh] gap-4">
-      <Board />
-      <div className="flex flex-col items-start gap-4 w-[15vw]">
-        <span className="font-bold text-xl">Player vs Player</span>
-        <div className="w-full">
-          <div className="flex flex-row items-center justify-between">
-            <p>Current turn</p>
-            <p className="font-bold text-slate-700">
-              {playerColor === "red" ? "Player 1" : "Player 2"}
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-row items-center justify-between w-full">
-          <p>Time</p>
-          <p className="font-bold text-slate-700">{timer.text}</p>
-        </div>
-        <div className="flex flex-row justify-between items-center w-full">
-          {isEnd &&
-            (playerColor === "red" ? (
-              <span className="text-lg font-bold">Player 1 won!</span>
-            ) : (
-              <span className="text-lg font-bold">Player 2 won!</span>
-            ))}
-          <RotateCcw
-            color="white"
-            size={24}
-            onClick={() => {
-              setIsEnd(false);
-              setTimer({ value: 0, text: stringifyTime(0) });
-              setPlayerColor("red");
-              setIsHoveringIndex(-1);
-              setTokens(Array(42).fill(undefined));
-              clearInterval(intervalRef.current!);
-              intervalRef.current = setInterval(() => {
-                setTimer((prev) => ({
-                  value: prev.value + 1,
-                  text: stringifyTime(prev.value + 1),
-                }));
-              }, 1000);
-            }}
-            className="self-start w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
-          />
-        </div>
+    <div className="flex flex-row justify-center gap-8 p-2">
+      <div className="flex w-[80%] justify-end">
+        <Board />
+      </div>
+      <div className="flex w-[20%]">
+        <GameStatus
+          title="Player vs player"
+          infos={[
+            {
+              label: "Current turn",
+              value: playerColor === "red" ? "Player 1" : "Player 2",
+            },
+            { label: "Game time", value: timer.text },
+            {
+              label: "Winner",
+              value: isEnd
+                ? playerColor === "red"
+                  ? "Player 1"
+                  : "Player 2"
+                : "/",
+            },
+          ]}
+          options={[
+            <Button
+              key="restart-button"
+              variant="default"
+              className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+              onClick={() => {
+                setIsEnd(false);
+                setTimer({ value: 0, text: stringifyTime(0) });
+                setPlayerColor("red");
+                setIsHoveringIndex(-1);
+                setTokens(Array(42).fill(undefined));
+                clearInterval(intervalRef.current!);
+                intervalRef.current = setInterval(() => {
+                  setTimer((prev) => ({
+                    value: prev.value + 1,
+                    text: stringifyTime(prev.value + 1),
+                  }));
+                }, 1000);
+              }}
+            >
+              <p className="text-white font-bold text-md text-center">
+                Restart
+              </p>
+              <RotateCcw color="white" size={32} />
+            </Button>,
+          ]}
+        />
       </div>
     </div>
   );

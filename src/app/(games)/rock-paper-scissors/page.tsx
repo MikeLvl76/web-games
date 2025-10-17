@@ -1,16 +1,18 @@
 "use client";
 
-import { Gem, LucideIcon, Scissors, StickyNote } from "lucide-react";
-import { memo, useEffect, useState } from "react";
+import { GameStatus } from "@/components/generic/game-status";
+import { Button } from "@/components/ui/button";
+import { Gem, LucideIcon, RotateCcw, Scissors, StickyNote } from "lucide-react";
+import { memo, useEffect, useMemo, useState } from "react";
 
 type MoveType = "Rock" | "Paper" | "Scissors";
-type MovePropsType = { text: MoveType; icon: LucideIcon; by?: "player" | "ia" };
+type MovePropsType = { text: MoveType; icon: LucideIcon; by?: "player" | "ai" };
 type MovesPropsType = { list: MovePropsType[] };
 
 export default function RockPaperScissorsPage() {
   const [choice, setChoice] = useState<MovePropsType | null>(null);
   const [randomChoice, setRandomChoice] = useState<MovePropsType | null>(null);
-  const [result, setResult] = useState<"player" | "ia" | "draw" | null>(null);
+  const [result, setResult] = useState<"player" | "ai" | "draw" | null>(null);
 
   const handleClick = (item: MovePropsType | null) => {
     if (choice || randomChoice || !item) return;
@@ -53,6 +55,18 @@ export default function RockPaperScissorsPage() {
     }
   };
 
+  const winner = useMemo(() => {
+    if (result === "draw") {
+      return "Draw";
+    } else if (result === "ai") {
+      return "AI";
+    } else if (result === "player") {
+      return "Player";
+    }
+
+    return null;
+  }, [result]);
+
   useEffect(() => {
     if (choice && randomChoice) {
       if (choice.text === randomChoice.text) {
@@ -61,7 +75,7 @@ export default function RockPaperScissorsPage() {
       }
       if (choice.text === "Rock") {
         if (randomChoice.text === "Paper") {
-          setResult("ia");
+          setResult("ai");
         } else if (randomChoice.text === "Scissors") {
           setResult("player");
         }
@@ -72,7 +86,7 @@ export default function RockPaperScissorsPage() {
         if (randomChoice.text === "Rock") {
           setResult("player");
         } else if (randomChoice.text === "Scissors") {
-          setResult("ia");
+          setResult("ai");
         }
         return;
       }
@@ -81,7 +95,7 @@ export default function RockPaperScissorsPage() {
         if (randomChoice.text === "Paper") {
           setResult("player");
         } else if (randomChoice.text === "Rock") {
-          setResult("ia");
+          setResult("ai");
         }
         return;
       }
@@ -102,7 +116,7 @@ export default function RockPaperScissorsPage() {
       );
     }
 
-    if (by === "ia") {
+    if (by === "ai") {
       return (
         <div
           className={`flex flex-col justify-center items-center gap-4 border-2 border-black bg-black p-2 rounded-full w-32 h-32 select-none`}
@@ -130,7 +144,7 @@ export default function RockPaperScissorsPage() {
   Move.displayName = "Move";
 
   const Moves = memo(({ list }: MovesPropsType) => (
-    <div className="flex flex-row justify-evenly w-full">
+    <div className="flex flex-row justify-between w-full">
       {list.map((item, i) => (
         <Move key={i} {...item} />
       ))}
@@ -138,58 +152,56 @@ export default function RockPaperScissorsPage() {
   ));
   Moves.displayName = "Moves";
 
-  const EndGame = memo(() => {
-    if (result) {
-      let msg;
-
-      if (result === "draw") {
-        msg = "Draw";
-      } else if (result === "ia") {
-        msg = "You lose!";
-      } else if (result === "player") {
-        msg = "You win!";
-      }
-
-      return (
-        <div className="flex flex-col items-center gap-4">
-          <span className="text-3xl font-bold">{msg}</span>
-          <button
-            onClick={() => {
-              setChoice(null);
-              setRandomChoice(null);
-              setResult(null);
-            }}
-            className="w-fit h-fit p-2 bg-blue-400 rounded-md text-white text-center hover:cursor-pointer text-xl"
-          >
-            Restart
-          </button>
-        </div>
-      );
-    }
-  });
-  EndGame.displayName = "EndGame";
-
   return (
-    <div className="flex flex-col items-center justify-between w-[50vw] h-[70vh] p-4">
-      {randomChoice ? (
-        <Move {...randomChoice} by="ia" />
-      ) : (
-        <span className="text-center text-xl font-medium">
-          Waiting for your choice...
-        </span>
-      )}
-      <EndGame />
-      {choice ? (
-        <Move {...choice} by="player" />
-      ) : (
-        <Moves
-          list={[
-            { text: "Rock", icon: Gem },
-            { text: "Paper", icon: StickyNote },
-            { text: "Scissors", icon: Scissors },
+    <div className="flex flex-row h-full justify-center items-center gap-8 p-2">
+      <div className="flex flex-col w-[80%] h-[75%] justify-around">
+        {randomChoice ? (
+          <Move {...randomChoice} by="ai" />
+        ) : (
+          <span className="text-center text-xl font-medium self-center">
+            Waiting for your choice...
+          </span>
+        )}
+        {choice ? (
+          <Move {...choice} by="player" />
+        ) : (
+          <Moves
+            list={[
+              { text: "Rock", icon: Gem },
+              { text: "Paper", icon: StickyNote },
+              { text: "Scissors", icon: Scissors },
+            ]}
+          />
+        )}
+      </div>
+      <div className="flex w-[20%] h-[50%] items-start">
+        <GameStatus
+          title="Be lucky"
+          infos={[
+            {
+              label: "Winner",
+              value: winner ? winner : "/",
+            },
+          ]}
+          options={[
+            <Button
+              key="restart-button"
+              variant="default"
+              className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+              onClick={() => {
+                setChoice(null);
+                setRandomChoice(null);
+                setResult(null);
+              }}
+            >
+              <p className="text-white font-bold text-md text-center">
+                Restart
+              </p>
+              <RotateCcw color="white" size={32} />
+            </Button>,
           ]}
         />
-      )}
+      </div>
     </div>
   );
 }

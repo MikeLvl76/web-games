@@ -1,12 +1,15 @@
 "use client";
 
+import { GameStatus } from "@/components/generic/game-status";
 import P5Sketch from "@/components/generic/p5-sketch";
+import { Button } from "@/components/ui/button";
 import { Food } from "@/lib/p5/snake/food";
 import { Snake } from "@/lib/p5/snake/snake";
 import { RotateCcw } from "lucide-react";
 import p5 from "p5";
 import { useState } from "react";
 
+// TODO: add timer + eat counter + snake size
 export default function SnakePage() {
   const [refresh, setRefresh] = useState(0);
 
@@ -65,16 +68,31 @@ export default function SnakePage() {
   };
 
   return (
-    <div className="flex flex-row justify-center items-center gap-2 p-2 w-full">
-      <P5Sketch sketch={sketch} refresh={refresh} />
-      <RotateCcw
-        color="white"
-        size={32}
-        onClick={() => {
-          setRefresh((prev) => prev + 1);
-        }}
-        className="self-start w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
-      />
+    <div className="flex flex-row justify-center gap-8 p-2">
+      <div className="flex w-[80%] justify-end">
+        <P5Sketch sketch={sketch} refresh={refresh} />
+      </div>
+      <div className="flex w-[20%]">
+        <GameStatus
+          title="Miam miam"
+          infos={[{ label: "Move", value: "Arrow keys" }]}
+          options={[
+            <Button
+              key="restart-button"
+              variant="default"
+              className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+              onClick={() => {
+                setRefresh((prev) => prev + 1);
+              }}
+            >
+              <p className="text-white font-bold text-md text-center">
+                Restart
+              </p>
+              <RotateCcw color="white" size={32} />
+            </Button>,
+          ]}
+        />
+      </div>
     </div>
   );
 }

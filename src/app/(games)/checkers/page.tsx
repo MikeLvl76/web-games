@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Board } from "./board";
-import { GameStatus } from "./game-status";
+import { GameStatus } from "../../../components/generic/game-status";
 import { stringifyTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
@@ -389,6 +389,7 @@ export default function CheckersPage() {
       </div>
       <div className="flex w-[20%]">
         <GameStatus
+          title="Player vs Player"
           infos={[
             {
               label: "Current turn",
