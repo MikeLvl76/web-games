@@ -2,25 +2,52 @@
 
 import { GameStatus } from "@/components/generic/game-status";
 import { Button } from "@/components/ui/button";
+import { stringifyTime } from "@/lib/utils";
 import { RotateCcw } from "lucide-react";
-import { memo, useState, MouseEvent, useCallback, useEffect } from "react";
+import {
+  memo,
+  useState,
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
 
 type Cell = {
   digit?: number;
 };
 
-// TODO: add timer + valid/wrong cells count
 export default function SudokuPage() {
   const [cells, setCells] = useState<Cell[]>(
     Array.from({ length: 81 }, () => ({}))
   );
 
+  const [timer, setTimer] = useState<{ value: number; text: string }>({
+    value: 0,
+    text: stringifyTime(0),
+  });
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isWin, setIsWin] = useState(false);
 
   useEffect(() => {
     generate(60);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (isWin) return;
+
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    intervalRef.current = setInterval(() => {
+      setTimer((prev) => ({
+        value: prev.value + 1,
+        text: stringifyTime(prev.value + 1),
+      }));
+    }, 1000);
+
+    return () => clearInterval(intervalRef.current!);
+  }, [isWin]);
 
   useEffect(() => {
     setIsWin(
@@ -182,6 +209,7 @@ export default function SudokuPage() {
               label: "Remaining cells",
               value: `${cells.filter((c) => !c.digit).length}`,
             },
+            { label: "Game time", value: timer.text },
           ]}
           options={[
             <Button
@@ -190,6 +218,14 @@ export default function SudokuPage() {
               className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
               onClick={() => {
                 generate(60);
+                setTimer({ value: 0, text: stringifyTime(0) });
+                clearInterval(intervalRef.current!);
+                intervalRef.current = setInterval(() => {
+                  setTimer((prev) => ({
+                    value: prev.value + 1,
+                    text: stringifyTime(prev.value + 1),
+                  }));
+                }, 1000);
               }}
             >
               <p className="text-white font-bold text-md text-center">

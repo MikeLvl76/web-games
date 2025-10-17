@@ -10,7 +10,6 @@ import { RotateCcw } from "lucide-react";
 import p5 from "p5";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-// TODO: add timer + eat counter + snake size
 export default function SnakePage() {
   const [refresh, setRefresh] = useState(0);
   const [timer, setTimer] = useState<{ value: number; text: string }>({
