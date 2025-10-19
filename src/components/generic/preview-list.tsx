@@ -10,6 +10,13 @@ import {
 } from "lucide-react";
 import { Preview } from "@/lib/utils";
 import { usePagination } from "@/hooks/use-pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 type Props = {
   previews: Preview[];
@@ -77,25 +84,30 @@ export default function PreviewList({ previews }: Props) {
           />
         </div>
         <div className="flex flex-row w-1/3 items-center justify-end p-2 gap-1">
-          <label className="font-medium text-lg">Filter by</label>
-          <select
-            onChange={(e) => {
-              const value = e.target.value as Preview["type"];
-              setType(value.length === 0 ? undefined : value);
+          <Select
+            defaultValue="None"
+            onValueChange={(value) => {
+              setType(
+                value === "None" ? undefined : (value as Preview["type"])
+              );
             }}
-            className="p-2 focus:outline-none hover:cursor-pointer rounded-sm"
           >
-            {[
-              { value: "", text: "---" },
-              { value: "solo", text: "Solo" },
-              { value: "puzzle", text: "Puzzle" },
-              { value: "versus", text: "Versus" },
-            ].map(({ value, text }, i) => (
-              <option key={i} value={value}>
-                {text}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="focus:outline-none after:outline-none border-none font-medium text-lg">
+              <SelectValue placeholder="Select a type" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              {[
+                { value: "None", text: "All" },
+                { value: "solo", text: "Solo" },
+                { value: "puzzle", text: "Puzzle" },
+                { value: "versus", text: "Versus" },
+              ].map(({ value, text }, i) => (
+                <SelectItem key={i} value={value} className="text-lg font-bold">
+                  {text}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-16">
