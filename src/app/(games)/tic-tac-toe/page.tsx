@@ -102,7 +102,9 @@ export default function TicTacToePage() {
       </div>
       <div className="flex w-[20%]">
         <GameStatus
-          title="Show you're the best"
+          title="Tic Tac Toe"
+          description="Align three of your symbols"
+          controls={[{ label: "Insert symbol", value: "Click on empty cell" }]}
           infos={[
             {
               label: "Current turn",

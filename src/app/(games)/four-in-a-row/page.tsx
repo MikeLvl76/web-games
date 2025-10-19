@@ -208,7 +208,11 @@ export default function FourInARowPage() {
       </div>
       <div className="flex w-[20%]">
         <GameStatus
-          title="Player vs player"
+          title="Four in a row"
+          description="Align four of your tokens"
+          controls={[
+            { label: "Insert token", value: "Click on one of columns" },
+          ]}
           infos={[
             {
               label: "Current turn",

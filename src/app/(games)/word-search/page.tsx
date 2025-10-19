@@ -227,7 +227,14 @@ export default function WordSearch() {
       </div>
       <div className="flex w-[20%]">
         <GameStatus
-          title="Read carefully"
+          title="Word Search"
+          description="Find the words inside a grid full of characters"
+          controls={[
+            {
+              label: "Highlight word",
+              value: "Drag over chars with mouse left button",
+            },
+          ]}
           infos={[
             { label: "Words", value: `${words.length}` },
             {

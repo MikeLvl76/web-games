@@ -389,7 +389,14 @@ export default function CheckersPage() {
       </div>
       <div className="flex w-[20%]">
         <GameStatus
-          title="Player vs Player"
+          title="Checkers"
+          description="Capture opponent's pieces"
+          controls={[
+            {
+              label: "Move piece",
+              value: "Click on piece and click on suggested tile",
+            },
+          ]}
           infos={[
             {
               label: "Current turn",

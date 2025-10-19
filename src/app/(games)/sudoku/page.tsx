@@ -201,10 +201,13 @@ export default function SudokuPage() {
       </div>
       <div className="flex w-[20%]">
         <GameStatus
-          title="Fill the grid"
+          title="Sudoku"
+          description="Fill the grid with correct digits"
+          controls={[
+            { label: "Increase", value: "Left mouse click on cell" },
+            { label: "Decrease", value: "Right mouse click on cell" },
+          ]}
           infos={[
-            { label: "Increase", value: "Left mouse" },
-            { label: "Decrease", value: "Right mouse" },
             {
               label: "Remaining cells",
               value: `${cells.filter((c) => !c.digit).length}`,

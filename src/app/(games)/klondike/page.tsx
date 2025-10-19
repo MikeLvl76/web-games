@@ -245,7 +245,14 @@ export default function KlondikePage() {
         </div>
         <div className="flex w-[20%] h-[75%] items-start">
           <GameStatus
-            title="Finish the game"
+            title="Klondike"
+            description="Recreate all four sequences"
+            controls={[
+              {
+                label: "Move card",
+                value: "Drag card onto a pile/sequence",
+              },
+            ]}
             infos={[
               { label: "Game time", value: timer.text },
               {

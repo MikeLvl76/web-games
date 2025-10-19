@@ -176,7 +176,9 @@ export default function RockPaperScissorsPage() {
       </div>
       <div className="flex w-[20%] h-[50%] items-start">
         <GameStatus
-          title="Be lucky"
+          title="Rock, Paper, Scissors"
+          description="Good luck :)"
+          controls={[{ label: "Choose symbol", value: "Click on it" }]}
           infos={[
             {
               label: "Winner",

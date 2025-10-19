@@ -111,9 +111,10 @@ export default function SnakePage() {
       </div>
       <div className="flex w-[20%]">
         <GameStatus
-          title="Miam miam"
+          title="Snake"
+          description="Make the snake grow"
+          controls={[{ label: "Move", value: "ZQSD / Arrow keys" }]}
           infos={[
-            { label: "Move", value: "ZQSD / Arrow keys" },
             { label: "Game time", value: timer.text },
             { label: "Snake length", value: `${sizeRef.current}` },
             { label: "Eat count", value: `${sizeRef.current - 3}` },

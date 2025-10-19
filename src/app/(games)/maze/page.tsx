@@ -233,8 +233,9 @@ export default function MazePage() {
       </div>
       <div className="flex w-[20%]">
         <GameStatus
-          title="Find exit"
-          infos={[
+          title="Maze"
+          description="Find exit"
+          controls={[
             { label: "Move", value: "ZQSD / Arrow keys" },
             {
               label: "Show path",
@@ -244,6 +245,8 @@ export default function MazePage() {
               label: "Reset position",
               value: options.enableReset ? "R" : "Disabled",
             },
+          ]}
+          infos={[
             {
               label: "Countdown",
               value: options.enableCountdown ? countdown.text : "Disabled",
