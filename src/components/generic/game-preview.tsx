@@ -18,7 +18,7 @@ export default function GamePreview({ data }: Props) {
   const [added, setAdded] = useState(content.favoriteGames.includes(name));
 
   return (
-    <div className="w-[30vw] h-[30vh] rounded-md shadow-2xl/50">
+    <div className="w-[30vw] h-[30vh] rounded-md shadow-lg/50">
       <Link href={url}>
         <div className="relative w-full h-full group overflow-hidden">
           {!error ? (

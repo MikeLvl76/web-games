@@ -46,14 +46,37 @@ export default function PreviewList({ previews }: Props) {
 
   return (
     <div className="relative flex flex-col w-full h-full items-center p-2">
-      <div className="fixed top-0 z-10 flex flex-row items-center justify-evenly gap-8 w-[80%] h-16 bg-white">
-        <input
-          type="text"
-          placeholder="Search a game..."
-          onChange={(e) => setSearchText(e.target.value)}
-          className="p-2 focus:outline-none focus:border-b-2 focus:border-b-slate-600 text-lg max-w-50"
-        />
-        <div className="flex flex-row items-center justify-center gap-2">
+      <div className="fixed top-0 z-10 flex flex-row items-center justify-evenly gap-8 w-[65%] h-16 bg-white shadow-lg/30">
+        <div className="w-1/3 p-2">
+          <input
+            type="text"
+            placeholder="Search a game..."
+            onChange={(e) => setSearchText(e.target.value)}
+            className="p-2 focus:outline-none focus:border-b-2 focus:border-b-slate-600 text-lg"
+          />
+        </div>
+        <div className="flex flex-row w-1/3 justify-center items-center gap-4 bg-white">
+          <ChevronsLeft
+            className="hover:cursor-pointer"
+            onClick={pagination.first}
+          />
+          <ChevronLeft
+            className="hover:cursor-pointer"
+            onClick={pagination.previous}
+          />
+          <span>
+            {pagination.pageNumber}/{pagination.totalPages}
+          </span>
+          <ChevronRight
+            className="hover:cursor-pointer"
+            onClick={pagination.next}
+          />
+          <ChevronsRight
+            className="hover:cursor-pointer"
+            onClick={pagination.last}
+          />
+        </div>
+        <div className="flex flex-row w-1/3 items-center justify-end p-2 gap-1">
           <label className="font-medium text-lg">Filter by</label>
           <select
             onChange={(e) => {
@@ -74,27 +97,8 @@ export default function PreviewList({ previews }: Props) {
             ))}
           </select>
         </div>
-        <div className="flex flex-row justify-center items-center gap-4 bg-white">
-          <ChevronsLeft
-            className="hover:cursor-pointer"
-            onClick={pagination.first}
-          />
-          <ChevronLeft
-            className="hover:cursor-pointer"
-            onClick={pagination.previous}
-          />
-          <span>{pagination.pageNumber}</span>
-          <ChevronRight
-            className="hover:cursor-pointer"
-            onClick={pagination.next}
-          />
-          <ChevronsRight
-            className="hover:cursor-pointer"
-            onClick={pagination.last}
-          />
-        </div>
       </div>
-      <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-16">
+      <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-16">
         {pagination.data.map((preview) => (
           <li
             key={preview.id}
