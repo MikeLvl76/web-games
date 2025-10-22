@@ -7,6 +7,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  Plus,
 } from "lucide-react";
 import { Preview } from "@/lib/utils";
 import { usePagination } from "@/hooks/use-pagination";
@@ -26,6 +27,7 @@ export default function PreviewList({ previews }: Props) {
   const pagination = usePagination<Preview>();
   const [searchText, setSearchText] = useState("");
   const [type, setType] = useState<Preview["type"] | undefined>();
+  const [unavailableGamesCount, setUnavailableGamesCount] = useState(0);
 
   useEffect(() => {
     const compareNames = (name: string) =>
@@ -47,7 +49,10 @@ export default function PreviewList({ previews }: Props) {
       _previews.push(...previews);
     }
 
-    pagination.paginate(_previews);
+    pagination.paginate(_previews.filter((p) => p.isGameAvailable));
+    setUnavailableGamesCount(
+      _previews.filter((p) => !p.isGameAvailable).length
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [previews, searchText, type]);
 
@@ -119,6 +124,14 @@ export default function PreviewList({ previews }: Props) {
             <GamePreview data={preview} />
           </li>
         ))}
+        <div className="w-full h-full rounded-md shadow-lg/50">
+          <div className="flex flex-col justify-center items-center gap-4 bg-slate-200 w-full h-full">
+            <Plus size={32} color="#5c5958" />
+            <span className="text-xl font-medium text-slate-600">
+              {unavailableGamesCount} coming soon...
+            </span>
+          </div>
+        </div>
       </ul>
     </div>
   );
