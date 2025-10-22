@@ -2,7 +2,7 @@
 
 import { memo } from "react";
 import { BoardTile } from "./board-tile";
-import { Player, Tile } from "./use-utils";
+import { Player, Tile } from "../../../hooks/games/checkers/use-utils";
 
 type Props = {
   tiles: Tile[];

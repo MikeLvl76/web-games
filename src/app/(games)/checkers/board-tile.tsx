@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { Player, Tile } from "./use-utils";
+import { Player, Tile } from "../../../hooks/games/checkers/use-utils";
 import { Crown } from "lucide-react";
 
 type Props = {

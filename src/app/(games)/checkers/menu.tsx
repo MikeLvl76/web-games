@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
-import { PlayerColor } from "./use-utils";
+import { PlayerColor } from "../../../hooks/games/checkers/use-utils";
 import { User } from "lucide-react";
 
 export type Config = {

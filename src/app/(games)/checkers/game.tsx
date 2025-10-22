@@ -5,8 +5,8 @@ import { Board } from "./board";
 import { GameStatus } from "../../../components/generic/game-status";
 import { stringifyTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { CornerDownLeft, RotateCcw } from "lucide-react";
-import { PlayerColor, useUtils } from "./use-utils";
+import { RotateCcw } from "lucide-react";
+import { PlayerColor, useUtils } from "../../../hooks/games/checkers/use-utils";
 
 type Props = {
   playerColor: PlayerColor;
@@ -31,7 +31,7 @@ export default function CheckersGame({
     defaultP2Color: oppColor,
     enableMultJumps: allowMultJumps,
   });
-  const { players, tiles, selectedIdx, setPlayers, setSelectedIdx, setTiles } =
+  const { players, tiles, selectedIdx, setPlayers, setSelectedIdx } =
     utils.states;
   const { init, handleClick } = utils.functions;
 
@@ -129,43 +129,43 @@ export default function CheckersGame({
             >
               End turn
             </Button>,
-            <Button
-              key="menu-button"
-              variant="default"
-              className="flex w-fit h-fit p-2 bg-green-700 rounded-md hover:cursor-pointer"
-              onClick={() => {
-                setTiles([]);
-                setPlayers((prev) => ({
-                  ...prev,
-                  p1: {
-                    ...prev.p1,
-                    canContinue: false,
-                    currentTurn: !prev.p1.isWinner,
-                    isWinner: false,
-                    nextMove: undefined,
-                  },
-                  p2: {
-                    ...prev.p2,
-                    canContinue: false,
-                    currentTurn: !prev.p2.isWinner,
-                    isWinner: false,
-                    nextMove: undefined,
-                  },
-                }));
-                setSelectedIdx(-1);
-                setTimer({ value: 0, text: stringifyTime(0) });
-                clearInterval(intervalRef.current!);
-                intervalRef.current = setInterval(() => {
-                  setTimer((prev) => ({
-                    value: prev.value + 1,
-                    text: stringifyTime(prev.value + 1),
-                  }));
-                }, 1000);
-              }}
-            >
-              <p className="text-white font-bold text-md text-center">Menu</p>
-              <CornerDownLeft color="white" size={32} />
-            </Button>,
+            // <Button
+            //   key="menu-button"
+            //   variant="default"
+            //   className="flex w-fit h-fit p-2 bg-green-700 rounded-md hover:cursor-pointer"
+            //   onClick={() => {
+            //     setTiles([]);
+            //     setPlayers((prev) => ({
+            //       ...prev,
+            //       p1: {
+            //         ...prev.p1,
+            //         canContinue: false,
+            //         currentTurn: !prev.p1.isWinner,
+            //         isWinner: false,
+            //         nextMove: undefined,
+            //       },
+            //       p2: {
+            //         ...prev.p2,
+            //         canContinue: false,
+            //         currentTurn: !prev.p2.isWinner,
+            //         isWinner: false,
+            //         nextMove: undefined,
+            //       },
+            //     }));
+            //     setSelectedIdx(-1);
+            //     setTimer({ value: 0, text: stringifyTime(0) });
+            //     clearInterval(intervalRef.current!);
+            //     intervalRef.current = setInterval(() => {
+            //       setTimer((prev) => ({
+            //         value: prev.value + 1,
+            //         text: stringifyTime(prev.value + 1),
+            //       }));
+            //     }, 1000);
+            //   }}
+            // >
+            //   <p className="text-white font-bold text-md text-center">Menu</p>
+            //   <CornerDownLeft color="white" size={32} />
+            // </Button>,
             <Button
               key="restart-button"
               variant="default"
