@@ -20,19 +20,29 @@ export type Player = {
   nextMove?: NextMove;
 };
 
-export function useUtils() {
+type UtilsParams = {
+  defaultP1Color?: PlayerColor;
+  defaultP2Color?: PlayerColor;
+  enableMultJumps: boolean;
+};
+
+export function useUtils(
+  { defaultP1Color, defaultP2Color, enableMultJumps }: UtilsParams = {
+    enableMultJumps: true,
+  }
+) {
   const [tiles, setTiles] = useState<Tile[]>([]);
   const [players, setPlayers] = useState<Record<Player["name"], Player>>({
     p1: {
       name: "p1",
-      color: "black",
+      color: defaultP1Color ? defaultP1Color : "black",
       canContinue: false,
       currentTurn: true,
       isWinner: false,
     },
     p2: {
       name: "p2",
-      color: "white",
+      color: defaultP2Color ? defaultP2Color : "white",
       canContinue: false,
       currentTurn: false,
       isWinner: false,
@@ -54,7 +64,7 @@ export function useUtils() {
         return {
           piece: {
             type: "pawn",
-            color: "white",
+            color: players.p2.color,
           },
         };
       }
@@ -68,7 +78,7 @@ export function useUtils() {
         return {
           piece: {
             type: "pawn",
-            color: "black",
+            color: players.p1.color,
           },
         };
       }
@@ -77,7 +87,7 @@ export function useUtils() {
     });
 
     setTiles(_tiles);
-  }, []);
+  }, [players.p1.color, players.p2.color]);
 
   const checkWinner = useCallback(() => {
     const { p1, p2 } = players;
@@ -97,7 +107,7 @@ export function useUtils() {
   }, [players, tiles]);
 
   const getNextMove = useCallback(
-    (idx: number, tile: Tile) => {
+    (idx: number, tile: Tile, currentPlayer: Player) => {
       const rowSize = 8;
       const indices: number[] = [];
       const captures: NextMove["captures"] = [];
@@ -107,7 +117,7 @@ export function useUtils() {
 
       if (piece.type === "pawn") {
         const dirs =
-          piece.color === "black"
+          currentPlayer.name === players.p1.name
             ? [
                 [-1, -1], // top left diag
                 [-1, 1], // top right diag
@@ -206,7 +216,7 @@ export function useUtils() {
 
       return { indices, captures } satisfies NextMove;
     },
-    [tiles]
+    [players.p1.name, tiles]
   );
 
   const getJumps = useCallback(
@@ -298,7 +308,7 @@ export function useUtils() {
 
         setPlayers((prev) => {
           const isP1Playing = prev.p1.currentTurn;
-          const canContinue = jumps.length > 0;
+          const canContinue = jumps.length > 0 && enableMultJumps;
 
           return {
             ...prev,
@@ -339,7 +349,7 @@ export function useUtils() {
 
       setTiles(copy);
     },
-    [applyPromotion, getJumps, selectedIdx, tiles]
+    [applyPromotion, enableMultJumps, getJumps, selectedIdx, tiles]
   );
 
   const handleClick = useCallback(
@@ -356,16 +366,19 @@ export function useUtils() {
 
         setPlayers((prev) => {
           const isP1 = currentPlayer.name === prev.p1.name;
-
           return {
             ...prev,
             p1: {
               ...prev.p1,
-              nextMove: isP1 ? getNextMove(index, tile) : prev.p1.nextMove,
+              nextMove: isP1
+                ? getNextMove(index, tile, currentPlayer)
+                : prev.p1.nextMove,
             },
             p2: {
               ...prev.p2,
-              nextMove: !isP1 ? getNextMove(index, tile) : prev.p2.nextMove,
+              nextMove: !isP1
+                ? getNextMove(index, tile, currentPlayer)
+                : prev.p2.nextMove,
             },
           };
         });
