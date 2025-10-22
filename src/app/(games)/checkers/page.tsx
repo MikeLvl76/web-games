@@ -451,6 +451,18 @@ export default function CheckersPage() {
               label: "Current turn",
               value: players.p1.currentTurn ? players.p1.name : players.p2.name,
             },
+            {
+              label: "Remaining pieces",
+              value: `${
+                tiles.filter((t) => t.piece?.color === players.p1.color).length
+              }`,
+            },
+            {
+              label: "Remaining opponent pieces",
+              value: `${
+                tiles.filter((t) => t.piece?.color === players.p2.color).length
+              }`,
+            },
             { label: "Game time", value: timer.text },
             {
               label: "Winner",
