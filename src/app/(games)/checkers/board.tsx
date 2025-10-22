@@ -2,13 +2,12 @@
 
 import { memo } from "react";
 import { BoardTile } from "./board-tile";
-import { NextMove, Tile } from "./page";
+import { Player, Tile } from "./page";
 
 type Props = {
   tiles: Tile[];
   selectedIndex: number;
-  nextMove: NextMove;
-  playerColor: Tile["pieceColor"];
+  currentPlayer: Player;
   onClick: (tile: Tile, index: number) => void;
 };
 

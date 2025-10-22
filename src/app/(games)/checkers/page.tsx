@@ -7,87 +7,95 @@ import { stringifyTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
 
+export type PlayerColor = "black" | "white";
+export type PieceType = "pawn" | "dame";
 export type Tile = {
-  piece?: "pawn" | "dame";
-  pieceColor?: "black" | "white";
-  boardIndex?: number;
+  piece?: { color: PlayerColor; type: PieceType };
 };
-
 export type NextMove = {
   indices: number[];
   captures: { fromIdx: number; targetIdx: number; jumpIdx: number }[];
 };
+export type Player = {
+  name: string;
+  color: PlayerColor;
+  canContinue: boolean;
+  currentTurn: boolean;
+  isWinner: boolean;
+  nextMove?: NextMove;
+};
 
 export default function CheckersPage() {
   const [tiles, setTiles] = useState<Tile[]>([]);
-  const [pieces, setPieces] = useState<Tile[]>([]);
-  const [oppPieces, setOppPieces] = useState<Tile[]>([]);
-  const [nextMove, setNextMove] = useState<NextMove>({
-    indices: [],
-    captures: [],
+  const [players, setPlayers] = useState<Record<Player["name"], Player>>({
+    p1: {
+      name: "p1",
+      color: "black",
+      canContinue: false,
+      currentTurn: true,
+      isWinner: false,
+    },
+    p2: {
+      name: "p2",
+      color: "white",
+      canContinue: false,
+      currentTurn: false,
+      isWinner: false,
+    },
   });
   const [selectedIdx, setSelectedIdx] = useState(-1);
-  const [playerTurnColor, setPlayerTurnColor] =
-    useState<Tile["pieceColor"]>("black");
-  const [canContinue, setCanContinue] = useState(false);
-  const [winner, setWinner] = useState<Tile["pieceColor"]>();
   const [timer, setTimer] = useState<{ value: number; text: string }>({
     value: 0,
     text: stringifyTime(0),
   });
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const generate = useCallback(() => {
-    const _tiles: Tile[] = Array(64).fill({});
-    const _pieces: Tile[] = Array(12).fill({
-      piece: "pawn",
-      pieceColor: "black",
-    });
-    const _oppPieces: Tile[] = Array(12).fill({
-      piece: "pawn",
-      pieceColor: "white",
-    });
-
-    let index = 0,
-      oppIndex = 0;
-
-    for (let i = 0; i < _tiles.length; i++) {
-      const row = Math.floor(i / 8);
-      const col = i % 8;
-
-      if ((row + col) % 2 === 0 && oppIndex < _oppPieces.length) {
-        _oppPieces[oppIndex].boardIndex = i;
-        _tiles[i] = _oppPieces[oppIndex];
-
-        oppIndex++;
-      }
-
-      if (i >= 40) {
-        if ((row + col) % 2 === 0 && index < _pieces.length) {
-          _pieces[index].boardIndex = i;
-          _tiles[i] = _pieces[index];
-
-          index++;
-        }
-      }
-    }
-
-    return [_tiles, _pieces, _oppPieces];
-  }, []);
-
   const init = useCallback(() => {
-    const [_tiles, _pieces, _oppPieces] = generate();
+    const PLAYERS_PIECE_MAX_COUNT = 12;
+    let playerPieceCount = 0,
+      oppPieceCount = 0;
+
+    const _tiles: Tile[] = Array.from({ length: 64 }, (_, k) => {
+      const row = Math.floor(k / 8);
+      const col = k % 8;
+
+      if ((row + col) % 2 === 0 && oppPieceCount < PLAYERS_PIECE_MAX_COUNT) {
+        oppPieceCount++;
+        return {
+          piece: {
+            type: "pawn",
+            color: "white",
+          },
+        };
+      }
+
+      if (
+        k >= 40 &&
+        (row + col) % 2 === 0 &&
+        playerPieceCount < PLAYERS_PIECE_MAX_COUNT
+      ) {
+        playerPieceCount++;
+        return {
+          piece: {
+            type: "pawn",
+            color: "black",
+          },
+        };
+      }
+
+      return { piece: undefined };
+    });
+
     setTiles(_tiles);
-    setPieces(_pieces);
-    setOppPieces(_oppPieces);
-  }, [generate]);
+  }, []);
 
   useEffect(() => {
     init();
-  }, [generate, init]);
+  }, [init]);
 
   useEffect(() => {
-    if (winner) return;
+    const { p1, p2 } = players;
+    if (p1.isWinner || p2.isWinner) return;
 
     if (intervalRef.current) clearInterval(intervalRef.current);
 
@@ -99,22 +107,37 @@ export default function CheckersPage() {
     }, 1000);
 
     return () => clearInterval(intervalRef.current!);
-  }, [winner]);
+  }, [players]);
 
   const checkWinner = useCallback(() => {
-    if (pieces.length === 0) setWinner("white");
-    if (oppPieces.length === 0) setWinner("black");
-  }, [oppPieces.length, pieces.length]);
+    const { p1, p2 } = players;
 
-  const computeMoves = useCallback(
+    const p1Pieces = tiles.filter((tile) => tile.piece?.color === p1.color);
+    const p2Pieces = tiles.filter((tile) => tile.piece?.color === p2.color);
+
+    if (p1Pieces.length === 0) {
+      setPlayers((prev) => ({ ...prev, p2: { ...prev.p2, isWinner: true } }));
+      return;
+    }
+
+    if (p2Pieces.length === 0) {
+      setPlayers((prev) => ({ ...prev, p1: { ...prev.p1, isWinner: true } }));
+      return;
+    }
+  }, [players, tiles]);
+
+  const getNextMove = useCallback(
     (idx: number, tile: Tile) => {
       const rowSize = 8;
       const indices: number[] = [];
       const captures: NextMove["captures"] = [];
+      const piece = tile.piece;
 
-      if (tile.piece === "pawn") {
+      if (!piece) return;
+
+      if (piece.type === "pawn") {
         const dirs =
-          tile.pieceColor === "black"
+          piece.color === "black"
             ? [
                 [-1, -1], // top left diag
                 [-1, 1], // top right diag
@@ -147,10 +170,7 @@ export default function CheckersPage() {
                 const jumpIdx = nextRow * rowSize + nextCol;
                 const jumpTile = tiles[jumpIdx];
 
-                if (
-                  neighbor.pieceColor !== tile.pieceColor &&
-                  !jumpTile.piece
-                ) {
+                if (neighbor.piece?.color !== piece.color && !jumpTile.piece) {
                   indices.push(jumpIdx);
                   captures.push({
                     fromIdx: idx,
@@ -162,7 +182,7 @@ export default function CheckersPage() {
             }
           }
         }
-      } else if (tile.piece === "dame") {
+      } else if (piece.type === "dame") {
         const dirs = [
           [-1, -1], // top-left
           [-1, 1], // top-right
@@ -199,10 +219,7 @@ export default function CheckersPage() {
                 const jumpIdx = nextRow * rowSize + nextCol;
                 const jumpTile = tiles[jumpIdx];
 
-                if (
-                  neighbor.pieceColor !== tile.pieceColor &&
-                  !jumpTile.piece
-                ) {
+                if (neighbor.piece?.color !== piece.color && !jumpTile.piece) {
                   indices.push(jumpIdx);
                   captures.push({
                     fromIdx: idx,
@@ -222,158 +239,191 @@ export default function CheckersPage() {
     [tiles]
   );
 
-  function getFollowUpJumps(
-    idx: number,
-    tiles: Tile[],
-    color: Tile["pieceColor"]
-  ) {
-    const rowSize = 8;
-    const directions =
-      color === "black"
-        ? [
-            [-1, -1],
-            [-1, 1],
-          ]
-        : [
-            [1, -1],
-            [1, 1],
-          ];
-    const jumps: NextMove["captures"] = [];
+  const getJumps = useCallback(
+    (index: number, color: PlayerColor, _tiles: Tile[]) => {
+      const rowSize = 8;
+      const directions =
+        color === "black"
+          ? [
+              [-1, -1],
+              [-1, 1],
+            ]
+          : [
+              [1, -1],
+              [1, 1],
+            ];
+      const jumps: NextMove["captures"] = [];
 
-    for (const [dr, dc] of directions) {
-      const row = Math.floor(idx / rowSize);
-      const col = idx % rowSize;
-      const nRow = row + dr;
-      const nCol = col + dc;
+      for (const [dr, dc] of directions) {
+        const row = Math.floor(index / rowSize);
+        const col = index % rowSize;
+        const nRow = row + dr;
+        const nCol = col + dc;
 
-      if (nRow < 0 || nRow >= rowSize || nCol < 0 || nCol >= rowSize) continue;
+        if (nRow < 0 || nRow >= rowSize || nCol < 0 || nCol >= rowSize)
+          continue;
 
-      const neighborIdx = nRow * rowSize + nCol;
-      const neighbor = tiles[neighborIdx];
+        const neighborIdx = nRow * rowSize + nCol;
+        const neighbor = _tiles[neighborIdx];
 
-      if (neighbor.pieceColor && neighbor.pieceColor !== color) {
-        const jumpRow = nRow + dr;
-        const jumpCol = nCol + dc;
-        if (
-          jumpRow >= 0 &&
-          jumpRow < rowSize &&
-          jumpCol >= 0 &&
-          jumpCol < rowSize
-        ) {
-          const jumpIdx = jumpRow * rowSize + jumpCol;
-          if (!tiles[jumpIdx].piece) {
-            jumps.push({ fromIdx: idx, targetIdx: neighborIdx, jumpIdx });
+        if (neighbor.piece && neighbor.piece.color !== color) {
+          const jumpRow = nRow + dr;
+          const jumpCol = nCol + dc;
+          if (
+            jumpRow >= 0 &&
+            jumpRow < rowSize &&
+            jumpCol >= 0 &&
+            jumpCol < rowSize
+          ) {
+            const jumpIdx = jumpRow * rowSize + jumpCol;
+            if (!_tiles[jumpIdx].piece) {
+              jumps.push({ fromIdx: index, targetIdx: neighborIdx, jumpIdx });
+            }
           }
         }
       }
-    }
 
-    return jumps;
-  }
+      return jumps;
+    },
+    []
+  );
 
-  const getPromotedPiece = useCallback(
-    (piece: Tile["piece"], idx: number) => {
-      if (piece === "dame") return piece;
-
+  const applyPromotion = useCallback(
+    (piece: Tile["piece"], index: number) => {
+      if (!piece) return piece;
       const rowSize = 8;
       const lastRowStart = tiles.length - rowSize;
 
-      const isBlackPromotion =
-        playerTurnColor === "black" && idx >= 0 && idx < rowSize;
-      const isWhitePromotion =
-        playerTurnColor === "white" &&
-        idx >= lastRowStart &&
-        idx < tiles.length;
+      if (piece.color === "black" && index >= 0 && index < rowSize) {
+        return { ...piece, type: "dame" } as Tile["piece"];
+      }
 
-      return isBlackPromotion || isWhitePromotion ? "dame" : piece;
+      if (piece.color === "white" && index >= lastRowStart) {
+        return { ...piece, type: "dame" } as Tile["piece"];
+      }
+
+      return piece;
     },
-    [playerTurnColor, tiles.length]
+    [tiles.length]
   );
 
-  const movePiece = useCallback(
-    (fromIdx: number, toIdx: number, captures: NextMove["captures"]) => {
-      const _tiles = [...tiles];
-      const origin = _tiles[fromIdx];
-
-      if (origin.pieceColor !== playerTurnColor && selectedIdx !== -1) {
+  const move = useCallback(
+    (player: Player, originIdx: number, targetIdx: number) => {
+      const copy = [...tiles];
+      const originTile = copy[originIdx];
+      if (originTile.piece?.color !== player.color && selectedIdx !== -1) {
         return;
       }
 
-      const capture = captures.find((c) => c.jumpIdx === toIdx);
+      const capture = player.nextMove?.captures.find(
+        (c) => c.jumpIdx === targetIdx
+      );
 
       if (capture) {
-        const target = _tiles[capture.targetIdx];
+        copy[capture.targetIdx].piece = undefined;
+        copy[targetIdx].piece = applyPromotion(originTile.piece, targetIdx);
+        originTile.piece = undefined;
 
-        _tiles[capture.targetIdx] = {};
-        _tiles[fromIdx] = {};
+        const jumps = getJumps(targetIdx, player.color, copy);
 
-        _tiles[toIdx] = {
-          ...origin,
-          piece: getPromotedPiece(origin.piece, toIdx),
-        };
+        setPlayers((prev) => {
+          const isP1Playing = prev.p1.currentTurn;
+          const canContinue = jumps.length > 0;
 
-        if (target.pieceColor === "black") {
-          setPieces((prev) =>
-            prev.filter((p) => p.boardIndex !== capture.targetIdx)
-          );
-        } else if (target.pieceColor === "white") {
-          setOppPieces((prev) =>
-            prev.filter((p) => p.boardIndex !== capture.targetIdx)
-          );
-        }
+          return {
+            ...prev,
+            p1: {
+              ...prev.p1,
+              canContinue: isP1Playing ? canContinue : false,
+              currentTurn: isP1Playing ? canContinue : !canContinue,
+            },
+            p2: {
+              ...prev.p2,
+              canContinue: !isP1Playing ? canContinue : false,
+              currentTurn: !isP1Playing ? canContinue : !canContinue,
+            },
+          };
+        });
+      } else if (originIdx !== targetIdx) {
+        copy[targetIdx].piece = applyPromotion(originTile.piece, targetIdx);
+        originTile.piece = undefined;
 
-        const followUps = getFollowUpJumps(toIdx, _tiles, playerTurnColor);
-        setCanContinue(followUps.length > 0);
+        setPlayers((prev) => {
+          const p1CanPlay = !prev.p1.currentTurn;
 
-        if (followUps.length === 0) {
-          setPlayerTurnColor((prev) => (prev === "black" ? "white" : "black"));
-        }
-      } else if (fromIdx !== toIdx) {
-        _tiles[fromIdx] = {};
-        _tiles[toIdx] = {
-          ...origin,
-          piece: getPromotedPiece(origin.piece, toIdx),
-        };
-
-        setCanContinue(false);
-        setPlayerTurnColor((prev) => (prev === "black" ? "white" : "black"));
+          return {
+            ...prev,
+            p1: {
+              ...prev.p1,
+              canContinue: false,
+              currentTurn: p1CanPlay,
+            },
+            p2: {
+              ...prev.p2,
+              canContinue: false,
+              currentTurn: !p1CanPlay,
+            },
+          };
+        });
       }
 
-      setTiles(_tiles);
+      setTiles(copy);
     },
-    [getPromotedPiece, playerTurnColor, selectedIdx, tiles]
+    [applyPromotion, getJumps, selectedIdx, tiles]
   );
 
   const handleClick = useCallback(
-    (tile: Tile, idx: number) => {
-      if (winner) return;
+    (tile: Tile, index: number) => {
+      if (!tile.piece && selectedIdx === -1) return;
+      const { p1, p2 } = players;
+
+      const currentPlayer = p1.currentTurn ? { ...p1 } : { ...p2 };
+
+      if (currentPlayer.isWinner) return;
 
       if (selectedIdx === -1 && tile.piece) {
-        setSelectedIdx(idx);
-        setNextMove(computeMoves(idx, tile));
+        setSelectedIdx(index);
+
+        setPlayers((prev) => {
+          const isP1 = currentPlayer.name === prev.p1.name;
+
+          return {
+            ...prev,
+            p1: {
+              ...prev.p1,
+              nextMove: isP1 ? getNextMove(index, tile) : prev.p1.nextMove,
+            },
+            p2: {
+              ...prev.p2,
+              nextMove: !isP1 ? getNextMove(index, tile) : prev.p2.nextMove,
+            },
+          };
+        });
         return;
       }
 
-      if (selectedIdx !== -1 && !tile.piece && nextMove.indices.includes(idx)) {
-        movePiece(selectedIdx, idx, nextMove.captures);
+      if (
+        selectedIdx !== -1 &&
+        !tile.piece &&
+        currentPlayer.nextMove?.indices.includes(index)
+      ) {
+        move(currentPlayer, selectedIdx, index);
         setSelectedIdx(-1);
-        setNextMove({ indices: [], captures: [] });
+        setPlayers((prev) => ({
+          p1: { ...prev.p1, nextMove: undefined },
+          p2: { ...prev.p2, nextMove: undefined },
+        }));
         return;
       }
 
       checkWinner();
       setSelectedIdx(-1);
-      setNextMove({ indices: [], captures: [] });
+      setPlayers((prev) => ({
+        p1: { ...prev.p1, nextMove: undefined },
+        p2: { ...prev.p2, nextMove: undefined },
+      }));
     },
-    [
-      checkWinner,
-      computeMoves,
-      movePiece,
-      nextMove.captures,
-      nextMove.indices,
-      selectedIdx,
-      winner,
-    ]
+    [checkWinner, getNextMove, move, players, selectedIdx]
   );
 
   return (
@@ -382,8 +432,7 @@ export default function CheckersPage() {
         <Board
           tiles={tiles}
           selectedIndex={selectedIdx}
-          nextMove={nextMove}
-          playerColor={playerTurnColor}
+          currentPlayer={players.p1.currentTurn ? players.p1 : players.p2}
           onClick={handleClick}
         />
       </div>
@@ -400,15 +449,15 @@ export default function CheckersPage() {
           infos={[
             {
               label: "Current turn",
-              value: playerTurnColor === "black" ? "Player 1" : "Player 2",
+              value: players.p1.currentTurn ? players.p1.name : players.p2.name,
             },
             { label: "Game time", value: timer.text },
             {
               label: "Winner",
-              value: winner
-                ? winner === "black"
-                  ? "Player 1"
-                  : "Player 2"
+              value: players.p1.isWinner
+                ? players.p1.name
+                : players.p2.isWinner
+                ? players.p2.name
                 : "/",
             },
           ]}
@@ -416,13 +465,26 @@ export default function CheckersPage() {
             <Button
               key="end-turn-button"
               onClick={() => {
-                setCanContinue(false);
-                setPlayerTurnColor((prev) =>
-                  prev === "black" ? "white" : "black"
-                );
+                setPlayers((prev) => {
+                  const p1CanPlay = !prev.p1.currentTurn;
+
+                  return {
+                    ...prev,
+                    p1: {
+                      ...prev.p1,
+                      canContinue: false,
+                      currentTurn: p1CanPlay,
+                    },
+                    p2: {
+                      ...prev.p2,
+                      canContinue: false,
+                      currentTurn: !p1CanPlay,
+                    },
+                  };
+                });
               }}
               className="w-fit h-fit p-2 rounded-sm bg-red-500 text-sm text-white font-bold hover:cursor-pointer disabled:opacity-20"
-              disabled={!canContinue}
+              disabled={!players.p1.canContinue && !players.p2.canContinue}
             >
               End turn
             </Button>,
@@ -432,13 +494,24 @@ export default function CheckersPage() {
               className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
               onClick={() => {
                 init();
-                setCanContinue(false);
-                setPlayerTurnColor(() =>
-                  winner === "black" ? "white" : "black"
-                );
-                setWinner(undefined);
+                setPlayers((prev) => ({
+                  ...prev,
+                  p1: {
+                    ...prev.p1,
+                    canContinue: false,
+                    currentTurn: !prev.p1.isWinner,
+                    isWinner: false,
+                    nextMove: undefined,
+                  },
+                  p2: {
+                    ...prev.p2,
+                    canContinue: false,
+                    currentTurn: !prev.p2.isWinner,
+                    isWinner: false,
+                    nextMove: undefined,
+                  },
+                }));
                 setSelectedIdx(-1);
-                setNextMove({ indices: [], captures: [] });
                 setTimer({ value: 0, text: stringifyTime(0) });
                 clearInterval(intervalRef.current!);
                 intervalRef.current = setInterval(() => {
