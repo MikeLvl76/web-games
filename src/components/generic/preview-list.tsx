@@ -58,7 +58,7 @@ export default function PreviewList({ previews }: Props) {
 
   return (
     <div className="relative flex flex-col w-full h-full items-center p-2">
-      <div className="fixed top-0 z-10 flex flex-row items-center justify-evenly gap-8 w-[65%] h-16 bg-white shadow-lg/30">
+      <div className="fixed top-0 z-10 flex flex-row items-center justify-evenly gap-8 w-[70%] h-16 bg-white shadow-lg/30">
         <div className="w-1/3 p-2">
           <input
             type="text"
@@ -115,11 +115,11 @@ export default function PreviewList({ previews }: Props) {
           </Select>
         </div>
       </div>
-      <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-16">
+      <ul className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mt-16">
         {pagination.data.map((preview) => (
           <li
             key={preview.id}
-            className="flex items-center justify-center rounded-sm w-60 h-60 gap-1 hover:cursor-pointer"
+            className="flex items-center justify-center rounded-sm w-50 h-50 gap-1 hover:cursor-pointer"
           >
             <GamePreview data={preview} />
           </li>
