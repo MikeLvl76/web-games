@@ -1,8 +1,8 @@
 "use client";
 
 import { Dispatch, memo, SetStateAction } from "react";
-import { Token } from "./page";
 import { ArrowBigDown } from "lucide-react";
+import { Token } from "@/hooks/games/four-in-a-row/use-utils";
 
 type Props = {
   index: number;
