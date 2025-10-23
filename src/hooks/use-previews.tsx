@@ -17,6 +17,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("checkers"),
     id: "checkers-game",
     isGameAvailable: true,
+    gameStatus: "fine",
   },
   {
     name: "Maze",
@@ -26,6 +27,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("maze"),
     id: "maze-game",
     isGameAvailable: true,
+    gameStatus: "fine",
   },
   {
     name: "Snake",
@@ -35,6 +37,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("snake"),
     id: "snake-game",
     isGameAvailable: true,
+    gameStatus: "fine",
   },
   {
     name: "Klondike",
@@ -44,6 +47,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("klondike"),
     id: "klondike-game",
     isGameAvailable: true,
+    gameStatus: "buggy",
   },
   {
     name: "Sudoku",
@@ -53,6 +57,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("sudoku"),
     id: "sudoku-game",
     isGameAvailable: true,
+    gameStatus: "fine",
   },
   {
     name: "Tic-tac-toe",
@@ -62,6 +67,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("tic-tac-toe"),
     id: "tic-tac-toe-game",
     isGameAvailable: true,
+    gameStatus: "fine",
   },
   {
     name: "Word-search",
@@ -71,6 +77,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("word-search"),
     id: "word-search-game",
     isGameAvailable: true,
+    gameStatus: "fine",
   },
   {
     name: "Four in a Row",
@@ -80,6 +87,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("four-in-a-row"),
     id: "four-in-a-row-game",
     isGameAvailable: true,
+    gameStatus: "fine",
   },
   {
     name: "Rock, Paper, Scissors",
@@ -89,6 +97,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("rock-paper-scissors"),
     id: "rock-paper-scissors-game",
     isGameAvailable: true,
+    gameStatus: "fine",
   },
   /* non-implemented games */
   {
@@ -99,6 +108,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("dino-run"),
     id: "dino-run-game",
     isGameAvailable: false,
+    gameStatus: "unplayable",
   },
   {
     name: "Flying Bird",
@@ -108,6 +118,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("flying-bird"),
     id: "flying-bird-game",
     isGameAvailable: false,
+    gameStatus: "unplayable",
   },
   {
     name: "Guess the word",
@@ -117,6 +128,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("word-guess"),
     id: "word-guess-game",
     isGameAvailable: false,
+    gameStatus: "unplayable",
   },
   {
     name: "Poker",
@@ -126,6 +138,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("poker"),
     id: "poker-game",
     isGameAvailable: false,
+    gameStatus: "unplayable",
   },
   {
     name: "Shape Dash",
@@ -135,6 +148,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("shape-dash"),
     id: "shape-dash-game",
     isGameAvailable: false,
+    gameStatus: "unplayable",
   },
   {
     name: "Chess",
@@ -144,6 +158,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("chess"),
     id: "chess-game",
     isGameAvailable: false,
+    gameStatus: "unplayable",
   },
   {
     name: "Click fast",
@@ -153,6 +168,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("click-fast"),
     id: "click-fast-game",
     isGameAvailable: false,
+    gameStatus: "unplayable",
   },
   {
     name: "Don't touch",
@@ -162,6 +178,7 @@ const DEFAULT_PREVIEWS: Preview[] = [
     filepath: getFilepath("do-not-touch"),
     id: "do-not-touch-game",
     isGameAvailable: false,
+    gameStatus: "unplayable",
   },
 ];
 
