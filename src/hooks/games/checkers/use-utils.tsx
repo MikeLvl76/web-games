@@ -89,22 +89,31 @@ export function useUtils(
     setTiles(_tiles);
   }, [players.p1.color, players.p2.color]);
 
-  const checkWinner = useCallback(() => {
-    const { p1, p2 } = players;
+  const checkWinner = useCallback(
+    (currentPlayer: Player) => {
+      const pieces = tiles.filter(
+        (tile) => tile.piece?.color === currentPlayer.color
+      );
+      if (pieces.length === 0) {
+        setPlayers((prev) => {
+          const isP1 = currentPlayer.name === prev.p1.name;
 
-    const p1Pieces = tiles.filter((tile) => tile.piece?.color === p1.color);
-    const p2Pieces = tiles.filter((tile) => tile.piece?.color === p2.color);
-
-    if (p1Pieces.length === 0) {
-      setPlayers((prev) => ({ ...prev, p2: { ...prev.p2, isWinner: true } }));
-      return;
-    }
-
-    if (p2Pieces.length === 0) {
-      setPlayers((prev) => ({ ...prev, p1: { ...prev.p1, isWinner: true } }));
-      return;
-    }
-  }, [players, tiles]);
+          return {
+            ...prev,
+            p1: {
+              ...prev.p1,
+              isWinner: isP1,
+            },
+            p2: {
+              ...prev.p2,
+              isWinner: !isP1,
+            },
+          };
+        });
+      }
+    },
+    [tiles]
+  );
 
   const getNextMove = useCallback(
     (idx: number, tile: Tile, currentPlayer: Player) => {
@@ -399,7 +408,7 @@ export function useUtils(
         return;
       }
 
-      checkWinner();
+      checkWinner(currentPlayer);
       setSelectedIdx(-1);
       setPlayers((prev) => ({
         p1: { ...prev.p1, nextMove: undefined },
