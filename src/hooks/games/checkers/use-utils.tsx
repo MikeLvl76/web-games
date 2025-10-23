@@ -102,11 +102,11 @@ export function useUtils(
             ...prev,
             p1: {
               ...prev.p1,
-              isWinner: isP1,
+              isWinner: !isP1,
             },
             p2: {
               ...prev.p2,
-              isWinner: !isP1,
+              isWinner: isP1,
             },
           };
         });
