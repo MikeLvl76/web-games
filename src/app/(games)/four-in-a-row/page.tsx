@@ -3,22 +3,42 @@
 import { GameStatus } from "@/components/generic/game-status";
 import { Button } from "@/components/ui/button";
 import { stringifyTime } from "@/lib/utils";
-import { ArrowBigDown, RotateCcw } from "lucide-react";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { RotateCcw } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Board } from "./board";
 
-type Token = "red" | "yellow" | undefined;
+export type Token = "red" | "yellow" | undefined;
+type Player = {
+  name: string;
+  color: NonNullable<Token>;
+  currentTurn: boolean;
+  isWinner: boolean;
+};
+
 const WINNING_COLLECTION_LENGTH = 4;
 
 export default function FourInARowPage() {
   const [tokens, setTokens] = useState<Token[]>(Array(42).fill(undefined));
-  const [isHoveringIndex, setIsHoveringIndex] = useState(-1);
-  const [playerColor, setPlayerColor] = useState<NonNullable<Token>>("red");
+  const [hoveringIndex, setHoveringIndex] = useState(-1);
+  const [players, setPlayers] = useState<Record<Player["name"], Player>>({
+    p1: {
+      name: "p1",
+      color: "red",
+      currentTurn: true,
+      isWinner: false,
+    },
+    p2: {
+      name: "p2",
+      color: "yellow",
+      currentTurn: false,
+      isWinner: false,
+    },
+  });
   const [timer, setTimer] = useState<{ value: number; text: string }>({
     value: 0,
     text: stringifyTime(0),
   });
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [isEnd, setIsEnd] = useState(false);
 
   const findSuitableIndex = useCallback(
     (colIndex: number) => {
@@ -101,7 +121,7 @@ export default function FourInARowPage() {
 
   const handleClick = useCallback(
     (index: number) => {
-      if (isEnd) return;
+      if (players.p1.isWinner || players.p2.isWinner) return;
 
       const rowSize = 7;
 
@@ -109,27 +129,56 @@ export default function FourInARowPage() {
 
       const col = index % rowSize;
       const _tokens = [...tokens];
+      const currentPlayer = players.p1.currentTurn ? players.p1 : players.p2;
 
       const suitableIndex = findSuitableIndex(col);
       if (suitableIndex !== -1) {
-        _tokens[suitableIndex] = playerColor;
+        _tokens[suitableIndex] = currentPlayer.color;
 
-        const isWin = checkEndGame(_tokens, suitableIndex, playerColor);
+        const isWin = checkEndGame(_tokens, suitableIndex, currentPlayer.color);
 
         if (isWin) {
-          setIsEnd(true);
+          setPlayers((prev) => {
+            const hasP1Win = currentPlayer.name === prev.p1.name && isWin;
+
+            return {
+              ...prev,
+              p1: {
+                ...prev.p1,
+                isWinner: hasP1Win,
+              },
+              p2: {
+                ...prev.p2,
+                isWinner: !hasP1Win,
+              },
+            };
+          });
         } else {
-          setPlayerColor((prev) => (prev === "red" ? "yellow" : "red"));
+          setPlayers((prev) => {
+            const isP1Turn = !prev.p1.currentTurn;
+
+            return {
+              ...prev,
+              p1: {
+                ...prev.p1,
+                currentTurn: isP1Turn,
+              },
+              p2: {
+                ...prev.p2,
+                currentTurn: !isP1Turn,
+              },
+            };
+          });
         }
 
         setTokens(_tokens);
       }
     },
-    [checkEndGame, findSuitableIndex, isEnd, playerColor, tokens]
+    [checkEndGame, findSuitableIndex, players, tokens]
   );
 
   useEffect(() => {
-    if (isEnd) return;
+    if (players.p1.isWinner || players.p2.isWinner) return;
 
     if (intervalRef.current) clearInterval(intervalRef.current);
 
@@ -141,70 +190,17 @@ export default function FourInARowPage() {
     }, 1000);
 
     return () => clearInterval(intervalRef.current!);
-  }, [isEnd]);
-
-  const Column = memo(({ index }: { index: number }) => {
-    const rowSize = 7;
-    const colSize = 6;
-
-    const elements = Array.from(
-      { length: colSize },
-      (_, k) => tokens[k * rowSize + index]
-    );
-
-    return (
-      <div className="relative">
-        {isHoveringIndex === index && (
-          <ArrowBigDown
-            color="black"
-            fill="red"
-            size={64}
-            className="absolute -top-20"
-          />
-        )}
-        <div
-          onMouseEnter={() => setIsHoveringIndex(index)}
-          onMouseLeave={() => setIsHoveringIndex(-1)}
-          className="flex flex-col gap-4 items-center"
-        >
-          {elements.map((elt, i) => (
-            <div
-              key={i}
-              onClick={() => handleClick(index)}
-              className={`${
-                elt
-                  ? elt === "red"
-                    ? "bg-red-400"
-                    : "bg-amber-200"
-                  : "bg-white"
-              } rounded-full w-16 h-16 place-self-center hover:cursor-pointer`}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  });
-  Column.displayName = "Column";
-
-  const Board = memo(() => {
-    const rowSize = 7;
-
-    const columns = Array.from({ length: rowSize }, (_, k) => (
-      <Column key={k} index={k} />
-    ));
-
-    return (
-      <div className="flex flex-row w-fit h-fit gap-4 justify-center items-center bg-blue-600 rounded-lg p-4">
-        {columns}
-      </div>
-    );
-  });
-  Board.displayName = "Board";
+  }, [players]);
 
   return (
     <div className="flex flex-row justify-center gap-8 p-2">
       <div className="flex w-[80%] justify-end">
-        <Board />
+        <Board
+          hoveringIndex={hoveringIndex}
+          setHoveringIndex={setHoveringIndex}
+          tokens={tokens}
+          handleClick={handleClick}
+        />
       </div>
       <div className="flex w-[20%]">
         <GameStatus
@@ -216,15 +212,27 @@ export default function FourInARowPage() {
           infos={[
             {
               label: "Current turn",
-              value: playerColor === "red" ? "Player 1" : "Player 2",
+              value: players.p1.currentTurn ? "Player 1" : "Player 2",
+            },
+            {
+              label: "Red tokens",
+              value:
+                players.p1.color === "red" ? players.p1.name : players.p2.name,
+            },
+            {
+              label: "Yellow tokens",
+              value:
+                players.p1.color === "yellow"
+                  ? players.p1.name
+                  : players.p2.name,
             },
             { label: "Game time", value: timer.text },
             {
               label: "Winner",
-              value: isEnd
-                ? playerColor === "red"
-                  ? "Player 1"
-                  : "Player 2"
+              value: players.p1.isWinner
+                ? players.p1.name
+                : players.p2.isWinner
+                ? players.p2.name
                 : "/",
             },
           ]}
@@ -234,10 +242,21 @@ export default function FourInARowPage() {
               variant="default"
               className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
               onClick={() => {
-                setIsEnd(false);
                 setTimer({ value: 0, text: stringifyTime(0) });
-                setPlayerColor("red");
-                setIsHoveringIndex(-1);
+                setPlayers((prev) => ({
+                  ...prev,
+                  p1: {
+                    ...prev.p1,
+                    currentTurn: !prev.p1.isWinner,
+                    isWinner: false,
+                  },
+                  p2: {
+                    ...prev.p2,
+                    currentTurn: !prev.p2.isWinner,
+                    isWinner: false,
+                  },
+                }));
+                setHoveringIndex(-1);
                 setTokens(Array(42).fill(undefined));
                 clearInterval(intervalRef.current!);
                 intervalRef.current = setInterval(() => {
