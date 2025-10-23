@@ -35,14 +35,14 @@ export function useUtils(
   const [players, setPlayers] = useState<Record<Player["name"], Player>>({
     p1: {
       name: "p1",
-      color: defaultP1Color ? defaultP1Color : "black",
+      color: defaultP1Color ?? "black",
       canContinue: false,
       currentTurn: true,
       isWinner: false,
     },
     p2: {
       name: "p2",
-      color: defaultP2Color ? defaultP2Color : "white",
+      color: defaultP2Color ?? "white",
       canContinue: false,
       currentTurn: false,
       isWinner: false,

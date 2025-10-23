@@ -11,18 +11,23 @@ export type Player = {
 };
 const WINNING_COLLECTION_LENGTH = 4;
 
-export function useUtils() {
+type UtilsParams = {
+  defaultP1Color?: NonNullable<Token>;
+  defaultP2Color?: NonNullable<Token>;
+};
+
+export function useUtils({ defaultP1Color, defaultP2Color }: UtilsParams) {
   const [tokens, setTokens] = useState<Token[]>(Array(42).fill(undefined));
   const [players, setPlayers] = useState<Record<Player["name"], Player>>({
     p1: {
       name: "p1",
-      color: "red",
+      color: defaultP1Color ?? "red",
       currentTurn: true,
       isWinner: false,
     },
     p2: {
       name: "p2",
-      color: "yellow",
+      color: defaultP2Color ?? "yellow",
       currentTurn: false,
       isWinner: false,
     },
