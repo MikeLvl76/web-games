@@ -31,7 +31,7 @@ const GameStatus = memo(
           {description}
         </span>
       </div>
-      <Collapsible className="w-full">
+      <Collapsible defaultOpen className="w-full">
         <CollapsibleTrigger className="flex flex-row justify-between items-center w-full border-b-2 border-b-black hover:cursor-pointer hover:bg-slate-300 px-2">
           <span className="font-bold text-lg">Controls</span>
           <Gamepad2 fill="gray" />
@@ -55,7 +55,7 @@ const GameStatus = memo(
           ))}
         </CollapsibleContent>
       </Collapsible>
-      <Collapsible className="w-full">
+      <Collapsible defaultOpen className="w-full">
         <CollapsibleTrigger className="flex flex-row justify-between items-center w-full border-b-2 border-b-black hover:cursor-pointer hover:bg-slate-300 px-2">
           <span className="font-bold text-lg">Infos</span>
           <Info fill="#4295f5" />
@@ -76,7 +76,7 @@ const GameStatus = memo(
           ))}
         </CollapsibleContent>
       </Collapsible>
-      <Collapsible className="w-full">
+      <Collapsible defaultOpen className="w-full">
         <CollapsibleTrigger className="flex flex-row justify-between items-center w-full border-b-2 border-b-black hover:cursor-pointer hover:bg-slate-300 px-2">
           <span className="font-bold text-lg">Play options</span>
           <Puzzle fill="#18d606" />
