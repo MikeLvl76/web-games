@@ -18,11 +18,11 @@ export class Snake {
   body: SnakePart[];
   p: p5;
 
-  constructor(_p: p5) {
+  constructor(_p: p5, startSize?: number) {
     this.p = _p;
     this.direction = directions[Math.floor(Math.random() * directions.length)];
     this.speed = 2 + Math.floor(Math.random() * 3);
-    this.body = Array.from({ length: 3 }, (_, i) => ({
+    this.body = Array.from({ length: startSize ?? 3 }, (_, i) => ({
       x: this.p.width * 0.5,
       y: this.p.height * 0.5 + 20 * i,
       r: 20,

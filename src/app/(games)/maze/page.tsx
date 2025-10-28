@@ -4,7 +4,7 @@ import { useState } from "react";
 import Menu, { Config } from "./menu";
 import MazeGame from "./game";
 
-export default function Maze() {
+export default function Page() {
   const [startGame, setStartGame] = useState(false);
   const [config, setConfig] = useState<Config>({
     enableCountdown: true,
