@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Web games",
   description: "Play games in your browser!",
+  icons: {
+    icon: "./images/logo-icon.ico",
+  },
 };
 
 export default function RootLayout({
