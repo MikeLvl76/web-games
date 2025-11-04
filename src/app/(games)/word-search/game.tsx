@@ -22,6 +22,7 @@ export default function WordSearchGame({
   wordLength,
   listSize,
 }: Props) {
+  const [highlightIndices, setHighlightIndices] = useState<number[]>([]);
   const [countdown, setCountdown] = useState<{ value: number; text: string }>({
     value: 20 * listSize, // 20s per word
     text: stringifyTime(20 * listSize),
@@ -71,6 +72,12 @@ export default function WordSearchGame({
     const word = words.find(({ value }) => string.includes(value));
 
     if (word) {
+      const index = string.indexOf(word.value);
+
+      setHighlightIndices((prev) => [
+        ...prev,
+        ...selectedIndices.slice(index, index + word.value.length),
+      ]);
       setWords((prev) =>
         prev.map((w) => (w === word ? { ...w, isFound: true } : w))
       );
@@ -105,6 +112,7 @@ export default function WordSearchGame({
         <Grid
           content={content}
           selectedIndices={selectedIndices}
+          highlightIndices={highlightIndices}
           handleMouseDown={handleMouseDown}
           handleMouseEnter={handleMouseEnter}
         />
@@ -139,6 +147,7 @@ export default function WordSearchGame({
                 setIsEnd(false);
                 generateList();
                 setIsHolding(false);
+                setHighlightIndices([]);
                 setSelectedIndices([]);
                 setCountdown({
                   value: 20 * listSize,

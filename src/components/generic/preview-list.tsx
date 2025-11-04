@@ -124,14 +124,16 @@ export default function PreviewList({ previews }: Props) {
             <GamePreview data={preview} />
           </li>
         ))}
-        <div className="w-full h-full rounded-md shadow-lg/50">
-          <div className="flex flex-col justify-center items-center gap-4 bg-slate-200 w-full h-full">
-            <Plus size={32} color="#5c5958" />
-            <span className="text-xl font-medium text-slate-600">
-              {unavailableGamesCount} coming soon...
-            </span>
+        {unavailableGamesCount > 0 && (
+          <div className="w-full h-full rounded-md shadow-lg/50">
+            <div className="flex flex-col justify-center items-center gap-4 bg-slate-200 w-full h-full">
+              <Plus size={32} color="#5c5958" />
+              <span className="text-xl font-medium text-slate-600">
+                {unavailableGamesCount} coming soon...
+              </span>
+            </div>
           </div>
-        </div>
+        )}
       </ul>
     </div>
   );
