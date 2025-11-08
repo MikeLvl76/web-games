@@ -20,52 +20,10 @@ export const getFilepath = (filename: string) => {
   return `/images/${filename}.png`;
 };
 
-export type CardSymbol = "heart" | "spade" | "diamond" | "club";
-export type CardColor = "black" | "red";
-export type CardRank = {
-  name: string;
-  value: number;
-};
-export type Card = {
-  id: string;
-  rank: CardRank;
-  symbol: CardSymbol;
-  color: CardColor;
-  isHidden: boolean;
-};
-
-export const SYMBOL_COLOR = {
-  club: "black",
-  spade: "black",
-  heart: "red",
-  diamond: "red",
-};
-
-export const compareCards = (c1: Card, c2: Card, includeSequence?: boolean) =>
-  (includeSequence &&
-    c2.rank.value - c1.rank.value === 1 &&
-    c1.symbol === c2.symbol &&
-    c1.color === c2.color) ||
-  (c1.rank.value - c2.rank.value === 1 &&
-    c1.symbol !== c2.symbol &&
-    c1.color !== c2.color);
-
 export type DndDefaultDataType = {
   type: string;
   accepts?: string[];
   supports?: string[];
-};
-
-export type DraggableDataType = DndDefaultDataType & {
-  card: Card;
-  cardIndex: number;
-  pileIndex: number;
-  sub: Card[];
-};
-
-export type DroppableDataType = DndDefaultDataType & {
-  symbol?: CardSymbol;
-  pileIndex?: number;
 };
 
 export type StorageData = {
