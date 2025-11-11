@@ -89,6 +89,7 @@ export function useUtils({}: UtilsParams = {}) {
       },
     })).reduce((acc, curr) => ({ ...acc, ...curr }), {}),
   });
+  const [movesCount, setMovesCount] = useState(0);
 
   const compareCards = (c1: Card, c2: Card, includeFoundation?: boolean) => {
     if (includeFoundation) {
@@ -242,6 +243,7 @@ export function useUtils({}: UtilsParams = {}) {
           targetCards.push(card);
           sourceCards.pop();
           setStacks(_stacks);
+          setMovesCount((prev) => prev + 1);
           return;
         }
 
@@ -271,6 +273,7 @@ export function useUtils({}: UtilsParams = {}) {
           }
 
           setStacks(_stacks);
+          setMovesCount((prev) => prev + 1);
           return;
         }
         return;
@@ -300,6 +303,7 @@ export function useUtils({}: UtilsParams = {}) {
         }
 
         setStacks(_stacks);
+        setMovesCount((prev) => prev + 1);
         return;
       }
     },
@@ -312,7 +316,7 @@ export function useUtils({}: UtilsParams = {}) {
 
   return {
     variables: { defaultPack, completeFoundations },
-    states: { stacks, setStacks },
+    states: { stacks, setStacks, movesCount, setMovesCount },
     functions: { setup, drawCard, handleDragEnd, generatePack, compareCards },
   };
 }

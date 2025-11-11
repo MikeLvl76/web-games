@@ -22,7 +22,7 @@ export default function KlondikeGame({ enableTime }: Props) {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const utils = useUtils();
   const { completeFoundations } = utils.variables;
-  const { stacks } = utils.states;
+  const { stacks, movesCount, setMovesCount } = utils.states;
   const { setup, handleDragEnd, drawCard } = utils.functions;
 
   useEffect(() => {
@@ -66,6 +66,7 @@ export default function KlondikeGame({ enableTime }: Props) {
             ]}
             infos={[
               { label: "Game time", value: timer.text },
+              { label: "Moves", value: `${movesCount}` },
               {
                 label: "Complete foundations",
                 value: `${completeFoundations}`,
@@ -80,6 +81,7 @@ export default function KlondikeGame({ enableTime }: Props) {
                   setIsEnd(false);
                   setTimer({ value: 0, text: stringifyTime(0) });
                   setup();
+                  setMovesCount(0);
                   clearInterval(intervalRef.current!);
                   intervalRef.current = setInterval(() => {
                     setTimer((prev) => ({
