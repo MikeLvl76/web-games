@@ -1,7 +1,7 @@
 "use client";
 
-import { CardRank, Card } from "@/lib/utils";
 import { useCallback, useEffect, useState } from "react";
+import { Card, CardRank } from "./use-utils";
 
 export function usePackGenerator() {
   const [pack, setPack] = useState<Card[]>([]);
