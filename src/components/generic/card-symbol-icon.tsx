@@ -1,6 +1,6 @@
 "use client";
 
-import { CardColor, CardSymbol } from "@/lib/utils";
+import { CardSymbol, CardColor } from "@/hooks/games/klondike/use-utils";
 import { Club, Spade, Heart, Diamond, TriangleAlert } from "lucide-react";
 
 type Props = {
