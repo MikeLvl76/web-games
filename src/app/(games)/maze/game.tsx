@@ -76,7 +76,7 @@ export default function MazeGame({
           (div?.offsetWidth ?? p.windowWidth) * 0.9,
           (div?.offsetHeight ?? p.windowHeight) * 1.15
         );
-        p.frameRate(10);
+        p.frameRate(60);
         p.background(0);
         maze = new Maze(p, Math.pow(size, 2));
         player = new Player(p, maze);

@@ -73,6 +73,10 @@ export class Player {
           this.visitedCells.push(next);
         }
         this.info = { cell: next, index: nextIndex };
+        const speed = 0.005;
+        next.position = next.position.map(
+          (pos) => pos + speed * this.p.deltaTime
+        ) as [number, number];
         this.updatePosition(next);
         this.movesCount++;
 

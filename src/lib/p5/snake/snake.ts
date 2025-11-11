@@ -21,7 +21,7 @@ export class Snake {
   constructor(_p: p5, startSize?: number) {
     this.p = _p;
     this.direction = directions[Math.floor(Math.random() * directions.length)];
-    this.speed = 2 + Math.floor(Math.random() * 3);
+    this.speed = 0.25;
     this.body = Array.from({ length: startSize ?? 3 }, (_, i) => ({
       x: this.p.width * 0.5,
       y: this.p.height * 0.5 + 20 * i,
@@ -49,14 +49,15 @@ export class Snake {
     });
 
     const head = this.body[0];
+    const delta = this.speed * this.p.deltaTime;
     if (this.direction === "left") {
-      head.x -= this.speed;
+      head.x -= delta;
     } else if (this.direction === "right") {
-      head.x += this.speed;
+      head.x += delta;
     } else if (this.direction === "up") {
-      head.y -= this.speed;
+      head.y -= delta;
     } else if (this.direction === "down") {
-      head.y += this.speed;
+      head.y += delta;
     }
 
     for (let i = 1; i < this.body.length; i++) {
@@ -76,7 +77,6 @@ export class Snake {
         px: tail.x,
         py: tail.y,
       });
-      this.speed += 0.2;
       food.randomizeLocation();
       food.randomizeColor();
       if (onsuccess) {

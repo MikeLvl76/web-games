@@ -62,6 +62,7 @@ export default function SnakeGame({ enableTime, size }: Props) {
           div?.offsetHeight ?? p.windowHeight * 0.8
         );
         p.background(0);
+        p.frameRate(60);
         snake = new Snake(p, size);
         food = new Food(p, 15);
         score = 0;
