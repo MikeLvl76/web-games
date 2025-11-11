@@ -1,6 +1,6 @@
 "use client";
 
-import { Card } from "@/lib/utils";
+import { Card } from "@/hooks/games/klondike/use-utils";
 
 type Props = {
   pack: Card[];

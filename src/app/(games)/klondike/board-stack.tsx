@@ -1,22 +1,28 @@
 "use client";
 
-import { DroppableDataType, Stack } from "@/hooks/games/klondike/use-utils";
+import {
+  BoardStackName,
+  Card,
+  DroppableDataType,
+  Stack,
+} from "@/hooks/games/klondike/use-utils";
 import { BoardCard } from "./board-card";
 import Droppable from "@/components/generic/droppable";
 
 type Props = {
+  name: BoardStackName;
   stack: Stack;
-  isActive?: boolean;
+  activeCards: Card[];
 };
 
-export function BoardStack({ stack, isActive }: Props) {
+export function BoardStack({ name, stack, activeCards }: Props) {
   return (
     <Droppable<DroppableDataType>
       nodeId={`drop-pile-${stack.id}`}
       data={{
-        accepts: ["col-drag", "draw-drag"],
+        accepts: ["draw", "pile"],
         type: "pile",
-        pileIndex: Number(stack.id.split("-").slice(-1)[0]) - 1,
+        targetName: name,
       }}
     >
       <div className="relative w-24 h-32">
@@ -26,11 +32,14 @@ export function BoardStack({ stack, isActive }: Props) {
           return (
             <BoardCard
               key={card.id}
-              card={card}
-              cardIndex={index}
-              pileIndex={Number(stack.id.split("-").slice(-1)[0]) - 1}
-              sub={sub}
-              isDragging={isActive}
+              name={name}
+              current={card}
+              index={index}
+              cards={sub}
+              isDragging={
+                activeCards.length > 0 &&
+                activeCards.some((c) => c.id === card.id)
+              }
             />
           );
         })}

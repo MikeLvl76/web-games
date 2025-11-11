@@ -2,55 +2,51 @@
 
 import Draggable from "@/components/generic/draggable";
 import { CardContainer } from "./card-container";
-import { Card, DraggableDataType } from "@/hooks/games/klondike/use-utils";
+import {
+  BoardStackName,
+  Card,
+  DraggableDataType,
+} from "@/hooks/games/klondike/use-utils";
 
 type Props = {
-  card: Card;
-  cardIndex: number;
-  pileIndex: number;
-  sub: Card[];
+  name: BoardStackName;
+  current: Card;
+  index: number;
+  cards: Card[];
   isDragging?: boolean;
 };
 
-export function BoardCard({
-  card,
-  cardIndex,
-  pileIndex,
-  sub,
-  isDragging,
-}: Props) {
+export function BoardCard({ name, current, cards, index, isDragging }: Props) {
   return (
     <Draggable<DraggableDataType>
-      nodeId={card.id}
+      nodeId={`drag-pile-card-${current.id}`}
       data={{
-        type: "col-drag",
-        card,
-        cardIndex,
-        pileIndex,
-        sub,
+        type: "pile",
+        sourceName: name,
+        cards,
+        boardStackCardIndex: index,
       }}
-      disabled={card.isHidden}
+      disabled={current.isHidden}
     >
       <div
-        key={cardIndex}
         className={`
-                absolute w-24 h-32 rounded-md border-2 border-black shadow-2xl
+                absolute w-24 h-32 rounded-md border-2 border-black shadow-2xl transition-opacity
                 ${
-                  card.isHidden
+                  current.isHidden
                     ? "bg-red-700"
                     : "bg-slate-200 hover:cursor-pointer"
                 }
-                ${isDragging ? "opacity-0" : "opacity-100"}
+                ${isDragging ? "opacity-0 pointer-events-none" : ""}
               `}
         style={{
-          top: `${cardIndex * 18}px`,
+          top: `${index * 18}px`,
         }}
       >
-        {!card.isHidden && (
+        {!current.isHidden && (
           <CardContainer
-            symbol={card.symbol}
-            color={card.color}
-            rank={card.rank.name}
+            symbol={current.symbol}
+            color={current.color}
+            rank={current.rank.name}
             className="flex flex-col justify-center items-center gap-2 h-full"
           />
         )}

@@ -1,28 +1,32 @@
 "use client";
 
-import { Card, DraggableDataType } from "@/lib/utils";
 import { useMemo } from "react";
 import { CardContainer } from "./card-container";
 import Draggable from "@/components/generic/draggable";
+import {
+  Card,
+  DraggableDataType,
+  GameStacks,
+  Stack,
+} from "@/hooks/games/klondike/use-utils";
 
 type Props = {
-  drawnCards: Card[];
+  name: keyof GameStacks;
+  draw: Stack;
+  isCardActive?: (card: Card) => boolean;
 };
 
-export function BoardDrawnCards({ drawnCards }: Props) {
-  const lastCard = useMemo(() => {
-    const [last] = drawnCards.slice(-1);
-    return last;
-  }, [drawnCards]);
-
-  const preLastCard = useMemo(() => {
-    const [last] = drawnCards.slice(-2, -1);
-    return last;
-  }, [drawnCards]);
+export function BoardDrawnCards({ name, draw, isCardActive }: Props) {
+  const { lastCard, preLastCard } = useMemo(() => {
+    return {
+      lastCard: draw.cards[draw.cards.length - 1],
+      preLastCard: draw.cards[draw.cards.length - 2],
+    };
+  }, [draw.cards]);
 
   return (
     <div className="relative w-24 h-32">
-      {drawnCards.length > 1 ? (
+      {preLastCard ? (
         <CardContainer
           symbol={preLastCard.symbol}
           color={preLastCard.color}
@@ -34,22 +38,31 @@ export function BoardDrawnCards({ drawnCards }: Props) {
       )}
       {lastCard && (
         <Draggable<DraggableDataType>
-          nodeId={`drag-drawn-card-${drawnCards.length - 1}`}
+          nodeId={`drag-drawn-card-${lastCard.id}`}
           data={{
-            type: "draw-drag",
-            card: lastCard,
-            cardIndex: drawnCards.length - 1,
-            pileIndex: -1,
-            sub: [],
+            type: "draw",
+            sourceName: name,
+            cards: [lastCard],
+            boardStackCardIndex: -1,
           }}
-          disabled={drawnCards.length === 0}
+          disabled={!lastCard}
         >
-          <CardContainer
-            symbol={lastCard.symbol}
-            color={lastCard.color}
-            rank={lastCard.rank.name}
-            className="relative flex flex-col justify-center items-center w-24 h-32 bg-slate-200 hover:cursor-pointer rounded-md gap-2"
-          />
+          <div
+            className={`relative flex flex-col justify-center items-center w-24 h-32 bg-slate-200 hover:cursor-pointer rounded-md gap-2
+              ${
+                isCardActive?.(lastCard)
+                  ? "opacity-0 pointer-events-none"
+                  : "opacity-100"
+              }
+            `}
+          >
+            <CardContainer
+              symbol={lastCard.symbol}
+              color={lastCard.color}
+              rank={lastCard.rank.name}
+              className="flex flex-col justify-center items-center gap-2 h-full"
+            />
+          </div>
         </Draggable>
       )}
     </div>

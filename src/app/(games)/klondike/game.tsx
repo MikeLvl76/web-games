@@ -1,7 +1,7 @@
 "use client";
 
 import { stringifyTime } from "@/lib/utils";
-import { closestCenter, DndContext } from "@dnd-kit/core";
+import { closestCorners, DndContext } from "@dnd-kit/core";
 import { useEffect, useRef, useState } from "react";
 import { RotateCcw } from "lucide-react";
 import { GameStatus } from "@/components/generic/game-status";
@@ -51,7 +51,7 @@ export default function KlondikeGame({ enableTime }: Props) {
   }, [stacks]);
 
   return (
-    <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
+    <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
       <div className="flex flex-row justify-center items-center h-screen gap-8 p-2">
         <Board stacks={stacks} onDrawCard={drawCard} />
         <div className="flex w-[20%] h-[75%] items-start">

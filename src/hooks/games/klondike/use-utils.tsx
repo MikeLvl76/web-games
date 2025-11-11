@@ -32,6 +32,8 @@ export type Stack = {
   cards: Card[];
 };
 
+export type BoardStackName = `board_stack_${number}`;
+
 export type GameStacks = {
   pack: Stack;
   draw: Stack;
@@ -39,20 +41,18 @@ export type GameStacks = {
   spade_foundation: Stack;
   heart_foundation: Stack;
   diamond_foundation: Stack;
-  [key: `board_stack_${number}`]: Stack;
+  [key: BoardStackName]: Stack;
 };
 
-export type DraggableDataType = DndDefaultDataType & {
-  card: Card;
-  cardIndex: number;
-  pileIndex: number;
-  sub: Card[];
-};
+export interface DraggableDataType extends DndDefaultDataType {
+  sourceName: keyof GameStacks;
+  cards: Card[];
+  boardStackCardIndex: number;
+}
 
-export type DroppableDataType = DndDefaultDataType & {
-  symbol?: CardSymbol;
-  pileIndex?: number;
-};
+export interface DroppableDataType extends DndDefaultDataType {
+  targetName: keyof GameStacks;
+}
 
 type UtilsParams = Record<string, unknown>;
 
@@ -90,14 +90,23 @@ export function useUtils({}: UtilsParams = {}) {
     })).reduce((acc, curr) => ({ ...acc, ...curr }), {}),
   });
 
-  const compareCards = (c1: Card, c2: Card, includeSequence?: boolean) =>
-    (includeSequence &&
-      c2.rank.value - c1.rank.value === 1 &&
-      c1.symbol === c2.symbol &&
-      c1.color === c2.color) ||
-    (c1.rank.value - c2.rank.value === 1 &&
+  const compareCards = (c1: Card, c2: Card, includeFoundation?: boolean) => {
+    if (includeFoundation) {
+      // Foundation
+      return (
+        c2.rank.value - c1.rank.value === 1 &&
+        c1.symbol === c2.symbol &&
+        c1.color === c2.color
+      );
+    }
+
+    // Board
+    return (
+      c1.rank.value - c2.rank.value === 1 &&
       c1.symbol !== c2.symbol &&
-      c1.color !== c2.color);
+      c1.color !== c2.color
+    );
+  };
 
   const completeFoundations = useMemo(() => {
     if (JSON.stringify(stacks) === "{}") return 0;
@@ -201,7 +210,7 @@ export function useUtils({}: UtilsParams = {}) {
 
   const handleDragEnd = useCallback(
     ({ active, over }: DragEndEvent) => {
-      if (!over) return;
+      if (!active || !over) return;
 
       const source: DraggableDataType | undefined = active.data
         .current as DraggableDataType;
@@ -209,123 +218,89 @@ export function useUtils({}: UtilsParams = {}) {
       const dest: DroppableDataType | undefined = over.data
         .current as DroppableDataType;
 
-      if (!source || !dest) return;
+      if (!source || !dest || !dest.accepts?.includes(source.type)) return;
 
-      if (dest.accepts?.includes(source.type)) {
-        if (dest.type === "pile") {
-          if (source.type === "draw-drag") {
-            const { card, cardIndex } = source;
-            const { pileIndex } = dest;
+      const _stacks = { ...stacks };
+      const { sourceName, cards, boardStackCardIndex } = source;
+      const { targetName } = dest;
 
-            if (typeof pileIndex === "undefined") return;
-            const _stacks = { ...stacks };
-            const _cards = _stacks[`board_stack_${pileIndex + 1}`].cards;
+      if (dest.type === "pile") {
+        if (source.type === "draw") {
+          const sourceCards = _stacks[sourceName].cards;
+          const targetCards = _stacks[targetName].cards;
+          const [card] = cards;
+          if (!card) return;
 
-            if (_cards.length > 0) {
-              const [lastCard] = _cards.slice(-1);
-              if (!compareCards(lastCard, card)) {
-                return;
-              }
-            }
-
-            card.isHidden = false;
-            _cards.push(card);
-            stacks.draw.cards.splice(cardIndex, 1);
-
-            setStacks(_stacks);
-            return;
-          }
-
-          if (source.type === "col-drag") {
-            const { cardIndex, pileIndex: dragPileIndex, sub } = source;
-            const { pileIndex: dropPileIndex } = dest;
-
-            if (typeof dropPileIndex === "undefined" || sub.length === 0)
-              return;
-
-            const _stacks = { ...stacks };
-            const dragPile = _stacks[`board_stack_${dragPileIndex + 1}`].cards;
-            const dropPile = _stacks[`board_stack_${dropPileIndex + 1}`].cards;
-            const subHead = sub[0];
-
-            if (dropPile.length > 0) {
-              const [lastCard] = dropPile.slice(-1);
-              if (!compareCards(lastCard, subHead)) {
-                return;
-              }
-            } else {
-              if (subHead.rank.name !== "king") return;
-            }
-
-            sub.forEach((c) => {
-              c.isHidden = false;
-            });
-            dropPile.push(...sub);
-            dragPile.splice(cardIndex, sub.length);
-
-            const [pileLastCard] = dragPile.slice(-1);
-            if (pileLastCard) {
-              pileLastCard.isHidden = false;
-            }
-
-            setStacks(_stacks);
-            return;
-          }
-        } else if (dest.type === "sequence") {
-          if (source.type === "draw-drag") {
-            const { card, cardIndex } = source;
-            const { symbol } = dest;
-
-            if (!symbol) return;
-            const _stacks = { ...stacks };
-            const foundation = _stacks[`${symbol}_foundation`].cards;
-            const [lastCard] = foundation.slice(-1);
-
-            if (
-              (!lastCard && card.rank.value > 1) ||
-              (lastCard && !compareCards(lastCard, card, true))
-            ) {
+          if (targetCards.length > 0) {
+            const [lastCard] = targetCards.slice(-1);
+            if (!lastCard || !compareCards(lastCard, card)) {
               return;
             }
-
-            card.isHidden = false;
-            foundation.push(card);
-            stacks.draw.cards.splice(cardIndex, 1);
-
-            setStacks(_stacks);
-            return;
           }
 
-          if (source.type === "col-drag") {
-            const { card, pileIndex } = source;
-            const { symbol } = dest;
+          card.isHidden = false;
+          targetCards.push(card);
+          sourceCards.pop();
+          setStacks(_stacks);
+          return;
+        }
 
-            if (!symbol) return;
-            const _stacks = { ...stacks };
-            const foundation = _stacks[`${symbol}_foundation`].cards;
-            const _cards = _stacks[`board_stack_${pileIndex + 1}`].cards;
-            const [lastCard] = foundation.slice(-1);
+        if (source.type === "pile") {
+          if (boardStackCardIndex === -1 || cards.length === 0) return;
 
-            if (
-              (!lastCard && card.rank.value > 1) ||
-              (lastCard && !compareCards(lastCard, card, true))
-            ) {
+          const sourceCards = _stacks[sourceName].cards;
+          const targetCards = _stacks[targetName].cards;
+
+          const head = cards[0];
+
+          if (targetCards.length > 0) {
+            const [lastCard] = targetCards.slice(-1);
+            if (!head || !lastCard || !compareCards(lastCard, head)) {
               return;
             }
+          } else {
+            if (head.rank.name !== "king") return;
+          }
 
-            card.isHidden = false;
-            foundation.push(card);
-            _cards.pop();
+          targetCards.push(...cards.map((c) => ({ ...c, isHidden: false })));
+          sourceCards.splice(boardStackCardIndex, cards.length);
 
-            const [pileLastCard] = _cards.slice(-1);
-            if (pileLastCard) {
-              pileLastCard.isHidden = false;
-            }
+          const [pileLastCard] = sourceCards.slice(-1);
+          if (pileLastCard) {
+            pileLastCard.isHidden = false;
+          }
 
-            setStacks(_stacks);
-            return;
+          setStacks(_stacks);
+          return;
+        }
+        return;
+      }
+
+      if (dest.type === "foundation") {
+        const sourceCards = _stacks[sourceName].cards;
+        const foundationCards = _stacks[targetName].cards;
+        const [foundationCard] = foundationCards.slice(-1);
+        const [card] = cards.slice(-1);
+
+        if (
+          (!foundationCard && card.rank.value > 1) ||
+          (card && foundationCard && !compareCards(foundationCard, card, true))
+        ) {
+          return;
+        }
+
+        foundationCards.push(card);
+        sourceCards.pop();
+
+        if (source.type === "pile") {
+          const [pileLastCard] = sourceCards.slice(-1);
+          if (pileLastCard) {
+            pileLastCard.isHidden = false;
           }
         }
+
+        setStacks(_stacks);
+        return;
       }
     },
     [stacks]
