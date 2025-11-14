@@ -7,7 +7,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Heart, Home, LucideIcon } from "lucide-react";
+import { Heart, Home, LucideIcon, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -20,6 +20,7 @@ type SidebarItem = {
 const items: SidebarItem[] = [
   { url: "/", icon: Home },
   { title: "Favorite games", url: "/favorite-games", icon: Heart },
+  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 export function AppSidebar() {
@@ -32,13 +33,18 @@ export function AppSidebar() {
               {items.map((item, i) => (
                 <SidebarMenuItem
                   key={item.title ?? i}
-                  className="flex w-full h-[10vh] items-center hover:bg-black/20 rounded-md"
+                  className="flex w-[99%] h-[8vh] items-center hover:bg-black/20 rounded-md p-2"
                 >
                   <SidebarMenuButton size="lg" asChild>
                     <Link
                       href={item.url}
-                      className="flex flex-row items-center justify-around"
+                      className="flex flex-row items-baseline justify-between"
                     >
+                      {item.title && (
+                        <span className="text-sm font-bold text-center text-slate-200">
+                          {item.title}
+                        </span>
+                      )}
                       {i === 0 ? (
                         <Image
                           src="/images/logo.png"
@@ -50,15 +56,8 @@ export function AppSidebar() {
                       ) : (
                         <item.icon
                           color="white"
-                          fill="white"
-                          className="!size-10"
+                          className="!size-6"
                         />
-                      )}
-
-                      {item.title && (
-                        <span className="text-md font-bold text-center text-white">
-                          {item.title}
-                        </span>
                       )}
                     </Link>
                   </SidebarMenuButton>

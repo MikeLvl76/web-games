@@ -7,7 +7,6 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Plus,
 } from "lucide-react";
 import { Preview } from "@/lib/utils";
 import { usePagination } from "@/hooks/use-pagination";
@@ -119,17 +118,16 @@ export default function PreviewList({ previews }: Props) {
         {pagination.data.map((preview) => (
           <li
             key={preview.id}
-            className="flex items-center justify-center rounded-sm w-50 h-50 gap-1 hover:cursor-pointer"
+            className="flex items-center justify-center rounded-sm w-50 h-50 gap-1 hover:cursor-pointer hover:scale-105 transition duration-400 ease-in-out"
           >
             <GamePreview data={preview} />
           </li>
         ))}
         {unavailableGamesCount > 0 && (
-          <div className="w-full h-full rounded-md shadow-lg/50">
-            <div className="flex flex-col justify-center items-center gap-4 bg-slate-200 w-full h-full">
-              <Plus size={32} color="#5c5958" />
+          <div className="w-full h-full rounded-md">
+            <div className="flex flex-col justify-center items-center gap-4 w-full h-full">
               <span className="text-xl font-medium text-slate-600">
-                {unavailableGamesCount} coming soon...
+                +{unavailableGamesCount} coming soon...
               </span>
             </div>
           </div>
