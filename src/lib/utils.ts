@@ -12,8 +12,6 @@ export type Preview = {
   filepath: string;
   type: "puzzle" | "versus" | "solo";
   estimatedPlaytime: string;
-  isGameAvailable: boolean;
-  gameStatus: "fine" | "buggy" | "unplayable";
 };
 
 export const getFilepath = (filename: string) => {

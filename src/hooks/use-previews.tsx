@@ -16,8 +16,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "5-15 min",
     filepath: getFilepath("checkers"),
     id: "checkers-game",
-    isGameAvailable: true,
-    gameStatus: "fine",
   },
   {
     name: "Maze",
@@ -26,8 +24,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "4-6 min",
     filepath: getFilepath("maze"),
     id: "maze-game",
-    isGameAvailable: true,
-    gameStatus: "fine",
   },
   {
     name: "Snake",
@@ -36,8 +32,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "1 min or unlimited",
     filepath: getFilepath("snake"),
     id: "snake-game",
-    isGameAvailable: true,
-    gameStatus: "fine",
   },
   {
     name: "Klondike",
@@ -46,8 +40,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "2-10 min",
     filepath: getFilepath("klondike"),
     id: "klondike-game",
-    isGameAvailable: true,
-    gameStatus: "buggy",
   },
   {
     name: "Sudoku",
@@ -56,8 +48,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "10 min",
     filepath: getFilepath("sudoku"),
     id: "sudoku-game",
-    isGameAvailable: true,
-    gameStatus: "fine",
   },
   {
     name: "Tic-tac-toe",
@@ -66,8 +56,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "1 min",
     filepath: getFilepath("tic-tac-toe"),
     id: "tic-tac-toe-game",
-    isGameAvailable: true,
-    gameStatus: "fine",
   },
   {
     name: "Word-search",
@@ -76,8 +64,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "1-3 min",
     filepath: getFilepath("word-search"),
     id: "word-search-game",
-    isGameAvailable: true,
-    gameStatus: "fine",
   },
   {
     name: "Four in a Row",
@@ -86,8 +72,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "1-3 min",
     filepath: getFilepath("four-in-a-row"),
     id: "four-in-a-row-game",
-    isGameAvailable: true,
-    gameStatus: "fine",
   },
   {
     name: "Rock, Paper, Scissors",
@@ -96,10 +80,9 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "30 sec",
     filepath: getFilepath("rock-paper-scissors"),
     id: "rock-paper-scissors-game",
-    isGameAvailable: true,
-    gameStatus: "fine",
   },
-  /* non-implemented games */
+  /* 
+  * non-implemented games
   {
     name: "Dino Run",
     url: "dino-run",
@@ -107,8 +90,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "1 min or unlimited",
     filepath: getFilepath("dino-run"),
     id: "dino-run-game",
-    isGameAvailable: false,
-    gameStatus: "unplayable",
   },
   {
     name: "Flying Bird",
@@ -117,8 +98,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "1 min or unlimited",
     filepath: getFilepath("flying-bird"),
     id: "flying-bird-game",
-    isGameAvailable: false,
-    gameStatus: "unplayable",
   },
   {
     name: "Guess the word",
@@ -127,8 +106,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "1-2 min",
     filepath: getFilepath("word-guess"),
     id: "word-guess-game",
-    isGameAvailable: false,
-    gameStatus: "unplayable",
   },
   {
     name: "Poker",
@@ -137,8 +114,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "10-30 min",
     filepath: getFilepath("poker"),
     id: "poker-game",
-    isGameAvailable: false,
-    gameStatus: "unplayable",
   },
   {
     name: "Shape Dash",
@@ -147,8 +122,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "1-2 min",
     filepath: getFilepath("shape-dash"),
     id: "shape-dash-game",
-    isGameAvailable: false,
-    gameStatus: "unplayable",
   },
   {
     name: "Chess",
@@ -157,8 +130,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "10-20 min",
     filepath: getFilepath("chess"),
     id: "chess-game",
-    isGameAvailable: false,
-    gameStatus: "unplayable",
   },
   {
     name: "Click fast",
@@ -167,8 +138,6 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "1-2 min",
     filepath: getFilepath("click-fast"),
     id: "click-fast-game",
-    isGameAvailable: false,
-    gameStatus: "unplayable",
   },
   {
     name: "Don't touch",
@@ -177,9 +146,8 @@ const DEFAULT_PREVIEWS: Preview[] = [
     estimatedPlaytime: "1-2 min",
     filepath: getFilepath("do-not-touch"),
     id: "do-not-touch-game",
-    isGameAvailable: false,
-    gameStatus: "unplayable",
   },
+  */
 ];
 
 export function usePreviews({ sort, filter }: Props = {}) {
@@ -197,8 +165,8 @@ export function usePreviews({ sort, filter }: Props = {}) {
         ...previews.sort((a, b) =>
           sort === "asc"
             ? a.name.localeCompare(b.name)
-            : b.name.localeCompare(a.name)
-        )
+            : b.name.localeCompare(a.name),
+        ),
       );
     }
 

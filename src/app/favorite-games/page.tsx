@@ -11,5 +11,5 @@ export default function FavoriteGamesPage() {
     sort: "asc",
   });
 
-  return <PreviewList previews={previews} />;
+  return <PreviewList previews={previews} hideMCSMessage />;
 }

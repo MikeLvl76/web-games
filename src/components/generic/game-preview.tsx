@@ -17,7 +17,7 @@ type Props = {
 };
 
 export default function GamePreview({ data }: Props) {
-  const { name, url, estimatedPlaytime, type, filepath, gameStatus } = data;
+  const { name, url, estimatedPlaytime, type, filepath } = data;
   const { content, setContent } = useStorageContext();
   const [error, setError] = useState(false);
   const [added, setAdded] = useState(content.favoriteGames.includes(name));
@@ -103,18 +103,6 @@ export default function GamePreview({ data }: Props) {
             className="absolute bottom-0 left-0 w-full flex flex-row items-center justify-end gap-2 translate-y-full group-hover:translate-y-0
                bg-white/0 text-white p-2 text-center transition-all duration-500"
           >
-            {(gameStatus === "buggy" || gameStatus === "unplayable") && (
-              <Tooltip>
-                <TooltipTrigger>
-                  <CircleAlert fill="orange" color="black" size={32} />
-                </TooltipTrigger>
-                <TooltipContent className="bg-black">
-                  <p className="text-white text-[14px]">
-                    Bugs that could influence game experience.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            )}
             <p className="text-sm font-medium text-white bg-black rounded-2xl p-2 w-fit h-fit">
               {estimatedPlaytime}
             </p>

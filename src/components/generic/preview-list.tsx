@@ -20,13 +20,13 @@ import {
 
 type Props = {
   previews: Preview[];
+  hideMCSMessage?: boolean;
 };
 
-export default function PreviewList({ previews }: Props) {
+export default function PreviewList({ previews, hideMCSMessage }: Props) {
   const pagination = usePagination<Preview>();
   const [searchText, setSearchText] = useState("");
   const [type, setType] = useState<Preview["type"] | undefined>();
-  const [unavailableGamesCount, setUnavailableGamesCount] = useState(0);
 
   useEffect(() => {
     const compareNames = (name: string) =>
@@ -41,17 +41,14 @@ export default function PreviewList({ previews }: Props) {
     } else if (type && searchText.length === 0) {
       _previews.push(
         ...previews.filter(
-          ({ name, type }) => compareNames(name) && compareTypes(type)
-        )
+          ({ name, type }) => compareNames(name) && compareTypes(type),
+        ),
       );
     } else if (searchText.length === 0 && !type) {
       _previews.push(...previews);
     }
 
-    pagination.paginate(_previews.filter((p) => p.isGameAvailable));
-    setUnavailableGamesCount(
-      _previews.filter((p) => !p.isGameAvailable).length
-    );
+    pagination.paginate(_previews);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [previews, searchText, type]);
 
@@ -92,7 +89,7 @@ export default function PreviewList({ previews }: Props) {
             defaultValue="None"
             onValueChange={(value) => {
               setType(
-                value === "None" ? undefined : (value as Preview["type"])
+                value === "None" ? undefined : (value as Preview["type"]),
               );
             }}
           >
@@ -123,11 +120,11 @@ export default function PreviewList({ previews }: Props) {
             <GamePreview data={preview} />
           </li>
         ))}
-        {unavailableGamesCount > 0 && (
+        {!hideMCSMessage && (
           <div className="w-full h-full rounded-md">
             <div className="flex flex-col justify-center items-center gap-4 w-full h-full">
               <span className="text-xl font-medium text-slate-600">
-                +{unavailableGamesCount} coming soon...
+                More coming soon...
               </span>
             </div>
           </div>
