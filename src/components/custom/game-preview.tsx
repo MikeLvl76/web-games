@@ -12,6 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import GameTypeIcon from "./game-type-icon";
+import GameTimeIcon from "./game-time-icon";
 
 type Props = {
   data: Preview;
@@ -106,10 +107,8 @@ export default function GamePreview({ data }: Props) {
             className="absolute bottom-0 left-0 w-full flex flex-row items-center justify-end gap-2 translate-y-full group-hover:translate-y-0
                bg-white/0 text-white p-2 text-center transition-all duration-500"
           >
-            <p className="text-sm font-medium text-white bg-black rounded-2xl p-2 w-fit h-fit">
-              {estimatedPlaytime}
-            </p>
-            <GameTypeIcon gameType={type} size={18} fill="black" color="white" />
+            <GameTimeIcon playtime={estimatedPlaytime} />
+            <GameTypeIcon gameType={type} />
           </div>
         </div>
       </Link>

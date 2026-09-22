@@ -29,9 +29,9 @@ export default function GameTypeIcon({ gameType, size, fill, color }: Props) {
     <Tooltip>
       <TooltipTrigger className="bg-black rounded-2xl p-2 w-fit h-fit">
         <Icon
-          size={size ?? 16}
+          size={size ?? 18}
           color={color ?? "white"}
-          fill={fill ?? "white"}
+          fill={fill ?? "black"}
           className="text-sm font-medium bg-none p-1 w-fit h-fit"
         />
       </TooltipTrigger>

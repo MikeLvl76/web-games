@@ -11,7 +11,7 @@ export type Preview = {
   url: string;
   filepath: string;
   type: "puzzle" | "versus" | "solo";
-  estimatedPlaytime: string;
+  estimatedPlaytime: "short" | "medium" | "long" | "unlimited";
 };
 
 export const getFilepath = (filename: string) => {
