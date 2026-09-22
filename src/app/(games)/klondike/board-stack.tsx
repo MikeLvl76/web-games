@@ -7,7 +7,7 @@ import {
   Stack,
 } from "@/hooks/games/klondike/use-utils";
 import { BoardCard } from "./board-card";
-import Droppable from "@/components/generic/droppable";
+import Droppable from "@/components/custom/droppable";
 
 type Props = {
   name: BoardStackName;

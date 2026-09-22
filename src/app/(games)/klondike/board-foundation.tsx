@@ -1,7 +1,7 @@
 "use client";
 
-import CardSymbolIcon from "@/components/generic/card-symbol-icon";
-import Droppable from "@/components/generic/droppable";
+import CardSymbolIcon from "@/components/custom/card-symbol-icon";
+import Droppable from "@/components/custom/droppable";
 import { CardContainer } from "./card-container";
 import {
   CardSymbol,

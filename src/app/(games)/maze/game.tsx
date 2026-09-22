@@ -1,13 +1,13 @@
 "use client";
 
-import P5Sketch from "@/components/generic/p5-sketch";
+import P5Sketch from "@/components/custom/p5-sketch";
 import { stringifyTime } from "@/lib/utils";
 import { Maze } from "@/lib/p5/maze/maze";
 import { Player } from "@/lib/p5/maze/player";
 import { RotateCcw } from "lucide-react";
 import p5 from "p5";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { GameStatus } from "@/components/generic/game-status";
+import { GameStatus } from "@/components/custom/game-status";
 import { Button } from "@/components/ui/button";
 
 type Props = {

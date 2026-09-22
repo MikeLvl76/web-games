@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { CardContainer } from "./card-container";
-import Draggable from "@/components/generic/draggable";
+import Draggable from "@/components/custom/draggable";
 import {
   Card,
   DraggableDataType,

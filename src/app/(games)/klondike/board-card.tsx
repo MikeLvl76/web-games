@@ -1,6 +1,6 @@
 "use client";
 
-import Draggable from "@/components/generic/draggable";
+import Draggable from "@/components/custom/draggable";
 import { CardContainer } from "./card-container";
 import {
   BoardStackName,

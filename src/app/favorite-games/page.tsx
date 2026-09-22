@@ -1,6 +1,6 @@
 "use client";
 
-import PreviewList from "@/components/generic/preview-list";
+import PreviewList from "@/components/custom/preview-list";
 import { useStorageContext } from "@/components/provider/storage";
 import { usePreviews } from "@/hooks/use-previews";
 

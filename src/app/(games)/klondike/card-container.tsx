@@ -1,6 +1,6 @@
 "use client";
 
-import CardSymbolIcon from "@/components/generic/card-symbol-icon";
+import CardSymbolIcon from "@/components/custom/card-symbol-icon";
 import { CardSymbol, CardColor } from "@/hooks/games/klondike/use-utils";
 import { memo } from "react";
 
