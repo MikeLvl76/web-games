@@ -11,6 +11,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import GameTypeIcon from "./game-type-icon";
 
 type Props = {
   data: Preview;
@@ -23,7 +24,7 @@ export default function GamePreview({ data }: Props) {
   const [added, setAdded] = useState(content.favoriteGames.includes(name));
 
   return (
-    <div className="w-full h-full rounded-md shadow-lg/50">
+    <div className="w-full h-full rounded-full bg-none">
       <Link href={url}>
         <div className="relative w-full h-full group overflow-hidden">
           {!error ? (
@@ -34,10 +35,10 @@ export default function GamePreview({ data }: Props) {
               priority
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               onError={() => setError(true)}
-              className="object-cover rounded-md"
+              className="object-cover rounded-full"
             />
           ) : (
-            <div className="flex flex-col justify-center items-center gap-4 bg-slate-200 w-full h-full">
+            <div className="flex flex-col justify-center items-center gap-4 bg-slate-200 w-full h-full rounded-full">
               <CircleSlash size={32} color="#5c5958" />
               <span className="text-md font-medium text-slate-600">
                 Image not found.
@@ -48,49 +49,51 @@ export default function GamePreview({ data }: Props) {
             className="absolute top-0 left-0 w-full flex flex-row items-center justify-between gap-2 -translate-y-full group-hover:translate-y-0
                bg-white/0 text-white p-2 text-center transition-all duration-500"
           >
-            <p className="text-sm font-medium text-white bg-black rounded-2xl p-2 w-fit h-fit">
-              {name}
-            </p>
             <Tooltip>
               <TooltipTrigger>
-                {added ? (
-                  <Heart
-                    size={20}
-                    color="white"
-                    fill="white"
-                    className="text-sm font-medium bg-black rounded-2xl p-2 w-fit h-fit"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
+                <div className="flex flex-row justify-between items-center p-1 bg-black rounded-2xl">
+                  <p className="text-left text-sm font-medium text-white p-2 w-fit h-fit">
+                    {name}
+                  </p>
+                  {added ? (
+                    <Heart
+                      size={20}
+                      color="white"
+                      fill="white"
+                      className="text-sm font-medium bg-none p-1 w-fit h-fit hover:cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
 
-                      setContent((prev) => ({
-                        ...prev,
-                        favoriteGames: prev.favoriteGames.filter(
-                          (_n) => _n !== name
-                        ),
-                      }));
+                        setContent((prev) => ({
+                          ...prev,
+                          favoriteGames: prev.favoriteGames.filter(
+                            (_n) => _n !== name,
+                          ),
+                        }));
 
-                      setAdded(!added);
-                    }}
-                  />
-                ) : (
-                  <HeartPlus
-                    size={20}
-                    color="white"
-                    className="text-sm font-medium bg-black rounded-2xl p-2 w-fit h-fit"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
+                        setAdded(!added);
+                      }}
+                    />
+                  ) : (
+                    <HeartPlus
+                      size={20}
+                      color="white"
+                      className="text-sm font-medium bg-none p-1 w-fit h-fit hover:cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
 
-                      setContent((prev) => ({
-                        ...prev,
-                        favoriteGames: [...prev.favoriteGames, name],
-                      }));
+                        setContent((prev) => ({
+                          ...prev,
+                          favoriteGames: [...prev.favoriteGames, name],
+                        }));
 
-                      setAdded(!added);
-                    }}
-                  />
-                )}
+                        setAdded(!added);
+                      }}
+                    />
+                  )}
+                </div>
               </TooltipTrigger>
               <TooltipContent className="bg-black">
                 <p className="text-white text-[14px]">
@@ -106,9 +109,7 @@ export default function GamePreview({ data }: Props) {
             <p className="text-sm font-medium text-white bg-black rounded-2xl p-2 w-fit h-fit">
               {estimatedPlaytime}
             </p>
-            <p className="text-sm font-medium text-white bg-black rounded-2xl p-2 w-fit h-fit">
-              {type}
-            </p>
+            <GameTypeIcon gameType={type} size={18} fill="black" color="white" />
           </div>
         </div>
       </Link>
