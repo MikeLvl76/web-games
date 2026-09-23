@@ -1,10 +1,10 @@
 "use client";
 
-import PreviewList from "@/components/custom/preview-list";
-import { usePreviews } from "@/hooks/use-previews";
+import GamesDescriptionList from "@/components/custom/game/description-list";
+import { useGamesDescription } from "@/hooks/use-games-description";
 
 export default function HomePage() {
-  const previews = usePreviews({ sort: "asc" });
+  const descriptions = useGamesDescription({ sort: "asc" });
 
-  return <PreviewList previews={previews} />;
+  return <GamesDescriptionList descriptions={descriptions} />;
 }

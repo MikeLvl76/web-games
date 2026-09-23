@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import GamePreview from "./game-preview";
+import Description from "./description";
 import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-import { Preview } from "@/lib/utils";
+import { GameDescription } from "@/lib/utils";
 import { usePagination } from "@/hooks/use-pagination";
 import {
   Select,
@@ -16,41 +16,41 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "../../ui/select";
 
 type Props = {
-  previews: Preview[];
+  descriptions: GameDescription[];
   hideMCSMessage?: boolean;
 };
 
-export default function PreviewList({ previews, hideMCSMessage }: Props) {
-  const pagination = usePagination<Preview>();
+export default function GamesDescriptionList({ descriptions, hideMCSMessage }: Props) {
+  const pagination = usePagination<GameDescription>();
   const [searchText, setSearchText] = useState("");
-  const [type, setType] = useState<Preview["type"] | undefined>();
+  const [type, setType] = useState<GameDescription["type"] | undefined>();
 
   useEffect(() => {
     const compareNames = (name: string) =>
       name.toLowerCase().startsWith(searchText.toLowerCase());
 
-    const compareTypes = (_type: Preview["type"]) => _type === type;
+    const compareTypes = (_type: GameDescription["type"]) => _type === type;
 
     const _previews = [];
 
     if (searchText.length > 0 && !type) {
-      _previews.push(...previews.filter(({ name }) => compareNames(name)));
+      _previews.push(...descriptions.filter(({ name }) => compareNames(name)));
     } else if (type && searchText.length === 0) {
       _previews.push(
-        ...previews.filter(
+        ...descriptions.filter(
           ({ name, type }) => compareNames(name) && compareTypes(type),
         ),
       );
     } else if (searchText.length === 0 && !type) {
-      _previews.push(...previews);
+      _previews.push(...descriptions);
     }
 
     pagination.paginate(_previews);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [previews, searchText, type]);
+  }, [descriptions, searchText, type]);
 
   return (
     <div className="relative flex flex-col w-full h-full items-center p-2">
@@ -89,7 +89,7 @@ export default function PreviewList({ previews, hideMCSMessage }: Props) {
             defaultValue="None"
             onValueChange={(value) => {
               setType(
-                value === "None" ? undefined : (value as Preview["type"]),
+                value === "None" ? undefined : (value as GameDescription["type"]),
               );
             }}
           >
@@ -112,12 +112,12 @@ export default function PreviewList({ previews, hideMCSMessage }: Props) {
         </div>
       </div>
       <ul className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mt-16">
-        {pagination.data.map((preview) => (
+        {pagination.data.map((description) => (
           <li
-            key={preview.id}
+            key={description.id}
             className="flex items-center justify-center rounded-sm w-50 h-50 gap-1 hover:cursor-pointer hover:scale-105 transition duration-400 ease-in-out"
           >
-            <GamePreview data={preview} />
+            <Description description={description} />
           </li>
         ))}
         {!hideMCSMessage && (

@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export type Preview = {
+export type GameDescription = {
   id: string;
   name: string;
   url: string;

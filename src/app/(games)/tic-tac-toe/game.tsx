@@ -1,6 +1,6 @@
 "use client";
 
-import { GameStatus } from "@/components/custom/game-status";
+import { GameStatus } from "@/components/custom/game/status";
 import { Button } from "@/components/ui/button";
 import { CellSymbol, useUtils } from "@/hooks/games/tic-tac-toe/use-utils";
 import { RotateCcw } from "lucide-react";

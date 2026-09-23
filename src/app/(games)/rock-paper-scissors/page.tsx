@@ -1,6 +1,6 @@
 "use client";
 
-import { GameStatus } from "@/components/custom/game-status";
+import { GameStatus } from "@/components/custom/game/status";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";

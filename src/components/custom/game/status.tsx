@@ -1,11 +1,11 @@
 "use client";
 
-import { JSX, memo } from "react";
+import { JSX } from "react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "../ui/collapsible";
+} from "../../ui/collapsible";
 import { Gamepad2, Info, Puzzle } from "lucide-react";
 
 type GameInfo = {
@@ -22,8 +22,14 @@ type Props = {
   options: JSX.Element[];
 };
 
-const GameStatus = memo(
-  ({ title, description, controls, infos, options }: Props) => (
+export default function GameStatus({
+  title,
+  description,
+  controls,
+  infos,
+  options,
+}: Props) {
+  return (
     <div className="flex flex-col items-start gap-4 min-w-[20vw] w-fit h-fit bg-slate-200 shadow-2xl/50 rounded-md p-4">
       <div className="flex flex-col items-center w-full">
         <span className="font-bold text-xl text-center">{title}</span>
@@ -88,8 +94,5 @@ const GameStatus = memo(
         </CollapsibleContent>
       </Collapsible>
     </div>
-  )
-);
-GameStatus.displayName = "GameStatus";
-
-export { GameStatus };
+  );
+}

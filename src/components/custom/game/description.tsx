@@ -1,25 +1,25 @@
 "use client";
 
-import { Preview } from "@/lib/utils";
-import { CircleAlert, CircleSlash, Heart, HeartPlus } from "lucide-react";
+import { GameDescription } from "@/lib/utils";
+import { CircleSlash, Heart, HeartPlus } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { useStorageContext } from "../provider/storage";
+import { useStorageContext } from "../../provider/storage";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import GameTypeIcon from "./game-type-icon";
-import GameTimeIcon from "./game-time-icon";
+import GameTimeIcon from "./time-icon";
+import GameTypeIcon from "./type-icon";
 
 type Props = {
-  data: Preview;
+  description: GameDescription;
 };
 
-export default function GamePreview({ data }: Props) {
-  const { name, url, estimatedPlaytime, type, filepath } = data;
+export default function Description({ description }: Props) {
+  const { name, url, estimatedPlaytime, type, filepath } = description;
   const { content, setContent } = useStorageContext();
   const [error, setError] = useState(false);
   const [added, setAdded] = useState(content.favoriteGames.includes(name));

@@ -1,16 +1,16 @@
 "use client";
 
-import { Preview } from "@/lib/utils";
+import { GameDescription } from "@/lib/utils";
 import {
   LucideIcon,
   PuzzleIcon,
   SwordsIcon,
   UserRoundIcon,
 } from "lucide-react";
-import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../../ui/tooltip";
 
 type Props = {
-  gameType: Preview["type"];
+  gameType: GameDescription["type"];
   size?: number;
   fill?: string;
   color?: string;

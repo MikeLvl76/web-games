@@ -1,11 +1,11 @@
 "use client";
 
-import { Preview } from "@/lib/utils";
-import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
+import { GameDescription } from "@/lib/utils";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../../ui/tooltip";
 import { HourglassIcon } from "lucide-react";
 
 type Props = {
-  playtime: Preview["estimatedPlaytime"];
+  playtime: GameDescription["estimatedPlaytime"];
 };
 
 export default function GameTimeIcon({ playtime }: Props) {

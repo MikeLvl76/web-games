@@ -1,6 +1,6 @@
 "use client";
 
-import { GameStatus } from "@/components/custom/game-status";
+import { GameStatus } from "@/components/custom/game/status";
 import P5Sketch from "@/components/custom/p5-sketch";
 import { Button } from "@/components/ui/button";
 import { Food } from "@/lib/p5/snake/food";

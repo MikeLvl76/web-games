@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Board } from "./board";
-import { GameStatus } from "../../../components/custom/game-status";
+import { GameStatus } from "../../../components/custom/game/status";
 import { stringifyTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";

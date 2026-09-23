@@ -1,14 +1,18 @@
 "use client";
 
-import { getFilepath, Preview } from "@/lib/utils";
+import { getFilepath, GameDescription } from "@/lib/utils";
 import { useMemo } from "react";
 
 type Props = {
   sort?: "asc" | "desc";
-  filter?: (value: Preview, index: number, array: Preview[]) => boolean;
+  filter?: (
+    value: GameDescription,
+    index: number,
+    array: GameDescription[],
+  ) => boolean;
 };
 
-const DEFAULT_PREVIEWS: Preview[] = [
+const DESCRIPTIONS: GameDescription[] = [
   {
     name: "Checkers",
     url: "checkers",
@@ -150,19 +154,23 @@ const DEFAULT_PREVIEWS: Preview[] = [
   */
 ];
 
-export function usePreviews({ sort, filter }: Props = {}) {
-  const previews = useMemo(() => {
-    const previews = [...DEFAULT_PREVIEWS];
+export function useGamesDescription({ sort, filter }: Props = {}) {
+  const descriptions = useMemo(() => {
+    const _descriptions = [...DESCRIPTIONS];
 
     if (filter) {
-      previews.splice(0, previews.length, ...previews.filter(filter));
+      _descriptions.splice(
+        0,
+        _descriptions.length,
+        ..._descriptions.filter(filter),
+      );
     }
 
     if (sort) {
-      previews.splice(
+      _descriptions.splice(
         0,
-        previews.length,
-        ...previews.sort((a, b) =>
+        _descriptions.length,
+        ..._descriptions.sort((a, b) =>
           sort === "asc"
             ? a.name.localeCompare(b.name)
             : b.name.localeCompare(a.name),
@@ -170,8 +178,8 @@ export function usePreviews({ sort, filter }: Props = {}) {
       );
     }
 
-    return previews;
+    return _descriptions;
   }, [filter, sort]);
 
-  return previews;
+  return descriptions;
 }

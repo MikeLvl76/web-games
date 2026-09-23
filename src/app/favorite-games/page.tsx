@@ -1,15 +1,15 @@
 "use client";
 
-import PreviewList from "@/components/custom/preview-list";
+import GamesDescriptionList from "@/components/custom/game/description-list";
 import { useStorageContext } from "@/components/provider/storage";
-import { usePreviews } from "@/hooks/use-previews";
+import { useGamesDescription } from "@/hooks/use-games-description";
 
 export default function FavoriteGamesPage() {
   const { content } = useStorageContext();
-  const previews = usePreviews({
+  const descriptions = useGamesDescription({
     filter: (item) => content.favoriteGames.includes(item.name),
     sort: "asc",
   });
 
-  return <PreviewList previews={previews} hideMCSMessage />;
+  return <GamesDescriptionList descriptions={descriptions} hideMCSMessage />;
 }
