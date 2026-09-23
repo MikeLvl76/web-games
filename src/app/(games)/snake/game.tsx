@@ -1,6 +1,6 @@
 "use client";
 
-import { GameStatus } from "@/components/custom/game/status";
+import GameStatus from "@/components/custom/game/status";
 import P5Sketch from "@/components/custom/p5-sketch";
 import { Button } from "@/components/ui/button";
 import { Food } from "@/lib/p5/snake/food";
@@ -59,7 +59,7 @@ export default function SnakeGame({ enableTime, size }: Props) {
         const div = document.getElementById("p5-container");
         p.createCanvas(
           div?.offsetWidth ?? p.windowWidth * 0.5,
-          div?.offsetHeight ?? p.windowHeight * 0.8
+          div?.offsetHeight ?? p.windowHeight * 0.8,
         );
         p.background(0);
         p.frameRate(60);
@@ -98,7 +98,7 @@ export default function SnakeGame({ enableTime, size }: Props) {
           p.text(
             `Game time: ${stringifyTime(timeRef.current)}`,
             p.width * 0.5,
-            p.height * 0.7
+            p.height * 0.7,
           );
         }
       };
@@ -114,7 +114,7 @@ export default function SnakeGame({ enableTime, size }: Props) {
           snake.setDirection("down");
       };
     },
-    [size]
+    [size],
   );
 
   return (

@@ -1,117 +1,52 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Description from "./description";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
 import { GameDescription } from "@/lib/utils";
 import { usePagination } from "@/hooks/use-pagination";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../ui/select";
+import Pagination from "../pagination";
+import GameSearchBar from "./search-bar";
 
 type Props = {
   descriptions: GameDescription[];
   hideMCSMessage?: boolean;
 };
 
-export default function GamesDescriptionList({ descriptions, hideMCSMessage }: Props) {
+export default function GamesDescriptionList({
+  descriptions,
+  hideMCSMessage,
+}: Props) {
   const pagination = usePagination<GameDescription>();
-  const [searchText, setSearchText] = useState("");
-  const [type, setType] = useState<GameDescription["type"] | undefined>();
-
-  useEffect(() => {
-    const compareNames = (name: string) =>
-      name.toLowerCase().startsWith(searchText.toLowerCase());
-
-    const compareTypes = (_type: GameDescription["type"]) => _type === type;
-
-    const _previews = [];
-
-    if (searchText.length > 0 && !type) {
-      _previews.push(...descriptions.filter(({ name }) => compareNames(name)));
-    } else if (type && searchText.length === 0) {
-      _previews.push(
-        ...descriptions.filter(
-          ({ name, type }) => compareNames(name) && compareTypes(type),
-        ),
-      );
-    } else if (searchText.length === 0 && !type) {
-      _previews.push(...descriptions);
-    }
-
-    pagination.paginate(_previews);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [descriptions, searchText, type]);
 
   return (
-    <div className="relative flex flex-col w-full h-full items-center p-2">
-      <div className="fixed top-0 z-10 flex flex-row items-center justify-evenly gap-8 w-[70%] h-16 bg-white shadow-lg/30">
-        <div className="w-1/3 p-2">
-          <input
-            type="text"
-            placeholder="Search a game..."
-            onChange={(e) => setSearchText(e.target.value)}
-            className="p-2 focus:outline-none focus:border-b-2 focus:border-b-slate-600 text-lg"
-          />
-        </div>
-        <div className="flex flex-row w-1/3 justify-center items-center gap-4 bg-white">
-          <ChevronsLeft
-            className="hover:cursor-pointer"
-            onClick={pagination.first}
-          />
-          <ChevronLeft
-            className="hover:cursor-pointer"
-            onClick={pagination.previous}
-          />
-          <span>
-            {pagination.pageNumber}/{pagination.totalPages}
-          </span>
-          <ChevronRight
-            className="hover:cursor-pointer"
-            onClick={pagination.next}
-          />
-          <ChevronsRight
-            className="hover:cursor-pointer"
-            onClick={pagination.last}
-          />
-        </div>
-        <div className="flex flex-row w-1/3 items-center justify-end p-2 gap-1">
-          <Select
-            defaultValue="None"
-            onValueChange={(value) => {
-              setType(
-                value === "None" ? undefined : (value as GameDescription["type"]),
-              );
-            }}
-          >
-            <SelectTrigger className="focus:outline-none after:outline-none border-none font-medium text-lg">
-              <SelectValue placeholder="Select a type" />
-            </SelectTrigger>
-            <SelectContent className="bg-white">
-              {[
-                { value: "None", text: "All" },
-                { value: "solo", text: "Solo" },
-                { value: "puzzle", text: "Puzzle" },
-                { value: "versus", text: "Versus" },
-              ].map(({ value, text }, i) => (
-                <SelectItem key={i} value={value} className="text-lg font-bold">
-                  {text}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      <ul className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mt-16">
+    <div className="flex flex-col w-full h-full items-center p-2 gap-4">
+      <GameSearchBar
+        onSearch={(name, type) => {
+          const compareNames = (_name: string) =>
+            _name.toLowerCase().startsWith(name.toLowerCase());
+
+          const compareTypes = (_type: GameDescription["type"]) =>
+            _type === type;
+
+          const _descriptions = [];
+
+          if (name.length > 0 && !type) {
+            _descriptions.push(
+              ...descriptions.filter(({ name }) => compareNames(name)),
+            );
+          } else if (type && name.length === 0) {
+            _descriptions.push(
+              ...descriptions.filter(
+                ({ name, type }) => compareNames(name) && compareTypes(type),
+              ),
+            );
+          } else if (name.length === 0 && !type) {
+            _descriptions.push(...descriptions);
+          }
+
+          pagination.paginate(_descriptions);
+        }}
+      />
+      <ul className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
         {pagination.data.map((description) => (
           <li
             key={description.id}
@@ -130,6 +65,13 @@ export default function GamesDescriptionList({ descriptions, hideMCSMessage }: P
           </div>
         )}
       </ul>
+      <Pagination
+        text={`${pagination.pageNumber}/${pagination.totalPages}`}
+        onFirst={pagination.first}
+        onPrevious={pagination.previous}
+        onNext={pagination.next}
+        onLast={pagination.last}
+      />
     </div>
   );
 }

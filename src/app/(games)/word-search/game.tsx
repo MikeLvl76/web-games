@@ -1,6 +1,6 @@
 "use client";
 
-import { GameStatus } from "@/components/custom/game/status";
+import GameStatus from "@/components/custom/game/status";
 import { Button } from "@/components/ui/button";
 import { useUtils } from "@/hooks/games/word-search/use-utils";
 import { RotateCcw } from "lucide-react";
@@ -79,7 +79,7 @@ export default function WordSearchGame({
         ...selectedIndices.slice(index, index + word.value.length),
       ]);
       setWords((prev) =>
-        prev.map((w) => (w === word ? { ...w, isFound: true } : w))
+        prev.map((w) => (w === word ? { ...w, isFound: true } : w)),
       );
     }
 

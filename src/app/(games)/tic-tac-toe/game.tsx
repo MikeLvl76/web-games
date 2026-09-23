@@ -1,6 +1,6 @@
 "use client";
 
-import { GameStatus } from "@/components/custom/game/status";
+import GameStatus from "@/components/custom/game/status";
 import { Button } from "@/components/ui/button";
 import { CellSymbol, useUtils } from "@/hooks/games/tic-tac-toe/use-utils";
 import { RotateCcw } from "lucide-react";
@@ -49,8 +49,8 @@ export default function TicTacToeGame({ playerSymbol, oppSymbol }: Props) {
               value: players.p1.isWinner
                 ? players.p1.name
                 : players.p2.isWinner
-                ? players.p2.name
-                : "/",
+                  ? players.p2.name
+                  : "/",
             },
           ]}
           options={[

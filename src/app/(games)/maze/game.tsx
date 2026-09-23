@@ -7,7 +7,7 @@ import { Player } from "@/lib/p5/maze/player";
 import { RotateCcw } from "lucide-react";
 import p5 from "p5";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { GameStatus } from "@/components/custom/game/status";
+import GameStatus from "@/components/custom/game/status";
 import { Button } from "@/components/ui/button";
 
 type Props = {
@@ -74,7 +74,7 @@ export default function MazeGame({
         const div = document.getElementById("p5-container");
         p.createCanvas(
           (div?.offsetWidth ?? p.windowWidth) * 0.9,
-          (div?.offsetHeight ?? p.windowHeight) * 1.15
+          (div?.offsetHeight ?? p.windowHeight) * 1.15,
         );
         p.frameRate(60);
         p.background(0);
@@ -105,10 +105,10 @@ export default function MazeGame({
           p.textSize(32);
           p.text(
             `You found the exit in ${stringifyTime(
-              defaultCountdown - timeRef.current.value
+              defaultCountdown - timeRef.current.value,
             )} by moving ${player.movesCount} times!`,
             p.width * 0.5,
-            p.height * 0.7
+            p.height * 0.7,
           );
         } else if (gameOverRef.current) {
           p.noLoop();
@@ -137,7 +137,7 @@ export default function MazeGame({
         }
       };
     },
-    [enablePath, enableReset, size]
+    [enablePath, enableReset, size],
   );
 
   return (

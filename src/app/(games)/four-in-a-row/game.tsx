@@ -1,12 +1,12 @@
 "use client";
 
-import { GameStatus } from "@/components/custom/game/status";
 import { Button } from "@/components/ui/button";
 import { stringifyTime } from "@/lib/utils";
 import { RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Board } from "./board";
 import { Token, useUtils } from "@/hooks/games/four-in-a-row/use-utils";
+import GameStatus from "@/components/custom/game/status";
 
 type Props = {
   playerColor: NonNullable<Token>;
