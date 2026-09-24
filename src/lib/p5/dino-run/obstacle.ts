@@ -34,7 +34,56 @@ export class Obstacle {
   }
 
   draw() {
-    this.p.fill(255);
-    this.p.rect(this.x, this.y, this.w, this.h);
+    this.p.fill(10, 200, 10);
+    this.p.push();
+
+    this.p.translate(this.x, this.y);
+
+    const sx = this.w / 100;
+    const sy = this.h / 100;
+
+    this.p.scale(sx, sy);
+
+    this.p.beginShape();
+
+    // Main stem - bottom
+    this.p.vertex(40, 100);
+    this.p.vertex(40, 20);
+
+    // Left arm
+    this.p.vertex(25, 20);
+    this.p.vertex(25, 45);
+    this.p.vertex(15, 45);
+    this.p.vertex(15, 35);
+    this.p.vertex(5, 35);
+    this.p.vertex(5, 50);
+    this.p.vertex(15, 50);
+    this.p.vertex(15, 60);
+    this.p.vertex(25, 60);
+    this.p.vertex(25, 100);
+
+    // Bottom of main stem
+    this.p.vertex(75, 100);
+
+    // Right arm
+    this.p.vertex(75, 55);
+    this.p.vertex(85, 55);
+    this.p.vertex(85, 45);
+    this.p.vertex(95, 45);
+    this.p.vertex(95, 30);
+    this.p.vertex(85, 30);
+    this.p.vertex(85, 40);
+    this.p.vertex(75, 40);
+
+    // Top of main stem
+    this.p.vertex(75, 20);
+    this.p.vertex(70, 10);
+    this.p.vertex(60, 5);
+    this.p.vertex(50, 10);
+    this.p.vertex(40, 20);
+
+    this.p.endShape(this.p.CLOSE);
+
+    this.p.pop();
   }
 }
