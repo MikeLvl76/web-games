@@ -29,6 +29,10 @@ export class Obstacle {
     }
   }
 
+  increaseScrollSpeed(n: number) {
+    this.scrollSpeed += n;
+  }
+
   draw() {
     this.p.fill(255);
     this.p.rect(this.x, this.y, this.w, this.h);

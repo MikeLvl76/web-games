@@ -41,6 +41,7 @@ export default function DinoRunGame({}: Props) {
     let dino: Dino | null = null;
     let obstacle: Obstacle | null = null;
     let groundHeight = 0;
+    let score = 0;
 
     p.setup = () => {
       const div = document.getElementById("p5-container");
@@ -66,6 +67,15 @@ export default function DinoRunGame({}: Props) {
 
     p.draw = () => {
       p.background(0);
+
+      p.textAlign(p.CENTER);
+      p.textSize(24);
+      p.strokeWeight(2);
+      p.stroke(0);
+      p.fill(200, 0, 0);
+      const text = `Score: ${p.lerp(0, Math.floor(score), 1)}`;
+      p.text(text, p.textWidth(text), 32);
+
       if (!dino || !obstacle) {
         throw Error("Unknown null value(s)");
       }
@@ -79,14 +89,17 @@ export default function DinoRunGame({}: Props) {
       obstacle.scroll();
 
       if (dino.hasJumpedOver(obstacle)) {
-        p.textAlign(p.CENTER);
-        p.textSize(16);
-        p.noFill();
-        p.text("JUMPED", p.width * 0.1, 50);
+        score += 20 * (p.deltaTime / 1000);
       }
 
       dino.draw();
       obstacle.draw();
+
+      score += p.deltaTime / 1000;
+
+      if (Math.floor(score) % 500 === 0) {
+        obstacle.increaseScrollSpeed(0.2 * (p.deltaTime / 1000));
+      }
 
       if (dino.hit(obstacle)) {
         p.background(0);
@@ -95,7 +108,15 @@ export default function DinoRunGame({}: Props) {
         p.noStroke();
         p.fill(127, 0, 0);
         p.text("GAME OVER", p.width / 2, p.height / 2);
+        p.text(`Score: ${Math.floor(score)}`, p.width / 2, p.height * 0.7);
         p.noLoop();
+
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+
+        score = 0;
       }
     };
 
