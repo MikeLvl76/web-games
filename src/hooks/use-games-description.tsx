@@ -85,17 +85,17 @@ const DESCRIPTIONS: GameDescription[] = [
     filepath: getFilepath("rock-paper-scissors"),
     id: "rock-paper-scissors-game",
   },
-  /* 
-  * non-implemented games
   {
     name: "Dino Run",
     url: "dino-run",
     type: "solo",
-    estimatedPlaytime: "1 min or unlimited",
+    estimatedPlaytime: "unlimited",
     filepath: getFilepath("dino-run"),
     id: "dino-run-game",
   },
-  {
+  /* 
+    * non-implemented games
+    {
     name: "Flying Bird",
     url: "flying-bird",
     type: "solo",

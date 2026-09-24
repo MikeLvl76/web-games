@@ -1,0 +1,123 @@
+"use client";
+
+import P5Sketch from "@/components/custom/p5-sketch";
+import { stringifyTime } from "@/lib/utils";
+import { RotateCcw } from "lucide-react";
+import p5 from "p5";
+import { useCallback, useEffect, useRef, useState } from "react";
+import GameStatus from "@/components/custom/game/status";
+import { Button } from "@/components/ui/button";
+import { Dino } from "@/lib/p5/dino-run/dino";
+
+type Props = {};
+
+export default function DinoRunGame({}: Props) {
+  const [timer, setTimer] = useState<{ value: number; text: string }>({
+    value: 0,
+    text: stringifyTime(0),
+  });
+  const [gameOver, setGameOver] = useState(false);
+  const gameOverRef = useRef(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [refresh, setRefresh] = useState(0);
+
+  useEffect(() => {
+    if (gameOver) return;
+
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    intervalRef.current = setInterval(() => {
+      setTimer((prev) => ({
+        value: prev.value + 1,
+        text: stringifyTime(prev.value + 1),
+      }));
+    }, 1000);
+
+    return () => clearInterval(intervalRef.current!);
+  }, [gameOver]);
+
+  const sketch = useCallback((p: p5) => {
+    let dino: Dino | null = null;
+    let height = 0;
+
+    p.setup = () => {
+      const div = document.getElementById("p5-container");
+      p.createCanvas(
+        (div?.offsetWidth ?? p.windowWidth) * 0.9,
+        (div?.offsetHeight ?? p.windowHeight) * 1.15,
+      );
+      p.frameRate(60);
+      p.background(0);
+
+      dino = new Dino(p);
+      height = dino.y + 40;
+    };
+
+    p.draw = () => {
+      p.background(0);
+      if (dino) {
+        p.stroke(255);
+        p.strokeWeight(2);
+        p.line(0, height, p.width, height);
+
+        dino.handleJump();
+        dino.draw();
+      }
+    };
+
+    p.keyPressed = () => {
+      if (p.keyCode === 32) {
+        dino?.startJump();
+      }
+    };
+  }, []);
+
+  return (
+    <div className="flex flex-row justify-center gap-8 p-2">
+      <div className="flex w-[80%] justify-end">
+        <P5Sketch sketch={sketch} refresh={refresh} />
+      </div>
+      <div className="flex w-[20%]">
+        <GameStatus
+          title="Dino Run"
+          description="Jump over obstacles to earn points"
+          controls={[{ label: "Jump", value: "Space bar" }]}
+          infos={[
+            {
+              label: "Timer",
+              value: timer.text,
+            },
+          ]}
+          options={[
+            <Button
+              key="restart-button"
+              variant="default"
+              className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+              onClick={() => {
+                setRefresh((prev) => prev + 1);
+                gameOverRef.current = false;
+                setGameOver(false);
+                setTimer({
+                  value: 0,
+                  text: stringifyTime(0),
+                });
+                clearInterval(intervalRef.current!);
+                intervalRef.current = setInterval(() => {
+                  setTimer((prev) => ({
+                    value: prev.value + 1,
+                    text: stringifyTime(prev.value + 1),
+                  }));
+                }, 1000);
+              }}
+            >
+              <p className="text-white font-bold text-md text-center">
+                Restart
+              </p>
+              <RotateCcw color="white" size={32} />
+            </Button>,
+          ]}
+        />
+      </div>
+    </div>
+  );
+}

@@ -19,7 +19,7 @@ type SidebarItem = {
 
 const items: SidebarItem[] = [
   { url: "/", icon: Home },
-  { title: "Favorite games", url: "/favorite-games", icon: Heart },
+  { title: "My games", url: "/favorite-games", icon: Heart },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
