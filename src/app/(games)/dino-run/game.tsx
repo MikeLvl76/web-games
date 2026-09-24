@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import GameStatus from "@/components/custom/game/status";
 import { Button } from "@/components/ui/button";
 import { Dino } from "@/lib/p5/dino-run/dino";
+import { Obstacle } from "@/lib/p5/dino-run/obstacle";
 
 type Props = {};
 
@@ -38,30 +39,63 @@ export default function DinoRunGame({}: Props) {
 
   const sketch = useCallback((p: p5) => {
     let dino: Dino | null = null;
-    let height = 0;
+    let obstacle: Obstacle | null = null;
+    let groundHeight = 0;
 
     p.setup = () => {
       const div = document.getElementById("p5-container");
-      p.createCanvas(
+      const canvas = p.createCanvas(
         (div?.offsetWidth ?? p.windowWidth) * 0.9,
         (div?.offsetHeight ?? p.windowHeight) * 1.15,
       );
+      canvas.elt.tabIndex = 0;
+
+      // Avoid losing focus for keyboard when clicking elsewhere
+      canvas.elt.addEventListener("mousedown", () => {
+        canvas.elt.focus();
+      });
+
+      canvas.elt.focus();
       p.frameRate(60);
       p.background(0);
 
-      dino = new Dino(p);
-      height = dino.y + 40;
+      groundHeight = p.height * 0.85;
+      dino = new Dino(p, groundHeight);
+      obstacle = new Obstacle(p, groundHeight);
     };
 
     p.draw = () => {
       p.background(0);
-      if (dino) {
-        p.stroke(255);
-        p.strokeWeight(2);
-        p.line(0, height, p.width, height);
+      if (!dino || !obstacle) {
+        throw Error("Unknown null value(s)");
+      }
 
-        dino.handleJump();
-        dino.draw();
+      p.stroke(255);
+      p.strokeWeight(2);
+      p.line(0, groundHeight, p.width, groundHeight);
+
+      dino.handleJump();
+
+      obstacle.scroll();
+
+      if (dino.hasJumpedOver(obstacle)) {
+        p.textAlign(p.CENTER);
+        p.textSize(16);
+        p.noFill();
+        p.text("JUMPED", p.width * 0.1, 50);
+      }
+
+      dino.draw();
+      obstacle.draw();
+
+      if (dino.hit(obstacle)) {
+        p.background(0);
+        p.textAlign(p.CENTER);
+        p.textSize(32);
+        p.noStroke();
+        p.fill(127, 0, 0);
+        p.text("GAME OVER", p.width / 2, p.height / 2);
+        p.noLoop();
       }
     };
 
@@ -95,6 +129,7 @@ export default function DinoRunGame({}: Props) {
               className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
               onClick={() => {
                 setRefresh((prev) => prev + 1);
+
                 gameOverRef.current = false;
                 setGameOver(false);
                 setTimer({
