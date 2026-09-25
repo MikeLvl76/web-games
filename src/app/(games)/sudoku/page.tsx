@@ -1,8 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Menu, { Config } from "./menu";
 import SudokuGame from "./game";
+import Menu from "@/components/custom/menu";
+
+type Config = {
+  enableTime: boolean;
+};
 
 export default function Page() {
   const [startGame, setStartGame] = useState(false);
@@ -16,10 +20,22 @@ export default function Page() {
         <SudokuGame {...config} />
       ) : (
         <Menu
-          onStart={(_config) => {
+          onStart={() => {
             setStartGame(true);
-            setConfig(_config);
           }}
+          selectors={[]}
+          switches={[
+            {
+              label: "Enable time",
+              bool: config.enableTime,
+              onChange: () =>
+                setConfig((prev) => ({
+                  ...prev,
+                  enableTime: !prev.enableTime,
+                })),
+            },
+          ]}
+          inputs={[]}
         />
       )}
     </div>

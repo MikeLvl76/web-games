@@ -1,8 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Menu, { Config } from "./menu";
 import MazeGame from "./game";
+import Menu from "@/components/custom/menu";
+
+type Config = {
+  enableCountdown: boolean;
+  enablePath: boolean;
+  enableReset: boolean;
+  size: number;
+};
 
 export default function Page() {
   const [startGame, setStartGame] = useState(false);
@@ -19,10 +26,51 @@ export default function Page() {
         <MazeGame {...config} />
       ) : (
         <Menu
-          onStart={(_config) => {
+          onStart={() => {
             setStartGame(true);
-            setConfig(_config);
           }}
+          selectors={[]}
+          switches={[
+            {
+              label: "Enable countdown",
+              bool: config.enableCountdown,
+              onChange: () =>
+                setConfig((prev) => ({
+                  ...prev,
+                  enableCountdown: !prev.enableCountdown,
+                })),
+            },
+            {
+              label: "Enable path",
+              bool: config.enablePath,
+              onChange: () =>
+                setConfig((prev) => ({
+                  ...prev,
+                  enablePath: !prev.enablePath,
+                })),
+            },
+            {
+              label: "Enable reset",
+              bool: config.enableReset,
+              onChange: () =>
+                setConfig((prev) => ({
+                  ...prev,
+                  enableReset: !prev.enableReset,
+                })),
+            },
+          ]}
+          inputs={[
+            {
+              label: "Select size",
+              type: "number",
+              interval: { min: 30, max: 50, step: 1 },
+              onChange: (value: string | number) =>
+                setConfig((prev) => ({
+                  ...prev,
+                  size: Number(value),
+                })),
+            },
+          ]}
         />
       )}
     </div>

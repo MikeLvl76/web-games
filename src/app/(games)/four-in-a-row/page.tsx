@@ -1,8 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Menu, { Config } from "./menu";
 import FourInARowGame from "./game";
+import { Token } from "@/hooks/games/four-in-a-row/use-utils";
+import Menu from "@/components/custom/menu";
+
+type Config = {
+  playerColor: NonNullable<Token>;
+  oppColor: NonNullable<Token>;
+  enableTime: boolean;
+};
 
 export default function Page() {
   const [startGame, setStartGame] = useState(false);
@@ -18,10 +25,47 @@ export default function Page() {
         <FourInARowGame {...config} />
       ) : (
         <Menu
-          onStart={(_config) => {
+          onStart={() => {
             setStartGame(true);
-            setConfig(_config);
           }}
+          selectors={[
+            {
+              items: [
+                { value: "red", text: "Red" },
+                { value: "yellow", text: "Yellow" },
+              ],
+              onValueChange: (value) => {
+                setConfig((prev) => ({
+                  ...prev,
+                  playerColor: value as NonNullable<Token>,
+                }));
+              },
+            },
+            {
+              items: [
+                { value: "yellow", text: "Yellow" },
+                { value: "red", text: "Red" },
+              ],
+              onValueChange: (value) => {
+                setConfig((prev) => ({
+                  ...prev,
+                  oppColor: value as NonNullable<Token>,
+                }));
+              },
+            },
+          ]}
+          switches={[
+            {
+              label: "Enable time",
+              bool: config.enableTime,
+              onChange: () =>
+                setConfig((prev) => ({
+                  ...prev,
+                  enableTime: !prev.enableTime,
+                })),
+            },
+          ]}
+          inputs={[]}
         />
       )}
     </div>

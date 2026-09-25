@@ -1,8 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import Menu, { Config } from "./menu";
 import TicTacToeGame from "./game";
+import { CellSymbol } from "@/hooks/games/tic-tac-toe/use-utils";
+import Menu from "@/components/custom/menu";
+
+type Config = {
+  playerSymbol: NonNullable<CellSymbol>;
+  oppSymbol: NonNullable<CellSymbol>;
+};
 
 export default function Page() {
   const [startGame, setStartGame] = useState(false);
@@ -17,10 +23,37 @@ export default function Page() {
         <TicTacToeGame {...config} />
       ) : (
         <Menu
-          onStart={(_config) => {
+          onStart={() => {
             setStartGame(true);
-            setConfig(_config);
           }}
+          selectors={[
+            {
+              items: [
+                { value: "x", text: "X" },
+                { value: "o", text: "O" },
+              ],
+              onValueChange: (value) => {
+                setConfig((prev) => ({
+                  ...prev,
+                  playerColor: value as NonNullable<CellSymbol>,
+                }));
+              },
+            },
+            {
+              items: [
+                { value: "o", text: "O" },
+                { value: "x", text: "X" },
+              ],
+              onValueChange: (value) => {
+                setConfig((prev) => ({
+                  ...prev,
+                  oppColor: value as NonNullable<CellSymbol>,
+                }));
+              },
+            },
+          ]}
+          switches={[]}
+          inputs={[]}
         />
       )}
     </div>

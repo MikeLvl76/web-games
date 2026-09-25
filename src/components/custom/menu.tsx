@@ -17,6 +17,12 @@ type Props = {
     onValueChange: (value: string) => void;
   }[];
   switches: { label: string; bool: boolean; onChange: () => void }[];
+  inputs: {
+    label: string;
+    type: "text" | "number";
+    onChange: (value: string | number) => void;
+    interval?: { min: number; max: number; step: number };
+  }[];
   onStart: () => void;
 };
 
@@ -51,7 +57,7 @@ Selectors.displayName = "Selectors";
 
 const Switches = memo(({ _switches }: { _switches: Props["switches"] }) => (
   <div>
-    {..._switches.map(({ label, bool, onChange }, i) => (
+    {..._switches.map(({ label, bool, onChange }) => (
       <div>
         <label className="font-bold text-xl">{label}</label>
         <Input
@@ -66,7 +72,37 @@ const Switches = memo(({ _switches }: { _switches: Props["switches"] }) => (
 ));
 Switches.displayName = "Switches";
 
-export default function GameMenu({ selectors, switches, onStart }: Props) {
+const Inputs = memo(({ _inputs }: { _inputs: Props["inputs"] }) => (
+  <div>
+    {..._inputs.map(({ label, type, interval, onChange }) => (
+      <div>
+        <label className="font-bold text-xl">{label}</label>
+        <Input
+          type={type}
+          min={interval?.min}
+          max={interval?.max}
+          step={interval?.step}
+          onChange={(event) => {
+            const value = event.target.value;
+            if (Number.isNaN(Number(value))) {
+              onChange(value as string);
+            } else {
+              onChange(Number(value));
+            }
+          }}
+          className="w-16 h-6"
+        />
+      </div>
+    ))}
+  </div>
+));
+
+export default function GameMenu({
+  selectors,
+  switches,
+  inputs,
+  onStart,
+}: Props) {
   return (
     <div>
       <div>
@@ -76,6 +112,7 @@ export default function GameMenu({ selectors, switches, onStart }: Props) {
       <div>
         <Selectors _selectors={selectors} />
         <Switches _switches={switches} />
+        <Inputs _inputs={inputs} />
       </div>
       <div className="flex justify-center items-end w-full h-[20%]">
         <Button
