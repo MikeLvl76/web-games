@@ -22,6 +22,8 @@ export default function Page() {
         <SnakeGame {...config} />
       ) : (
         <Menu
+          gameName="Snake"
+          description="Make the snake grow by eating food and avoid colliding with borders."
           onStart={() => {
             setStartGame(true);
           }}

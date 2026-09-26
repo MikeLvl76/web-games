@@ -23,12 +23,14 @@ export default function Page() {
         <TicTacToeGame {...config} />
       ) : (
         <Menu
+          gameName="Tic tac toe"
+          description="Align three symbols horizontally, vertically or diagonally before opponent to win."
           onStart={() => {
             setStartGame(true);
           }}
           selectors={[
             {
-              label: 'Player 1',
+              label: "Player 1",
               items: [
                 { value: "x", text: "X" },
                 { value: "o", text: "O" },
@@ -41,7 +43,7 @@ export default function Page() {
               },
             },
             {
-              label: 'Player 2',
+              label: "Player 2",
               items: [
                 { value: "o", text: "O" },
                 { value: "x", text: "X" },

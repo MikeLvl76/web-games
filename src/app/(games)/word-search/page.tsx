@@ -44,6 +44,8 @@ export default function Page() {
         <WordSearchGame {...config} />
       ) : (
         <Menu
+          gameName="Word search"
+          description="Find all words in the grid."
           onStart={() => {
             setStartGame(true);
           }}

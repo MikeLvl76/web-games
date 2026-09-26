@@ -11,8 +11,11 @@ import { memo } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
+import { AsteriskIcon, SettingsIcon } from "lucide-react";
 
 type Props = {
+  gameName: string;
+  description: string;
   selectors: {
     label: string;
     items: { value: string; text: string }[];
@@ -103,6 +106,8 @@ const Inputs = memo(({ _inputs }: { _inputs: Props["inputs"] }) => (
 ));
 
 export default function GameMenu({
+  gameName,
+  description,
   selectors,
   switches,
   inputs,
@@ -110,10 +115,19 @@ export default function GameMenu({
 }: Props) {
   return (
     <div className="w-[30vw] sm:w-[40vw] md:w-[50vw] h-[70vh] flex flex-col gap-4 p-4 bg-slate-200 shadow-2xl/50 rounded-md">
-      <div className="w-full flex flex-col items-start p-4">
-        <h1 className="text-2xl font-bold text-slate-800">Game menu</h1>
-        <h3 className="text-sm text-slate-700">Customize game with settings</h3>
+      <div className="w-full flex flex-col items-start p-2">
+        <h1 className="text-xl font-bold text-slate-800">{gameName}</h1>
+        <div className="flex flex-row justify-start items-center gap-2">
+          <AsteriskIcon size={20} color="#B59410" />
+          <h3 className="text-md text-right text-slate-600 text-pretty break-all">
+            {description}
+          </h3>
+        </div>
         <Separator className="w-full bg-slate-400 mt-2" />
+      </div>
+      <div className="flex flex-row justify-center items-center gap-2 px-2">
+        <p className="text-sm font-bold text-slate-800">Settings</p>
+        <SettingsIcon size={20} color="#636363" />
       </div>
       <div className="grid grid-cols-3 w-full">
         {selectors.length > 0 && <Selectors _selectors={selectors} />}

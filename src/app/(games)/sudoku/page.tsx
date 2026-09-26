@@ -20,6 +20,8 @@ export default function Page() {
         <SudokuGame {...config} />
       ) : (
         <Menu
+          gameName="Sudoku"
+          description="Fill the grid with correct numbers."
           onStart={() => {
             setStartGame(true);
           }}

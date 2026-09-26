@@ -25,12 +25,14 @@ export default function Page() {
         <FourInARowGame {...config} />
       ) : (
         <Menu
+          gameName="Four in a row"
+          description="Align four tokens horizontally, vertically or diagonally before opponent to win."
           onStart={() => {
             setStartGame(true);
           }}
           selectors={[
             {
-              label: 'Player 1',
+              label: "Player 1",
               items: [
                 { value: "red", text: "Red" },
                 { value: "yellow", text: "Yellow" },
@@ -43,7 +45,7 @@ export default function Page() {
               },
             },
             {
-              label: 'Player 2',
+              label: "Player 2",
               items: [
                 { value: "yellow", text: "Yellow" },
                 { value: "red", text: "Red" },

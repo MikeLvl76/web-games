@@ -26,6 +26,8 @@ export default function Page() {
         <MazeGame {...config} />
       ) : (
         <Menu
+          gameName="Maze"
+          description="Find the exit to win."
           onStart={() => {
             setStartGame(true);
           }}

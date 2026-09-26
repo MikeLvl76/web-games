@@ -27,12 +27,14 @@ export default function Page() {
         <CheckersGame {...config} />
       ) : (
         <Menu
+          gameName="Checkers"
+          description="Capture opponent's pieces"
           onStart={() => {
             setStartGame(true);
           }}
           selectors={[
             {
-              label: 'Player 1',
+              label: "Player 1",
               items: [
                 { value: "black", text: "Black" },
                 { value: "white", text: "White" },
@@ -45,7 +47,7 @@ export default function Page() {
               },
             },
             {
-              label: 'Player 2',
+              label: "Player 2",
               items: [
                 { value: "white", text: "White" },
                 { value: "black", text: "Black" },
