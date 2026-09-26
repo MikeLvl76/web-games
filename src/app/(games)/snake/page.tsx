@@ -28,27 +28,41 @@ export default function Page() {
             setStartGame(true);
           }}
           selectors={[]}
-          switches={[
-            {
-              label: "Time",
-              bool: config.enableTime,
-              onChange: () =>
-                setConfig((prev) => ({
-                  ...prev,
-                  enableTime: !prev.enableTime,
-                })),
-            },
-          ]}
           inputs={[
             {
               label: "Size",
-              type: "number",
-              interval: { min: 3, max: 60, step: 3 },
-              onChange: (value: string | number) =>
-                setConfig((prev) => ({
-                  ...prev,
-                  size: Number(value),
-                })),
+              inputProps: {
+                type: "number",
+                min: 3,
+                max: 60,
+                defaultValue: 3,
+                value: config.size,
+                step: 3,
+                onChange: (event) => {
+                  const value = Number(event.target.value);
+                  if (value < 3 || value > 60) return;
+
+                  setConfig((prev) => ({
+                    ...prev,
+                    size: Number(event.target.value),
+                  }));
+                },
+                className:
+                  "w-20 h-8 text-slate-800 outline-none focus:outline-none",
+              },
+            },
+            {
+              label: "Time",
+              inputProps: {
+                type: "checkbox",
+                checked: config.enableTime,
+                onChange: () =>
+                  setConfig((prev) => ({
+                    ...prev,
+                    enableTime: !prev.enableTime,
+                  })),
+                className: "w-4 h-4 hover:cursor-pointer",
+              },
             },
           ]}
         />

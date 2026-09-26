@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { memo } from "react";
+import { ComponentProps, memo } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
@@ -21,12 +21,9 @@ type Props = {
     items: { value: string; text: string }[];
     onValueChange: (value: string) => void;
   }[];
-  switches: { label: string; bool: boolean; onChange: () => void }[];
   inputs: {
     label: string;
-    type: "text" | "number";
-    onChange: (value: string | number) => void;
-    interval?: { min: number; max: number; step: number };
+    inputProps?: ComponentProps<"input">;
   }[];
   onStart: () => void;
 };
@@ -63,43 +60,12 @@ const Selectors = memo(({ _selectors }: { _selectors: Props["selectors"] }) => {
 });
 Selectors.displayName = "Selectors";
 
-const Switches = memo(({ _switches }: { _switches: Props["switches"] }) => (
-  <div className="w-full flex flex-col items-center gap-4">
-    {..._switches.map(({ label, bool, onChange }) => (
-      <div className="w-4/5 flex flex-row justify-between items-center p-2">
-        <label className="font-bold text-md">{label}</label>
-        <Input
-          type="checkbox"
-          checked={bool}
-          onChange={onChange}
-          className="w-4 h-4 hover:cursor-pointer"
-        />
-      </div>
-    ))}
-  </div>
-));
-Switches.displayName = "Switches";
-
 const Inputs = memo(({ _inputs }: { _inputs: Props["inputs"] }) => (
   <div className="w-full flex flex-col items-center gap-4">
-    {..._inputs.map(({ label, type, interval, onChange }) => (
+    {..._inputs.map(({ label, inputProps }) => (
       <div className="min-w-5/6 flex flex-row justify-between items-center p-2">
         <label className="font-bold text-md">{label}</label>
-        <Input
-          type={type}
-          min={interval?.min}
-          max={interval?.max}
-          step={interval?.step}
-          onChange={(event) => {
-            const value = event.target.value;
-            if (Number.isNaN(Number(value))) {
-              onChange(value as string);
-            } else {
-              onChange(Number(value));
-            }
-          }}
-          className="w-20 h-8 text-slate-800 outline-none focus:outline-none "
-        />
+        <Input {...inputProps} />
       </div>
     ))}
   </div>
@@ -109,7 +75,6 @@ export default function GameMenu({
   gameName,
   description,
   selectors,
-  switches,
   inputs,
   onStart,
 }: Props) {
@@ -131,7 +96,6 @@ export default function GameMenu({
       </div>
       <div className="grid grid-cols-3 w-full">
         {selectors.length > 0 && <Selectors _selectors={selectors} />}
-        {switches.length > 0 && <Switches _switches={switches} />}
         {inputs.length > 0 && <Inputs _inputs={inputs} />}
       </div>
       <div className="flex justify-end items-end w-full h-full">

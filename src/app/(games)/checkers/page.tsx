@@ -60,27 +60,34 @@ export default function Page() {
               },
             },
           ]}
-          switches={[
+          inputs={[
             {
               label: "Time",
-              bool: config.enableTime,
-              onChange: () =>
-                setConfig((prev) => ({
-                  ...prev,
-                  enableTime: !prev.enableTime,
-                })),
+              inputProps: {
+                type: "checkbox",
+                checked: config.enableTime,
+                onChange: () =>
+                  setConfig((prev) => ({
+                    ...prev,
+                    enableTime: !prev.enableTime,
+                  })),
+                className: "w-4 h-4 hover:cursor-pointer",
+              },
             },
             {
               label: "Multiple jumps",
-              bool: config.allowMultJumps,
-              onChange: () =>
-                setConfig((prev) => ({
-                  ...prev,
-                  allowMultJumps: !prev.allowMultJumps,
-                })),
+              inputProps: {
+                type: "checkbox",
+                checked: config.allowMultJumps,
+                onChange: () =>
+                  setConfig((prev) => ({
+                    ...prev,
+                    allowMultJumps: !prev.allowMultJumps,
+                  })),
+                className: "w-4 h-4 hover:cursor-pointer",
+              },
             },
           ]}
-          inputs={[]}
         />
       )}
     </div>

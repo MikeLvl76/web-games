@@ -58,18 +58,21 @@ export default function Page() {
               },
             },
           ]}
-          switches={[
+          inputs={[
             {
               label: "Time",
-              bool: config.enableTime,
-              onChange: () =>
-                setConfig((prev) => ({
-                  ...prev,
-                  enableTime: !prev.enableTime,
-                })),
+              inputProps: {
+                type: "checkbox",
+                checked: config.enableTime,
+                onChange: () =>
+                  setConfig((prev) => ({
+                    ...prev,
+                    enableTime: !prev.enableTime,
+                  })),
+                className: "w-4 h-4 hover:cursor-pointer",
+              },
             },
           ]}
-          inputs={[]}
         />
       )}
     </div>

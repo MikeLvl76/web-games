@@ -50,37 +50,61 @@ export default function Page() {
             setStartGame(true);
           }}
           selectors={[]}
-          switches={[
-            {
-              label: "Countdown",
-              bool: config.enableCountdown,
-              onChange: () =>
-                setConfig((prev) => ({
-                  ...prev,
-                  enableCountdown: !prev.enableCountdown,
-                })),
-            },
-          ]}
           inputs={[
             {
               label: "Word length",
-              type: "number",
-              interval: { min: 3, max: 18, step: 1 },
-              onChange: (value: string | number) =>
-                setConfig((prev) => ({
-                  ...prev,
-                  wordLength: Number(value),
-                })),
+              inputProps: {
+                type: "number",
+                min: 3,
+                max: 18,
+                defaultValue: 3,
+                step: 1,
+                onChange: (event) => {
+                  const value = Number(event.target.value);
+                  if (value < 3 || value > 18) return;
+
+                  setConfig((prev) => ({
+                    ...prev,
+                    wordLength: Number(event.target.value),
+                  }));
+                },
+                className:
+                  "w-20 h-8 text-slate-800 outline-none focus:outline-none",
+              },
             },
             {
               label: "List size",
-              type: "number",
-              interval: { min: 5, max: 25, step: 1 },
-              onChange: (value: string | number) =>
-                setConfig((prev) => ({
-                  ...prev,
-                  listSize: Number(value),
-                })),
+              inputProps: {
+                type: "number",
+                min: 5,
+                max: 25,
+                defaultValue: 5,
+                step: 1,
+                onChange: (event) => {
+                  const value = Number(event.target.value);
+                  if (value < 5 || value > 25) return;
+
+                  setConfig((prev) => ({
+                    ...prev,
+                    listSize: Number(event.target.value),
+                  }));
+                },
+                className:
+                  "w-20 h-8 text-slate-800 outline-none focus:outline-none",
+              },
+            },
+            {
+              label: "Countdown",
+              inputProps: {
+                type: "checkbox",
+                checked: config.enableCountdown,
+                onChange: () =>
+                  setConfig((prev) => ({
+                    ...prev,
+                    enableCountdown: !prev.enableCountdown,
+                  })),
+                className: "w-4 h-4 hover:cursor-pointer",
+              },
             },
           ]}
         />

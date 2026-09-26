@@ -32,45 +32,66 @@ export default function Page() {
             setStartGame(true);
           }}
           selectors={[]}
-          switches={[
-            {
-              label: "Countdown",
-              bool: config.enableCountdown,
-              onChange: () =>
-                setConfig((prev) => ({
-                  ...prev,
-                  enableCountdown: !prev.enableCountdown,
-                })),
-            },
-            {
-              label: "Path",
-              bool: config.enablePath,
-              onChange: () =>
-                setConfig((prev) => ({
-                  ...prev,
-                  enablePath: !prev.enablePath,
-                })),
-            },
-            {
-              label: "Reset",
-              bool: config.enableReset,
-              onChange: () =>
-                setConfig((prev) => ({
-                  ...prev,
-                  enableReset: !prev.enableReset,
-                })),
-            },
-          ]}
           inputs={[
             {
               label: "Size",
-              type: "number",
-              interval: { min: 30, max: 50, step: 1 },
-              onChange: (value: string | number) =>
-                setConfig((prev) => ({
-                  ...prev,
-                  size: Number(value),
-                })),
+              inputProps: {
+                type: "number",
+                min: 30,
+                max: 50,
+                defaultValue: 30,
+                value: config.size,
+                step: 1,
+                onChange: (event) => {
+                  const value = Number(event.target.value);
+                  if (value < 30 || value > 50) return;
+
+                  setConfig((prev) => ({
+                    ...prev,
+                    size: value,
+                  }));
+                },
+                className: "w-20 h-8 text-slate-800 outline-none focus:outline-none"
+              },
+            },
+            {
+              label: "Countdown",
+              inputProps: {
+                type: "checkbox",
+                checked: config.enableCountdown,
+                onChange: () =>
+                  setConfig((prev) => ({
+                    ...prev,
+                    enableCountdown: !prev.enableCountdown,
+                  })),
+                className: "w-4 h-4 hover:cursor-pointer",
+              },
+            },
+            {
+              label: "Path",
+              inputProps: {
+                type: "checkbox",
+                checked: config.enablePath,
+                onChange: () =>
+                  setConfig((prev) => ({
+                    ...prev,
+                    enablePath: !prev.enablePath,
+                  })),
+                className: "w-4 h-4 hover:cursor-pointer",
+              },
+            },
+            {
+              label: "Reset",
+              inputProps: {
+                type: "checkbox",
+                checked: config.enableReset,
+                onChange: () =>
+                  setConfig((prev) => ({
+                    ...prev,
+                    enableReset: !prev.enableReset,
+                  })),
+                className: "w-4 h-4 hover:cursor-pointer",
+              },
             },
           ]}
         />

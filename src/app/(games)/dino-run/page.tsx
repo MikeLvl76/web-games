@@ -16,7 +16,6 @@ export default function Page() {
           gameName="Dino Run"
           description="Run and jump over obstacles to earn points."
           selectors={[]}
-          switches={[]}
           inputs={[]}
           onStart={() => {
             setStartGame(true);

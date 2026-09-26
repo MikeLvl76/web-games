@@ -16,7 +16,6 @@ export default function Page() {
           gameName="Rock Paper Scissors"
           description="Rock beats Scissors, Paper beats Rocks and Scissors beats Paper. Be lucky."
           selectors={[]}
-          switches={[]}
           inputs={[]}
           onStart={() => {
             setStartGame(true);
