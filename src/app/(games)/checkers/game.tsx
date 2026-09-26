@@ -4,9 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import { Board } from "./board";
 import { stringifyTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { RotateCcw } from "lucide-react";
+import {
+  Gamepad2Icon,
+  InfoIcon,
+  RotateCcwIcon,
+  SettingsIcon,
+} from "lucide-react";
 import { PlayerColor, useUtils } from "../../../hooks/games/checkers/use-utils";
-import GameStatus from "@/components/custom/game/status";
+import GameDetails from "@/components/custom/game/details";
 
 type Props = {
   playerColor: PlayerColor;
@@ -66,145 +71,121 @@ export default function CheckersGame({
         />
       </div>
       <div className="flex w-[20%]">
-        <GameStatus
-          title="Checkers"
-          description="Capture opponent's pieces"
-          controls={[
+        <GameDetails
+          sections={[
             {
-              label: "Move piece",
-              value: "Click on piece and click on suggested tile",
-            },
-          ]}
-          infos={[
-            {
-              label: "Current turn",
-              value: players.p1.currentTurn ? players.p1.name : players.p2.name,
+              title: "Controls",
+              icon: Gamepad2Icon,
+              iconProps: { fill: "black", color: "black" },
+              content: {
+                infos: ["Click on piece and on available tile to move it."],
+                elements: [],
+              },
             },
             {
-              label: "Remaining pieces",
-              value: `${
-                tiles.filter((t) => t.piece?.color === players.p1.color).length
-              }`,
+              title: "Game infos",
+              icon: InfoIcon,
+              iconProps: { fill: "#3A79BA", color: "black" },
+              content: {
+                infos: [
+                  `${players.p1.currentTurn ? players.p1.name : players.p2.name} turn`,
+                  `Player pieces: ${
+                    tiles.filter((t) => t.piece?.color === players.p1.color)
+                      .length
+                  }`,
+                  `Opponent pieces: ${
+                    tiles.filter((t) => t.piece?.color === players.p2.color)
+                      .length
+                  }`,
+                  enableTime ? `Time: ${timer.text}` : "Time disabled",
+                  `Winner: ${
+                    players.p1.isWinner
+                      ? players.p1.name
+                      : players.p2.isWinner
+                        ? players.p2.name
+                        : "/"
+                  }`,
+                ],
+                elements: [],
+              },
             },
             {
-              label: "Remaining opponent pieces",
-              value: `${
-                tiles.filter((t) => t.piece?.color === players.p2.color).length
-              }`,
-            },
-            { label: "Game time", value: enableTime ? timer.text : "Disabled" },
-            {
-              label: "Winner",
-              value: players.p1.isWinner
-                ? players.p1.name
-                : players.p2.isWinner
-                ? players.p2.name
-                : "/",
-            },
-          ]}
-          options={[
-            <Button
-              key="end-turn-button"
-              onClick={() => {
-                setPlayers((prev) => {
-                  const p1CanPlay = !prev.p1.currentTurn;
+              title: "Options",
+              icon: SettingsIcon,
+              iconProps: { fill: "#aaaaaa", color: "black" },
+              content: {
+                infos: [],
+                elements: [
+                  <Button
+                    key="end-turn-button"
+                    onClick={() => {
+                      setPlayers((prev) => {
+                        const p1CanPlay = !prev.p1.currentTurn;
 
-                  return {
-                    ...prev,
-                    p1: {
-                      ...prev.p1,
-                      canContinue: false,
-                      currentTurn: p1CanPlay,
-                    },
-                    p2: {
-                      ...prev.p2,
-                      canContinue: false,
-                      currentTurn: !p1CanPlay,
-                    },
-                  };
-                });
-              }}
-              className="w-fit h-fit p-2 rounded-sm bg-red-500 text-sm text-white font-bold hover:cursor-pointer disabled:opacity-20"
-              disabled={!players.p1.canContinue && !players.p2.canContinue}
-            >
-              End turn
-            </Button>,
-            // <Button
-            //   key="menu-button"
-            //   variant="default"
-            //   className="flex w-fit h-fit p-2 bg-green-700 rounded-md hover:cursor-pointer"
-            //   onClick={() => {
-            //     setTiles([]);
-            //     setPlayers((prev) => ({
-            //       ...prev,
-            //       p1: {
-            //         ...prev.p1,
-            //         canContinue: false,
-            //         currentTurn: !prev.p1.isWinner,
-            //         isWinner: false,
-            //         nextMove: undefined,
-            //       },
-            //       p2: {
-            //         ...prev.p2,
-            //         canContinue: false,
-            //         currentTurn: !prev.p2.isWinner,
-            //         isWinner: false,
-            //         nextMove: undefined,
-            //       },
-            //     }));
-            //     setSelectedIdx(-1);
-            //     setTimer({ value: 0, text: stringifyTime(0) });
-            //     clearInterval(intervalRef.current!);
-            //     intervalRef.current = setInterval(() => {
-            //       setTimer((prev) => ({
-            //         value: prev.value + 1,
-            //         text: stringifyTime(prev.value + 1),
-            //       }));
-            //     }, 1000);
-            //   }}
-            // >
-            //   <p className="text-white font-bold text-md text-center">Menu</p>
-            //   <CornerDownLeft color="white" size={32} />
-            // </Button>,
-            <Button
-              key="restart-button"
-              variant="default"
-              className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
-              onClick={() => {
-                init();
-                setPlayers((prev) => ({
-                  ...prev,
-                  p1: {
-                    ...prev.p1,
-                    canContinue: false,
-                    currentTurn: !prev.p1.isWinner,
-                    isWinner: false,
-                    nextMove: undefined,
-                  },
-                  p2: {
-                    ...prev.p2,
-                    canContinue: false,
-                    currentTurn: !prev.p2.isWinner,
-                    isWinner: false,
-                    nextMove: undefined,
-                  },
-                }));
-                setSelectedIdx(-1);
-                setTimer({ value: 0, text: stringifyTime(0) });
-                clearInterval(intervalRef.current!);
-                intervalRef.current = setInterval(() => {
-                  setTimer((prev) => ({
-                    value: prev.value + 1,
-                    text: stringifyTime(prev.value + 1),
-                  }));
-                }, 1000);
-              }}
-            >
-              <p className="text-white font-bold text-md text-center">
-                Restart
-              </p>
-              <RotateCcw color="white" size={32} />
-            </Button>,
+                        return {
+                          ...prev,
+                          p1: {
+                            ...prev.p1,
+                            canContinue: false,
+                            currentTurn: p1CanPlay,
+                          },
+                          p2: {
+                            ...prev.p2,
+                            canContinue: false,
+                            currentTurn: !p1CanPlay,
+                          },
+                        };
+                      });
+                    }}
+                    className="w-fit h-fit p-2 rounded-sm bg-red-500 text-sm text-white font-bold hover:cursor-pointer disabled:opacity-20"
+                    disabled={
+                      !players.p1.canContinue && !players.p2.canContinue
+                    }
+                  >
+                    End turn
+                  </Button>,
+                  <Button
+                    key="restart-button"
+                    variant="default"
+                    className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+                    onClick={() => {
+                      init();
+                      setPlayers((prev) => ({
+                        ...prev,
+                        p1: {
+                          ...prev.p1,
+                          canContinue: false,
+                          currentTurn: !prev.p1.isWinner,
+                          isWinner: false,
+                          nextMove: undefined,
+                        },
+                        p2: {
+                          ...prev.p2,
+                          canContinue: false,
+                          currentTurn: !prev.p2.isWinner,
+                          isWinner: false,
+                          nextMove: undefined,
+                        },
+                      }));
+                      setSelectedIdx(-1);
+                      setTimer({ value: 0, text: stringifyTime(0) });
+                      clearInterval(intervalRef.current!);
+                      intervalRef.current = setInterval(() => {
+                        setTimer((prev) => ({
+                          value: prev.value + 1,
+                          text: stringifyTime(prev.value + 1),
+                        }));
+                      }, 1000);
+                    }}
+                  >
+                    <p className="text-white font-bold text-md text-center">
+                      Restart
+                    </p>
+                    <RotateCcwIcon color="white" size={32} />
+                  </Button>,
+                ],
+              },
+            },
           ]}
         />
       </div>

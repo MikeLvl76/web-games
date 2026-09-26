@@ -1,13 +1,18 @@
 "use client";
 
-import GameStatus from "@/components/custom/game/status";
 import { Button } from "@/components/ui/button";
 import { useUtils } from "@/hooks/games/word-search/use-utils";
-import { RotateCcw } from "lucide-react";
+import {
+  Gamepad2Icon,
+  InfoIcon,
+  RotateCcwIcon,
+  SettingsIcon,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Grid } from "./grid";
 import { WordList } from "./list";
 import { stringifyTime } from "@/lib/utils";
+import GameDetails from "@/components/custom/game/details";
 
 type Props = {
   enableCountdown: boolean;
@@ -118,58 +123,75 @@ export default function WordSearchGame({
         />
       </div>
       <div className="flex w-[20%]">
-        <GameStatus
-          title="Word Search"
-          description="Find the words inside a grid full of characters"
-          controls={[
+        <GameDetails
+          sections={[
             {
-              label: "Highlight word",
-              value: "Drag over chars with mouse left button",
-            },
-          ]}
-          infos={[
-            { label: "Words", value: `${words.length}` },
-            {
-              label: "Found",
-              value: `${words.filter((w) => w.isFound).length}`,
+              title: "Controls",
+              icon: Gamepad2Icon,
+              iconProps: { fill: "black", color: "black" },
+              content: {
+                infos: [
+                  "Drag left mouse button over characters to highlight them.",
+                ],
+                elements: [],
+              },
             },
             {
-              label: "Countdown",
-              value: enableCountdown ? countdown.text : "Disabled",
+              title: "Game infos",
+              icon: InfoIcon,
+              iconProps: { fill: "#3A79BA", color: "black" },
+              content: {
+                infos: [
+                  `${words.length} words`,
+                  `${words.filter((w) => w.isFound).length} word(s) found`,
+                  enableCountdown
+                    ? `Countdown: ${countdown.text}`
+                    : "Countdown disabled",
+                ],
+                elements: [],
+              },
             },
-          ]}
-          options={[
-            <Button
-              key="restart-button"
-              variant="default"
-              className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
-              onClick={() => {
-                setIsEnd(false);
-                generateList();
-                setIsHolding(false);
-                setHighlightIndices([]);
-                setSelectedIndices([]);
-                setCountdown({
-                  value: 20 * listSize,
-                  text: stringifyTime(20 * listSize),
-                });
-                clearInterval(intervalRef.current!);
-                intervalRef.current = setInterval(() => {
-                  setCountdown((prev) => {
-                    const time = Math.max(prev.value - 1, 0);
-                    return {
-                      value: time,
-                      text: stringifyTime(time),
-                    };
-                  });
-                }, 1000);
-              }}
-            >
-              <p className="text-white font-bold text-md text-center">
-                Restart
-              </p>
-              <RotateCcw color="white" size={32} />
-            </Button>,
+            {
+              title: "Options",
+              icon: SettingsIcon,
+              iconProps: { fill: "#aaaaaa", color: "black" },
+              content: {
+                infos: [],
+                elements: [
+                  <Button
+                    key="restart-button"
+                    variant="default"
+                    className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+                    onClick={() => {
+                      setIsEnd(false);
+                      generateList();
+                      setIsHolding(false);
+                      setHighlightIndices([]);
+                      setSelectedIndices([]);
+                      setCountdown({
+                        value: 20 * listSize,
+                        text: stringifyTime(20 * listSize),
+                      });
+                      clearInterval(intervalRef.current!);
+                      intervalRef.current = setInterval(() => {
+                        setCountdown((prev) => {
+                          const time = Math.max(prev.value - 1, 0);
+                          return {
+                            value: time,
+                            text: stringifyTime(time),
+                          };
+                        });
+                      }, 1000);
+                    }}
+                  >
+                    <p className="text-white font-bold text-md text-center">
+                      Restart
+                    </p>
+                    <RotateCcwIcon color="white" size={32} />
+                  </Button>,
+                ],
+              },
+            },
           ]}
         />
       </div>

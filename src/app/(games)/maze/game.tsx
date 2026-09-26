@@ -4,11 +4,16 @@ import P5Sketch from "@/components/custom/p5-sketch";
 import { stringifyTime } from "@/lib/utils";
 import { Maze } from "@/lib/p5/maze/maze";
 import { Player } from "@/lib/p5/maze/player";
-import { RotateCcw } from "lucide-react";
+import {
+  Gamepad2Icon,
+  InfoIcon,
+  RotateCcwIcon,
+  SettingsIcon,
+} from "lucide-react";
 import p5 from "p5";
 import { useCallback, useEffect, useRef, useState } from "react";
-import GameStatus from "@/components/custom/game/status";
 import { Button } from "@/components/ui/button";
+import GameDetails from "@/components/custom/game/details";
 
 type Props = {
   enableCountdown: boolean;
@@ -146,82 +151,73 @@ export default function MazeGame({
         <P5Sketch sketch={sketch} refresh={refresh} />
       </div>
       <div className="flex w-[20%]">
-        <GameStatus
-          title="Maze"
-          description="Find exit"
-          controls={[
-            { label: "Move", value: "ZQSD / Arrow keys" },
+        <GameDetails
+          sections={[
             {
-              label: "Show path",
-              value: enablePath ? "H" : "Disabled",
+              title: "Controls",
+              icon: Gamepad2Icon,
+              iconProps: { fill: "black", color: "black" },
+              content: {
+                infos: [
+                  "Use ZQSD/Arrows to move.",
+                  `Use h to show path. (${enablePath ? "Enabled" : "Disabled"})`,
+                  `Use r to reset position. (${enableReset ? "Enabled" : "Disabled"})`,
+                ],
+                elements: [],
+              },
             },
             {
-              label: "Reset position",
-              value: enableReset ? "R" : "Disabled",
+              title: "Game infos",
+              icon: InfoIcon,
+              iconProps: { fill: "#3A79BA", color: "black" },
+              content: {
+                infos: [
+                  enableCountdown
+                    ? `Countdown: ${countdown.text}`
+                    : "Countdown disabled",
+                ],
+                elements: [],
+              },
             },
-          ]}
-          infos={[
             {
-              label: "Countdown",
-              value: enableCountdown ? countdown.text : "Disabled",
+              title: "Options",
+              icon: SettingsIcon,
+              iconProps: { fill: "#aaaaaa", color: "black" },
+              content: {
+                infos: [],
+                elements: [
+                  <Button
+                    key="restart-button"
+                    variant="default"
+                    className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+                    onClick={() => {
+                      setRefresh((prev) => prev + 1);
+                      gameOverRef.current = false;
+                      setGameOver(false);
+                      setCountdown({
+                        value: 60 * Math.floor(size / 10),
+                        text: stringifyTime(60 * Math.floor(size / 10)),
+                      });
+                      clearInterval(intervalRef.current!);
+                      intervalRef.current = setInterval(() => {
+                        setCountdown((prev) => {
+                          const time = Math.max(prev.value - 1, 0);
+                          return {
+                            value: time,
+                            text: stringifyTime(time),
+                          };
+                        });
+                      }, 1000);
+                    }}
+                  >
+                    <p className="text-white font-bold text-md text-center">
+                      Restart
+                    </p>
+                    <RotateCcwIcon color="white" size={32} />
+                  </Button>,
+                ],
+              },
             },
-          ]}
-          options={[
-            // <Button
-            //   key="menu-button"
-            //   variant="default"
-            //   className="flex w-fit h-fit p-2 bg-green-700 rounded-md hover:cursor-pointer"
-            //   onClick={() => {
-            //     gameOverRef.current = false;
-            //     setGameOver(false);
-            //     setCountdown({
-            //       value: 60 * Math.floor(size / 10),
-            //       text: stringifyTime(60 * Math.floor(size / 10)),
-            //     });
-            //     clearInterval(intervalRef.current!);
-            //     intervalRef.current = setInterval(() => {
-            //       setCountdown((prev) => {
-            //         const time = Math.max(prev.value - 1, 0);
-            //         return {
-            //           value: time,
-            //           text: stringifyTime(time),
-            //         };
-            //       });
-            //     }, 1000);
-            //   }}
-            // >
-            //   <p className="text-white font-bold text-md text-center">Menu</p>
-            //   <CornerDownLeft color="white" size={32} />
-            // </Button>,
-            <Button
-              key="restart-button"
-              variant="default"
-              className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
-              onClick={() => {
-                setRefresh((prev) => prev + 1);
-                gameOverRef.current = false;
-                setGameOver(false);
-                setCountdown({
-                  value: 60 * Math.floor(size / 10),
-                  text: stringifyTime(60 * Math.floor(size / 10)),
-                });
-                clearInterval(intervalRef.current!);
-                intervalRef.current = setInterval(() => {
-                  setCountdown((prev) => {
-                    const time = Math.max(prev.value - 1, 0);
-                    return {
-                      value: time,
-                      text: stringifyTime(time),
-                    };
-                  });
-                }, 1000);
-              }}
-            >
-              <p className="text-white font-bold text-md text-center">
-                Restart
-              </p>
-              <RotateCcw color="white" size={32} />
-            </Button>,
           ]}
         />
       </div>

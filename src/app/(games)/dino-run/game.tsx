@@ -2,13 +2,18 @@
 
 import P5Sketch from "@/components/custom/p5-sketch";
 import { stringifyTime } from "@/lib/utils";
-import { RotateCcw } from "lucide-react";
+import {
+  Gamepad2Icon,
+  InfoIcon,
+  RotateCcwIcon,
+  SettingsIcon,
+} from "lucide-react";
 import p5 from "p5";
 import { useCallback, useEffect, useRef, useState } from "react";
-import GameStatus from "@/components/custom/game/status";
 import { Button } from "@/components/ui/button";
 import { Dino } from "@/lib/p5/dino-run/dino";
 import { Obstacle } from "@/lib/p5/dino-run/obstacle";
+import GameDetails from "@/components/custom/game/details";
 
 type Props = {};
 
@@ -133,44 +138,63 @@ export default function DinoRunGame({}: Props) {
         <P5Sketch sketch={sketch} refresh={refresh} />
       </div>
       <div className="flex w-[20%]">
-        <GameStatus
-          title="Dino Run"
-          description="Jump over obstacles to earn points"
-          controls={[{ label: "Jump", value: "Space bar" }]}
-          infos={[
+        <GameDetails
+          sections={[
             {
-              label: "Timer",
-              value: timer.text,
+              title: "Controls",
+              icon: Gamepad2Icon,
+              iconProps: { fill: "black", color: "black" },
+              content: {
+                infos: ["Use space bar to jump."],
+                elements: [],
+              },
             },
-          ]}
-          options={[
-            <Button
-              key="restart-button"
-              variant="default"
-              className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
-              onClick={() => {
-                setRefresh((prev) => prev + 1);
+            {
+              title: "Game infos",
+              icon: InfoIcon,
+              iconProps: { fill: "#3A79BA", color: "black" },
+              content: {
+                infos: [`Time: ${timer.text}`],
+                elements: [],
+              },
+            },
+            {
+              title: "Options",
+              icon: SettingsIcon,
+              iconProps: { fill: "#aaaaaa", color: "black" },
+              content: {
+                infos: [],
+                elements: [
+                  <Button
+                    key="restart-button"
+                    variant="default"
+                    className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+                    onClick={() => {
+                      setRefresh((prev) => prev + 1);
 
-                gameOverRef.current = false;
-                setGameOver(false);
-                setTimer({
-                  value: 0,
-                  text: stringifyTime(0),
-                });
-                clearInterval(intervalRef.current!);
-                intervalRef.current = setInterval(() => {
-                  setTimer((prev) => ({
-                    value: prev.value + 1,
-                    text: stringifyTime(prev.value + 1),
-                  }));
-                }, 1000);
-              }}
-            >
-              <p className="text-white font-bold text-md text-center">
-                Restart
-              </p>
-              <RotateCcw color="white" size={32} />
-            </Button>,
+                      gameOverRef.current = false;
+                      setGameOver(false);
+                      setTimer({
+                        value: 0,
+                        text: stringifyTime(0),
+                      });
+                      clearInterval(intervalRef.current!);
+                      intervalRef.current = setInterval(() => {
+                        setTimer((prev) => ({
+                          value: prev.value + 1,
+                          text: stringifyTime(prev.value + 1),
+                        }));
+                      }, 1000);
+                    }}
+                  >
+                    <p className="text-white font-bold text-md text-center">
+                      Restart
+                    </p>
+                    <RotateCcwIcon color="white" size={32} />
+                  </Button>,
+                ],
+              },
+            },
           ]}
         />
       </div>

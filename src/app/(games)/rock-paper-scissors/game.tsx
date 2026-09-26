@@ -1,11 +1,16 @@
 "use client";
 
-import GameStatus from "@/components/custom/game/status";
 import { Button } from "@/components/ui/button";
-import { RotateCcw } from "lucide-react";
+import {
+  Gamepad2Icon,
+  InfoIcon,
+  RotateCcwIcon,
+  SettingsIcon,
+} from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Choice } from "./choice";
 import { Choices } from "./choices";
+import GameDetails from "@/components/custom/game/details";
 
 const MOVES = {
   rock: { win: "scissors", lose: "paper" },
@@ -95,32 +100,51 @@ export default function RockPaperScissorsGame() {
         )}
       </div>
       <div className="flex w-[20%] h-[50%] items-start">
-        <GameStatus
-          title="Rock, Paper, Scissors"
-          description="Good luck :)"
-          controls={[{ label: "Choose symbol", value: "Click on it" }]}
-          infos={[
+        <GameDetails
+          sections={[
             {
-              label: "Winner",
-              value: result ? result : "/",
+              title: "Controls",
+              icon: Gamepad2Icon,
+              iconProps: { fill: "black", color: "black" },
+              content: {
+                infos: ["Click on emoji to pick it."],
+                elements: [],
+              },
             },
-          ]}
-          options={[
-            <Button
-              key="restart-button"
-              variant="default"
-              className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
-              onClick={() => {
-                setPlayerChoice(null);
-                setRandomChoice(null);
-                setResult(null);
-              }}
-            >
-              <p className="text-white font-bold text-md text-center">
-                Restart
-              </p>
-              <RotateCcw color="white" size={32} />
-            </Button>,
+            {
+              title: "Game infos",
+              icon: InfoIcon,
+              iconProps: { fill: "#3A79BA", color: "black" },
+              content: {
+                infos: [`Winner: ${result ? result : "/"}`],
+                elements: [],
+              },
+            },
+            {
+              title: "Options",
+              icon: SettingsIcon,
+              iconProps: { fill: "#aaaaaa", color: "black" },
+              content: {
+                infos: [],
+                elements: [
+                  <Button
+                    key="restart-button"
+                    variant="default"
+                    className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+                    onClick={() => {
+                      setPlayerChoice(null);
+                      setRandomChoice(null);
+                      setResult(null);
+                    }}
+                  >
+                    <p className="text-white font-bold text-md text-center">
+                      Restart
+                    </p>
+                    <RotateCcwIcon color="white" size={32} />
+                  </Button>,
+                ],
+              },
+            },
           ]}
         />
       </div>

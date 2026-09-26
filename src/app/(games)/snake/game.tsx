@@ -1,12 +1,17 @@
 "use client";
 
-import GameStatus from "@/components/custom/game/status";
+import GameDetails from "@/components/custom/game/details";
 import P5Sketch from "@/components/custom/p5-sketch";
 import { Button } from "@/components/ui/button";
 import { Food } from "@/lib/p5/snake/food";
 import { Snake } from "@/lib/p5/snake/snake";
 import { stringifyTime } from "@/lib/utils";
-import { RotateCcw } from "lucide-react";
+import {
+  Gamepad2Icon,
+  InfoIcon,
+  RotateCcwIcon,
+  SettingsIcon,
+} from "lucide-react";
 import p5 from "p5";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -100,6 +105,7 @@ export default function SnakeGame({ enableTime, size }: Props) {
             p.width * 0.5,
             p.height * 0.7,
           );
+          score = 0;
         }
       };
 
@@ -123,39 +129,65 @@ export default function SnakeGame({ enableTime, size }: Props) {
         <P5Sketch sketch={sketch} refresh={refresh} />
       </div>
       <div className="flex w-[20%]">
-        <GameStatus
-          title="Snake"
-          description="Make the snake grow"
-          controls={[{ label: "Move", value: "ZQSD / Arrow keys" }]}
-          infos={[
-            { label: "Game time", value: enableTime ? timer.text : "Disabled" },
-            { label: "Snake length", value: `${sizeRef.current}` },
-            { label: "Eat count", value: `${countRef.current}` },
-            { label: "Score", value: `${scoreRef.current}` },
-          ]}
-          options={[
-            <Button
-              key="restart-button"
-              variant="default"
-              className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
-              onClick={() => {
-                setRefresh((prev) => prev + 1);
-                setGameOver(false);
-                setTimer({ value: 0, text: stringifyTime(0) });
-                clearInterval(intervalRef.current!);
-                intervalRef.current = setInterval(() => {
-                  setTimer((prev) => ({
-                    value: prev.value + 1,
-                    text: stringifyTime(prev.value + 1),
-                  }));
-                }, 1000);
-              }}
-            >
-              <p className="text-white font-bold text-md text-center">
-                Restart
-              </p>
-              <RotateCcw color="white" size={32} />
-            </Button>,
+        <GameDetails
+          sections={[
+            {
+              title: "Controls",
+              icon: Gamepad2Icon,
+              iconProps: { fill: "black", color: "black" },
+              content: {
+                infos: ["Use ZQSD/Arrows to move."],
+                elements: [],
+              },
+            },
+            {
+              title: "Game infos",
+              icon: InfoIcon,
+              iconProps: { fill: "#3A79BA", color: "black" },
+              content: {
+                infos: [
+                  `Snake size: ${sizeRef.current}`,
+                  `Ate ${countRef.current} times`,
+                  `Score: ${scoreRef.current}`,
+                  enableTime ? `Time: ${timer.text}` : "Time disabled",
+                ],
+                elements: [],
+              },
+            },
+            {
+              title: "Options",
+              icon: SettingsIcon,
+              iconProps: { fill: "#aaaaaa", color: "black" },
+              content: {
+                infos: [],
+                elements: [
+                  <Button
+                    key="restart-button"
+                    variant="default"
+                    className="flex w-fit h-fit p-2 bg-blue-400 rounded-md hover:cursor-pointer"
+                    onClick={() => {
+                      scoreRef.current = 0;
+                      countRef.current = 0;
+                      setRefresh((prev) => prev + 1);
+                      setGameOver(false);
+                      setTimer({ value: 0, text: stringifyTime(0) });
+                      clearInterval(intervalRef.current!);
+                      intervalRef.current = setInterval(() => {
+                        setTimer((prev) => ({
+                          value: prev.value + 1,
+                          text: stringifyTime(prev.value + 1),
+                        }));
+                      }, 1000);
+                    }}
+                  >
+                    <p className="text-white font-bold text-md text-center">
+                      Restart
+                    </p>
+                    <RotateCcwIcon color="white" size={32} />
+                  </Button>,
+                ],
+              },
+            },
           ]}
         />
       </div>

@@ -83,7 +83,7 @@ Switches.displayName = "Switches";
 const Inputs = memo(({ _inputs }: { _inputs: Props["inputs"] }) => (
   <div className="w-full flex flex-col items-center gap-4">
     {..._inputs.map(({ label, type, interval, onChange }) => (
-      <div className="min-w-2/3 max-w-4/5 flex flex-row justify-between items-center p-2">
+      <div className="min-w-5/6 flex flex-row justify-between items-center p-2">
         <label className="font-bold text-md">{label}</label>
         <Input
           type={type}
