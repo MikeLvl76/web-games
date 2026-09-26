@@ -30,6 +30,7 @@ export default function Page() {
           }}
           selectors={[
             {
+              label: 'Player 1',
               items: [
                 { value: "red", text: "Red" },
                 { value: "yellow", text: "Yellow" },
@@ -42,6 +43,7 @@ export default function Page() {
               },
             },
             {
+              label: 'Player 2',
               items: [
                 { value: "yellow", text: "Yellow" },
                 { value: "red", text: "Red" },
@@ -56,7 +58,7 @@ export default function Page() {
           ]}
           switches={[
             {
-              label: "Enable time",
+              label: "Time",
               bool: config.enableTime,
               onChange: () =>
                 setConfig((prev) => ({

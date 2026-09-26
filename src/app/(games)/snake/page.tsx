@@ -28,7 +28,7 @@ export default function Page() {
           selectors={[]}
           switches={[
             {
-              label: "Enable time",
+              label: "Time",
               bool: config.enableTime,
               onChange: () =>
                 setConfig((prev) => ({
@@ -39,7 +39,7 @@ export default function Page() {
           ]}
           inputs={[
             {
-              label: "Select size",
+              label: "Size",
               type: "number",
               interval: { min: 3, max: 60, step: 3 },
               onChange: (value: string | number) =>

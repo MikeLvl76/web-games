@@ -10,9 +10,11 @@ import {
 import { memo } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
 
 type Props = {
   selectors: {
+    label: string;
     items: { value: string; text: string }[];
     onValueChange: (value: string) => void;
   }[];
@@ -28,27 +30,30 @@ type Props = {
 
 const Selectors = memo(({ _selectors }: { _selectors: Props["selectors"] }) => {
   return (
-    <div>
-      {..._selectors.map(({ items, onValueChange }, i) => (
-        <Select key={i} onValueChange={onValueChange}>
-          <SelectTrigger
-            value={items[0].value}
-            className="hover:cursor-pointer focus:outline-none bg-white"
-          >
-            <SelectValue placeholder="Select color" />
-          </SelectTrigger>
-          <SelectContent className="bg-white">
-            {items.map(({ value, text }) => (
-              <SelectItem
-                key={value}
-                value={value}
-                className="hover:cursor-pointer hover:bg-slate-300"
-              >
-                {text}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <div className="w-full flex flex-col items-center gap-2">
+      {..._selectors.map(({ label, items, onValueChange }, i) => (
+        <div className="flex flex-col items-center p-2">
+          <label className="font-bold text-md">{label}</label>
+          <Select key={i} onValueChange={onValueChange}>
+            <SelectTrigger
+              value={items[0].value}
+              className="hover:cursor-pointer focus:outline-none focus:border-none bg-none outline-none border-none"
+            >
+              <SelectValue placeholder="Select color" />
+            </SelectTrigger>
+            <SelectContent className="bg-white/30 outline-none border-none">
+              {items.map(({ value, text }) => (
+                <SelectItem
+                  key={value}
+                  value={value}
+                  className="bg-slate-100 hover:cursor-pointer hover:bg-slate-300"
+                >
+                  {text}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       ))}
     </div>
   );
@@ -56,15 +61,15 @@ const Selectors = memo(({ _selectors }: { _selectors: Props["selectors"] }) => {
 Selectors.displayName = "Selectors";
 
 const Switches = memo(({ _switches }: { _switches: Props["switches"] }) => (
-  <div>
+  <div className="w-full flex flex-col items-center gap-4">
     {..._switches.map(({ label, bool, onChange }) => (
-      <div>
-        <label className="font-bold text-xl">{label}</label>
+      <div className="w-4/5 flex flex-row justify-between items-center p-2">
+        <label className="font-bold text-md">{label}</label>
         <Input
           type="checkbox"
           checked={bool}
           onChange={onChange}
-          className="w-6 h-6"
+          className="w-4 h-4 hover:cursor-pointer"
         />
       </div>
     ))}
@@ -73,10 +78,10 @@ const Switches = memo(({ _switches }: { _switches: Props["switches"] }) => (
 Switches.displayName = "Switches";
 
 const Inputs = memo(({ _inputs }: { _inputs: Props["inputs"] }) => (
-  <div>
+  <div className="w-full flex flex-col items-center gap-4">
     {..._inputs.map(({ label, type, interval, onChange }) => (
-      <div>
-        <label className="font-bold text-xl">{label}</label>
+      <div className="min-w-2/3 max-w-4/5 flex flex-row justify-between items-center p-2">
+        <label className="font-bold text-md">{label}</label>
         <Input
           type={type}
           min={interval?.min}
@@ -90,7 +95,7 @@ const Inputs = memo(({ _inputs }: { _inputs: Props["inputs"] }) => (
               onChange(Number(value));
             }
           }}
-          className="w-16 h-6"
+          className="w-20 h-8 text-slate-800 outline-none focus:outline-none "
         />
       </div>
     ))}
@@ -104,20 +109,21 @@ export default function GameMenu({
   onStart,
 }: Props) {
   return (
-    <div>
-      <div>
-        <h1>Game menu</h1>
-        <h3>Customize game with settings</h3>
+    <div className="w-[30vw] sm:w-[40vw] md:w-[50vw] h-[70vh] flex flex-col gap-4 p-4 bg-slate-200 shadow-2xl/50 rounded-md">
+      <div className="w-full flex flex-col items-start p-4">
+        <h1 className="text-2xl font-bold text-slate-800">Game menu</h1>
+        <h3 className="text-sm text-slate-700">Customize game with settings</h3>
+        <Separator className="w-full bg-slate-400 mt-2" />
       </div>
-      <div>
-        <Selectors _selectors={selectors} />
-        <Switches _switches={switches} />
-        <Inputs _inputs={inputs} />
+      <div className="grid grid-cols-3 w-full">
+        {selectors.length > 0 && <Selectors _selectors={selectors} />}
+        {switches.length > 0 && <Switches _switches={switches} />}
+        {inputs.length > 0 && <Inputs _inputs={inputs} />}
       </div>
-      <div className="flex justify-center items-end w-full h-[20%]">
+      <div className="flex justify-end items-end w-full h-full">
         <Button
           variant="secondary"
-          className="w-fit h-fit p-2 rounded-md hover:cursor-pointer bg-blue-400 text-white text-2xl self-end"
+          className="w-fit h-fit p-2 rounded-md hover:cursor-pointer bg-blue-600 text-slate-100 text-lg self-end"
           onClick={onStart}
         >
           Start game

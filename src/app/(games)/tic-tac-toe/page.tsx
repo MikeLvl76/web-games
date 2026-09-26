@@ -28,6 +28,7 @@ export default function Page() {
           }}
           selectors={[
             {
+              label: 'Player 1',
               items: [
                 { value: "x", text: "X" },
                 { value: "o", text: "O" },
@@ -40,6 +41,7 @@ export default function Page() {
               },
             },
             {
+              label: 'Player 2',
               items: [
                 { value: "o", text: "O" },
                 { value: "x", text: "X" },

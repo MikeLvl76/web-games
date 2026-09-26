@@ -32,7 +32,7 @@ export default function Page() {
           selectors={[]}
           switches={[
             {
-              label: "Enable countdown",
+              label: "Countdown",
               bool: config.enableCountdown,
               onChange: () =>
                 setConfig((prev) => ({
@@ -41,7 +41,7 @@ export default function Page() {
                 })),
             },
             {
-              label: "Enable path",
+              label: "Path",
               bool: config.enablePath,
               onChange: () =>
                 setConfig((prev) => ({
@@ -50,7 +50,7 @@ export default function Page() {
                 })),
             },
             {
-              label: "Enable reset",
+              label: "Reset",
               bool: config.enableReset,
               onChange: () =>
                 setConfig((prev) => ({
@@ -61,7 +61,7 @@ export default function Page() {
           ]}
           inputs={[
             {
-              label: "Select size",
+              label: "Size",
               type: "number",
               interval: { min: 30, max: 50, step: 1 },
               onChange: (value: string | number) =>

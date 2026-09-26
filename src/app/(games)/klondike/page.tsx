@@ -26,7 +26,7 @@ export default function Page() {
           selectors={[]}
           switches={[
             {
-              label: "Enable time",
+              label: "Time",
               bool: config.enableTime,
               onChange: () =>
                 setConfig((prev) => ({

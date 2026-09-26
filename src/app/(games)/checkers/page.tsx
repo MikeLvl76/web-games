@@ -32,6 +32,7 @@ export default function Page() {
           }}
           selectors={[
             {
+              label: 'Player 1',
               items: [
                 { value: "black", text: "Black" },
                 { value: "white", text: "White" },
@@ -44,6 +45,7 @@ export default function Page() {
               },
             },
             {
+              label: 'Player 2',
               items: [
                 { value: "white", text: "White" },
                 { value: "black", text: "Black" },
@@ -58,7 +60,7 @@ export default function Page() {
           ]}
           switches={[
             {
-              label: "Enable time",
+              label: "Time",
               bool: config.enableTime,
               onChange: () =>
                 setConfig((prev) => ({
@@ -67,7 +69,7 @@ export default function Page() {
                 })),
             },
             {
-              label: "Allow multiple jumps",
+              label: "Multiple jumps",
               bool: config.allowMultJumps,
               onChange: () =>
                 setConfig((prev) => ({

@@ -50,7 +50,7 @@ export default function Page() {
           selectors={[]}
           switches={[
             {
-              label: "Enable countdown",
+              label: "Countdown",
               bool: config.enableCountdown,
               onChange: () =>
                 setConfig((prev) => ({
@@ -61,7 +61,7 @@ export default function Page() {
           ]}
           inputs={[
             {
-              label: "Select word length",
+              label: "Word length",
               type: "number",
               interval: { min: 3, max: 18, step: 1 },
               onChange: (value: string | number) =>
@@ -71,7 +71,7 @@ export default function Page() {
                 })),
             },
             {
-              label: "Select list size",
+              label: "List size",
               type: "number",
               interval: { min: 5, max: 25, step: 1 },
               onChange: (value: string | number) =>
