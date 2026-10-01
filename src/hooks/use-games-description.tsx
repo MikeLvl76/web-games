@@ -93,6 +93,14 @@ const DESCRIPTIONS: GameDescription[] = [
     filepath: getFilepath("dino-run"),
     id: "dino-run-game",
   },
+  {
+    name: "Tower Defense",
+    url: "tower-defense",
+    type: "solo",
+    estimatedPlaytime: "medium",
+    filepath: getFilepath("tower-defense"),
+    id: "tower-defense-game",
+  },
   /* 
     * non-implemented games
     {
